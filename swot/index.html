@@ -7,7 +7,6 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-/* Reutilizando exatamente o CSS do seu Canvas para manter consistência */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
@@ -17,26 +16,24 @@
   --paper:    #F6F4EF;
   --white:    #FFFFFF;
   --line:     #DDD9D0;
-
-  --verde:    #0B6E4F; --verde-l:  #E6F4EF;
-  --coral:    #C0410D; --coral-l:  #FBF0EB;
-  --ambar:    #9A5000; --ambar-l:  #FDF3E6;
-  --roxo:     #5B21A8; --roxo-l:   #F0EBF9;
-  --azul:     #1340A0; --azul-l:   #EBF0FB;
-
+  --verde:    #0B6E4F; --verde-l: #E6F4EF;
+  --coral:    #C0410D; --coral-l: #FBF0EB;
+  --ambar:    #9A5000; --ambar-l: #FDF3E6;
+  --roxo:     #5B21A8; --roxo-l:  #F0EBF9;
   --r: 6px;
   --shadow: 0 1px 3px rgba(0,0,0,.08), 0 4px 12px rgba(0,0,0,.05);
 }
 
 body { font-family: 'DM Sans', sans-serif; background: var(--paper); color: var(--ink); min-height: 100vh; }
 
+/* HEADER - IDÊNTICO AO CANVAS */
 .page-header { background: var(--ink); padding: 20px 24px 0; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 12px rgba(0,0,0,.25); }
 .header-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
-.header-brand h1 { font-family: 'DM Serif Display', serif; font-size: 1.35rem; color: var(--white); }
+.header-brand h1 { font-family: 'DM Serif Display', serif; font-size: 1.35rem; color: var(--white); line-height: 1.15; }
 .header-brand span { font-size: .72rem; color: #7B98B2; text-transform: uppercase; display: block; margin-top: 1px; }
 
 .header-actions { display: flex; gap: 8px; align-items: center; }
-.btn { font-size: .78rem; font-weight: 600; padding: 7px 14px; border-radius: var(--r); cursor: pointer; border: none; display: flex; align-items: center; gap: 5px; transition: all .15s; }
+.btn { font-size: .78rem; font-weight: 600; padding: 7px 14px; border-radius: var(--r); cursor: pointer; border: none; display: flex; align-items: center; gap: 5px; transition: all .15s; white-space: nowrap; }
 .btn-ghost { background: rgba(255,255,255,.08); color: #C8D8E4; border: 1px solid rgba(255,255,255,.12); }
 .btn-accent { background: #2A5BDB; color: #fff; }
 .btn-print { background: var(--verde); color: #fff; }
@@ -46,42 +43,46 @@ body { font-family: 'DM Sans', sans-serif; background: var(--paper); color: var(
 .meta-label { font-size: .65rem; font-weight: 600; color: #5B7B94; text-transform: uppercase; display: block; margin-bottom: 4px; }
 .meta-field input { width: 100%; background: transparent; border: none; font-size: .82rem; color: #E0EAF2; outline: none; }
 
+/* GRID SWOT */
 main { padding: 20px; max-width: 1200px; margin: 0 auto; }
-
 .swot-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; min-height: 500px; }
 
 .bloco { background: var(--white); border: 1.5px solid var(--line); border-radius: 8px; display: flex; flex-direction: column; overflow: hidden; box-shadow: var(--shadow); position: relative; }
 .bloco::after { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: var(--bloco-cor); }
 .bloco-head { padding: 10px 16px; background: var(--bloco-bg); border-bottom: 1.5px solid var(--line); }
-.bloco-titulo { font-size: .9rem; font-weight: 700; color: var(--ink); }
+.bloco-titulo { font-size: .85rem; font-weight: 700; color: var(--ink); }
 .bloco-q { font-size: .7rem; color: var(--ink3); font-style: italic; margin-top: 2px; }
 .bloco-body { flex: 1; padding: 12px 16px; display: flex; flex-direction: column; }
 
-/* Mesmos estilos de itens do Canvas */
-.item { display: flex; align-items: flex-start; gap: 6px; padding: 4px 0; }
-.item-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--bloco-cor); margin-top: 8px; }
+.item { display: flex; align-items: flex-start; gap: 6px; padding: 3px 0; }
+.item-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--bloco-cor); margin-top: 8px; opacity: .7; }
 .item-input { flex: 1; border: none; background: transparent; font-family: inherit; font-size: .85rem; outline: none; resize: none; overflow: hidden; }
 .item-del { background: none; border: none; color: var(--line); cursor: pointer; display: none; }
 .item:hover .item-del { display: block; }
-
 .add-btn { font-size: .7rem; color: var(--ink3); background: none; border: 1px dashed var(--line); border-radius: 4px; padding: 4px 8px; cursor: pointer; margin-top: 8px; width: fit-content; }
 
-/* Cores SWOT baseadas no seu estilo */
 .b-forcas   { --bloco-cor: var(--verde); --bloco-bg: var(--verde-l); }
 .b-fraquezas { --bloco-cor: var(--coral); --bloco-bg: var(--coral-l); }
 .b-oportunidades { --bloco-cor: var(--ambar); --bloco-bg: var(--ambar-l); }
 .b-ameacas   { --bloco-cor: var(--roxo);  --bloco-bg: var(--roxo-l);  }
 
-.ref-section { margin-top: 20px; background: var(--white); border: 1.5px solid var(--line); border-radius: 8px; overflow: hidden; }
-.ref-toggle { padding: 12px 18px; cursor: pointer; background: var(--ink); color: var(--white); display: flex; justify-content: space-between; font-size: .82rem; }
-.ref-body { display: none; padding: 16px; }
-.ref-body.open { display: block; }
-.ref-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; }
+/* ═══════════════════════════════════════
+   PRINT - O SEGREDO DO "LINDO"
+═══════════════════════════════════════ */
+@media print {
+  * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+  body { background: white; }
+  .page-header { position: static; box-shadow: none; padding-bottom: 12px; }
+  .header-actions { display: none !important; }
+  main { padding: 8px; }
+  .bloco { box-shadow: none; page-break-inside: avoid; }
+  .item-del, .add-btn, .ref-section { display: none !important; }
+  .swot-grid { display: grid !important; grid-template-columns: 1fr 1fr !important; gap: 10px !important; }
+  @page { size: A4 landscape; margin: 10mm; }
+}
 
 .toast { position: fixed; bottom: 24px; right: 24px; background: var(--ink); color: #fff; padding: 12px 18px; border-radius: 6px; opacity: 0; transition: .3s; pointer-events: none; }
 .toast.show { opacity: 1; }
-
-@media (max-width: 768px) { .swot-grid { grid-template-columns: 1fr; } .header-meta { flex-wrap: wrap; } }
 </style>
 </head>
 <body>
@@ -96,7 +97,7 @@ main { padding: 20px; max-width: 1200px; margin: 0 auto; }
       <a href="../index.html" class="btn btn-ghost">← Menu</a>
       <button class="btn btn-ghost" onclick="limpar()">✕ Limpar</button>
       <button class="btn btn-accent" onclick="salvar()">↓ Salvar</button>
-      <button class="btn btn-print" onclick="window.print()">⎙ PDF</button>
+      <button class="btn btn-print" onclick="window.print()">⎙ Imprimir / PDF</button>
     </div>
   </div>
   <div class="header-meta">
@@ -109,29 +110,20 @@ main { padding: 20px; max-width: 1200px; margin: 0 auto; }
 <main>
   <div class="swot-grid">
     <div class="bloco b-forcas">
-      <div class="bloco-head"><div class="bloco-titulo">Forças (Strengths)</div><div class="bloco-q">Interno: O que fazemos bem?</div></div>
+      <div class="bloco-head"><div class="bloco-titulo">Forças (Strengths)</div><div class="bloco-q">O que fazemos bem?</div></div>
       <div class="bloco-body" id="b-forcas"></div>
     </div>
     <div class="bloco b-fraquezas">
-      <div class="bloco-head"><div class="bloco-titulo">Fraquezas (Weaknesses)</div><div class="bloco-q">Interno: Onde falhamos?</div></div>
+      <div class="bloco-head"><div class="bloco-titulo">Fraquezas (Weaknesses)</div><div class="bloco-q">Onde podemos melhorar?</div></div>
       <div class="bloco-body" id="b-fraquezas"></div>
     </div>
     <div class="bloco b-oportunidades">
-      <div class="bloco-head"><div class="bloco-titulo">Oportunidades (Opportunities)</div><div class="bloco-q">Externo: O que podemos aproveitar?</div></div>
+      <div class="bloco-head"><div class="bloco-titulo">Oportunidades (Opportunities)</div><div class="bloco-q">O que podemos aproveitar?</div></div>
       <div class="bloco-body" id="b-oportunidades"></div>
     </div>
     <div class="bloco b-ameacas">
-      <div class="bloco-head"><div class="bloco-titulo">Ameaças (Threats)</div><div class="bloco-q">Externo: O que nos coloca em risco?</div></div>
+      <div class="bloco-head"><div class="bloco-titulo">Ameaças (Threats)</div><div class="bloco-q">O que nos coloca em risco?</div></div>
       <div class="bloco-body" id="b-ameacas"></div>
-    </div>
-  </div>
-
-  <div class="ref-section">
-    <div class="ref-toggle" onclick="this.nextElementSibling.classList.toggle('open')">
-      <span>📋 Guia de Apoio</span><span>▼</span>
-    </div>
-    <div class="ref-body">
-      <div class="ref-grid" id="guia-content"></div>
     </div>
   </div>
 </main>
@@ -140,10 +132,10 @@ main { padding: 20px; max-width: 1200px; margin: 0 auto; }
 
 <script>
 const BLOCOS_CONFIG = [
-  { id: 'b-forcas', titulo: 'Forças', cor: 'var(--verde)', bg: 'var(--verde-l)', p: 'Ex: Equipe técnica dedicada', d: 'Fatores internos positivos sob seu controle.' },
-  { id: 'b-fraquezas', titulo: 'Fraquezas', cor: 'var(--coral)', bg: 'var(--coral-l)', p: 'Ex: Pouca verba de marketing', d: 'Fatores internos que prejudicam a performance.' },
-  { id: 'b-oportunidades', titulo: 'Oportunidades', cor: 'var(--ambar)', bg: 'var(--ambar-l)', p: 'Ex: Novo edital de fomento', d: 'Fatores externos que podem ser explorados.' },
-  { id: 'b-ameacas', titulo: 'Ameaças', cor: 'var(--roxo)', bg: 'var(--roxo-l)', p: 'Ex: Entrada de novo concorrente', d: 'Fatores externos que podem causar problemas.' }
+  { id: 'b-forcas', p: 'Ex: Equipe técnica dedicada' },
+  { id: 'b-fraquezas', p: 'Ex: Orçamento limitado' },
+  { id: 'b-oportunidades', p: 'Ex: Crescimento do mercado' },
+  { id: 'b-ameacas', p: 'Ex: Novos concorrentes' }
 ];
 
 function criarItem(blocoId, valor = '') {
@@ -159,19 +151,15 @@ function criarItem(blocoId, valor = '') {
 function inicializar() {
   BLOCOS_CONFIG.forEach(cfg => {
     const box = document.getElementById(cfg.id);
-    for(let i=0; i<3; i++) box.appendChild(criarItem(cfg.id));
+    for(let i=0; i<4; i++) box.appendChild(criarItem(cfg.id));
     const btn = document.createElement('button');
     btn.className = 'add-btn'; btn.innerText = '+ item';
-    btn.onclick = () => box.insertBefore(criarItem(cfg.id), btn);
+    btn.onclick = () => {
+      const novo = criarItem(cfg.id);
+      box.insertBefore(novo, btn);
+      novo.querySelector('textarea').focus();
+    };
     box.appendChild(btn);
-  });
-  
-  const guia = document.getElementById('guia-content');
-  BLOCOS_CONFIG.forEach(cfg => {
-    guia.innerHTML += `<div style="border-left:3px solid ${cfg.cor}; padding:10px; background:${cfg.bg}; border-radius:0 6px 6px 0">
-      <div style="font-weight:700; font-size:.8rem; color:${cfg.cor}">${cfg.titulo}</div>
-      <p style="font-size:.75rem">${cfg.d}</p>
-    </div>`;
   });
 }
 
@@ -183,16 +171,14 @@ function salvar() {
   const blob = new Blob([JSON.stringify(data, null, 2)], {type:'application/json'});
   const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
   a.download = `swot_${data.empresa || 'projeto'}.json`; a.click();
-  toast('Salvo com sucesso!');
+  toast('Salvo localmente!');
 }
 
 function limpar() { if(confirm('Limpar tudo?')) location.reload(); }
-
 function toast(msg) {
   const t = document.getElementById('toast'); t.innerText = msg; t.classList.add('show');
   setTimeout(() => t.classList.remove('show'), 3000);
 }
-
 document.getElementById('f-data').value = new Date().toLocaleDateString();
 inicializar();
 </script>
