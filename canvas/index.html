@@ -1,0 +1,858 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Business Model Canvas — P.I.</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --ink:      #0F1923;
+  --ink2:     #3D4F5C;
+  --ink3:     #8A9BAA;
+  --paper:    #F6F4EF;
+  --white:    #FFFFFF;
+  --line:     #DDD9D0;
+
+  --verde:    #0B6E4F;
+  --verde-l:  #E6F4EF;
+  --coral:    #C0410D;
+  --coral-l:  #FBF0EB;
+  --ambar:    #9A5000;
+  --ambar-l:  #FDF3E6;
+  --roxo:     #5B21A8;
+  --roxo-l:   #F0EBF9;
+  --azul:     #1340A0;
+  --azul-l:   #EBF0FB;
+  --teal:     #0A6960;
+  --teal-l:   #E6F3F2;
+  --grafite:  #2C3740;
+  --grafite-l:#EEF0F1;
+
+  --r: 6px;
+  --shadow: 0 1px 3px rgba(0,0,0,.08), 0 4px 12px rgba(0,0,0,.05);
+}
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--paper);
+  color: var(--ink);
+  min-height: 100vh;
+}
+
+/* ═══════════════════════════════════════
+   HEADER
+═══════════════════════════════════════ */
+.page-header {
+  background: var(--ink);
+  padding: 20px 24px 0;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 2px 12px rgba(0,0,0,.25);
+}
+.header-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.header-brand h1 {
+  font-family: 'DM Serif Display', serif;
+  font-size: 1.35rem;
+  color: var(--white);
+  letter-spacing: -.01em;
+  line-height: 1.15;
+}
+.header-brand span {
+  font-size: .72rem;
+  color: #7B98B2;
+  font-weight: 400;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  display: block;
+  margin-top: 1px;
+}
+.header-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.btn {
+  font-family: 'DM Sans', sans-serif;
+  font-size: .78rem;
+  font-weight: 600;
+  padding: 7px 14px;
+  border-radius: var(--r);
+  cursor: pointer;
+  border: none;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  transition: all .15s;
+  white-space: nowrap;
+}
+.btn-ghost {
+  background: rgba(255,255,255,.08);
+  color: #C8D8E4;
+  border: 1px solid rgba(255,255,255,.12);
+}
+.btn-ghost:hover { background: rgba(255,255,255,.14); color: #fff; }
+.btn-accent {
+  background: #2A5BDB;
+  color: #fff;
+}
+.btn-accent:hover { background: #2251C9; }
+.btn-print {
+  background: var(--verde);
+  color: #fff;
+}
+.btn-print:hover { background: #085A40; }
+
+/* meta fields */
+.header-meta {
+  display: flex;
+  gap: 0;
+  margin-top: 14px;
+  border-top: 1px solid rgba(255,255,255,.08);
+}
+.meta-field {
+  flex: 1;
+  padding: 10px 14px;
+  border-right: 1px solid rgba(255,255,255,.08);
+  min-width: 0;
+}
+.meta-field:last-child { border-right: none; }
+.meta-label {
+  font-size: .65rem;
+  font-weight: 600;
+  color: #5B7B94;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  display: block;
+  margin-bottom: 4px;
+}
+.meta-field input {
+  width: 100%;
+  background: transparent;
+  border: none;
+  font-family: 'DM Sans', sans-serif;
+  font-size: .82rem;
+  color: #E0EAF2;
+  outline: none;
+  padding: 0;
+}
+.meta-field input::placeholder { color: #3D5468; }
+
+/* ═══════════════════════════════════════
+   MAIN
+═══════════════════════════════════════ */
+main {
+  padding: 20px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+/* ═══════════════════════════════════════
+   CANVAS GRID (desktop)
+═══════════════════════════════════════ */
+.canvas-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1.6fr 1fr 1fr;
+  grid-template-rows: 1fr 1fr auto;
+  gap: 10px;
+  min-height: 560px;
+}
+
+.b-parcerias      { grid-column:1; grid-row:1/3; }
+.b-atividades     { grid-column:2; grid-row:1;   }
+.b-recursos       { grid-column:2; grid-row:2;   }
+.b-proposta       { grid-column:3; grid-row:1/3; }
+.b-relacionamento { grid-column:4; grid-row:1;   }
+.b-canais         { grid-column:4; grid-row:2;   }
+.b-clientes       { grid-column:5; grid-row:1/3; }
+.b-custos         { grid-column:1/4; grid-row:3; }
+.b-receitas       { grid-column:4/6; grid-row:3; }
+
+/* ═══════════════════════════════════════
+   BLOCO
+═══════════════════════════════════════ */
+.bloco {
+  background: var(--white);
+  border: 1.5px solid var(--line);
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: var(--shadow);
+  transition: box-shadow .2s;
+  position: relative;
+}
+.bloco:focus-within {
+  box-shadow: 0 0 0 2.5px var(--bloco-cor), 0 4px 16px rgba(0,0,0,.1);
+  border-color: var(--bloco-cor);
+}
+
+/* acento lateral */
+.bloco::after {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 4px;
+  background: var(--bloco-cor);
+  border-radius: 8px 0 0 8px;
+}
+
+.bloco-head {
+  padding: 10px 12px 8px 16px;
+  background: var(--bloco-bg);
+  border-bottom: 1.5px solid var(--line);
+  flex-shrink: 0;
+}
+.bloco-num {
+  font-family: 'DM Mono', monospace;
+  font-size: .6rem;
+  font-weight: 500;
+  color: var(--bloco-cor);
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  display: block;
+  margin-bottom: 2px;
+  opacity: .85;
+}
+.bloco-titulo {
+  font-size: .82rem;
+  font-weight: 700;
+  color: var(--ink);
+  line-height: 1.2;
+}
+.bloco-q {
+  font-size: .68rem;
+  color: var(--ink3);
+  margin-top: 3px;
+  line-height: 1.35;
+  font-style: italic;
+}
+
+.bloco-body {
+  flex: 1;
+  padding: 10px 12px 8px 16px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+/* ── ITENS ── */
+.item {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  padding: 3px 0;
+  border-bottom: 1px solid transparent;
+  transition: border-color .15s;
+}
+.item:focus-within {
+  border-bottom-color: var(--bloco-cor);
+}
+.item-dot {
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  background: var(--bloco-cor);
+  flex-shrink: 0;
+  margin-top: 8px;
+  opacity: .7;
+}
+.item-input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  font-family: 'DM Sans', sans-serif;
+  font-size: .8rem;
+  color: var(--ink);
+  padding: 4px 0;
+  outline: none;
+  min-width: 0;
+  line-height: 1.4;
+  resize: none;
+  overflow: hidden;
+  min-height: 26px;
+}
+.item-input::placeholder { color: var(--line); font-size: .73rem; }
+.item-del {
+  background: none;
+  border: none;
+  color: var(--line);
+  cursor: pointer;
+  font-size: .9rem;
+  padding: 0 2px;
+  flex-shrink: 0;
+  line-height: 1;
+  margin-top: 3px;
+  transition: color .15s;
+  display: none;
+}
+.item:hover .item-del,
+.item:focus-within .item-del { display: block; }
+.item-del:hover { color: #E53E3E; }
+
+.add-btn {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: .7rem;
+  color: var(--ink3);
+  background: none;
+  border: 1px dashed var(--line);
+  border-radius: 4px;
+  padding: 4px 8px;
+  cursor: pointer;
+  margin-top: 6px;
+  width: fit-content;
+  transition: all .15s;
+}
+.add-btn:hover { border-color: var(--bloco-cor); color: var(--bloco-cor); }
+
+/* horizontal (custos e receitas) */
+.b-custos .bloco-body,
+.b-receitas .bloco-body {
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-content: flex-start;
+  gap: 0 20px;
+}
+.b-custos .item,
+.b-receitas .item {
+  min-width: min(200px, 100%);
+  flex: 1;
+}
+
+/* ── CORES POR BLOCO ── */
+.b-parcerias      { --bloco-cor: var(--roxo);    --bloco-bg: var(--roxo-l);   }
+.b-atividades     { --bloco-cor: var(--azul);    --bloco-bg: var(--azul-l);   }
+.b-recursos       { --bloco-cor: var(--azul);    --bloco-bg: var(--azul-l);   }
+.b-proposta       { --bloco-cor: var(--verde);   --bloco-bg: var(--verde-l);  }
+.b-relacionamento { --bloco-cor: var(--coral);   --bloco-bg: var(--coral-l);  }
+.b-canais         { --bloco-cor: var(--coral);   --bloco-bg: var(--coral-l);  }
+.b-clientes       { --bloco-cor: var(--ambar);   --bloco-bg: var(--ambar-l);  }
+.b-custos         { --bloco-cor: var(--grafite); --bloco-bg: var(--grafite-l);}
+.b-receitas       { --bloco-cor: var(--teal);    --bloco-bg: var(--teal-l);   }
+
+/* ═══════════════════════════════════════
+   REFERÊNCIA (acordeão)
+═══════════════════════════════════════ */
+.ref-section {
+  margin-top: 16px;
+  background: var(--white);
+  border: 1.5px solid var(--line);
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: var(--shadow);
+}
+.ref-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 18px;
+  cursor: pointer;
+  user-select: none;
+  background: var(--ink);
+  color: var(--white);
+  font-size: .82rem;
+  font-weight: 600;
+}
+.ref-toggle .arrow {
+  font-size: .7rem;
+  transition: transform .2s;
+}
+.ref-toggle.open .arrow { transform: rotate(180deg); }
+.ref-body {
+  display: none;
+  padding: 0 18px 16px;
+}
+.ref-body.open { display: block; }
+.ref-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 12px;
+  margin-top: 14px;
+}
+.ref-card {
+  border-left: 3px solid var(--bloco-cor);
+  padding: 10px 12px;
+  background: var(--bloco-bg);
+  border-radius: 0 6px 6px 0;
+}
+.ref-card-titulo {
+  font-size: .78rem;
+  font-weight: 700;
+  color: var(--bloco-cor);
+  margin-bottom: 4px;
+}
+.ref-card p {
+  font-size: .72rem;
+  color: var(--ink2);
+  line-height: 1.45;
+  margin-bottom: 4px;
+}
+.ref-card .ex {
+  font-size: .7rem;
+  color: var(--ink3);
+  font-style: italic;
+  border-top: 1px solid var(--line);
+  padding-top: 4px;
+  margin-top: 4px;
+}
+
+/* ═══════════════════════════════════════
+   TOAST
+═══════════════════════════════════════ */
+.toast {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  background: var(--ink);
+  color: var(--white);
+  padding: 12px 18px;
+  border-radius: var(--r);
+  font-size: .82rem;
+  font-weight: 500;
+  box-shadow: 0 4px 20px rgba(0,0,0,.25);
+  transform: translateY(80px);
+  opacity: 0;
+  transition: all .3s cubic-bezier(.34,1.56,.64,1);
+  z-index: 999;
+  pointer-events: none;
+  max-width: 280px;
+}
+.toast.show {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+/* ═══════════════════════════════════════
+   MOBILE
+═══════════════════════════════════════ */
+@media (max-width: 768px) {
+  main { padding: 12px; }
+  .canvas-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .b-custos .bloco-body,
+  .b-receitas .bloco-body {
+    flex-direction: column;
+  }
+  .header-meta {
+    flex-wrap: wrap;
+  }
+  .meta-field {
+    min-width: 140px;
+  }
+}
+
+/* ═══════════════════════════════════════
+   PRINT
+═══════════════════════════════════════ */
+@media print {
+  * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+  body { background: white; }
+  .page-header {
+    position: static;
+    box-shadow: none;
+    padding-bottom: 12px;
+  }
+  .header-actions { display: none !important; }
+  main { padding: 8px; }
+  .bloco { box-shadow: none; page-break-inside: avoid; }
+  .item-del { display: none !important; }
+  .add-btn  { display: none !important; }
+  .ref-section { display: none !important; }
+  .toast { display: none !important; }
+  .canvas-grid {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr 1.6fr 1fr 1fr !important;
+    min-height: 500px;
+  }
+  .b-parcerias      { grid-column:1 !important; grid-row:1/3 !important; }
+  .b-atividades     { grid-column:2 !important; grid-row:1   !important; }
+  .b-recursos       { grid-column:2 !important; grid-row:2   !important; }
+  .b-proposta       { grid-column:3 !important; grid-row:1/3 !important; }
+  .b-relacionamento { grid-column:4 !important; grid-row:1   !important; }
+  .b-canais         { grid-column:4 !important; grid-row:2   !important; }
+  .b-clientes       { grid-column:5 !important; grid-row:1/3 !important; }
+  .b-custos         { grid-column:1/4 !important; grid-row:3 !important; }
+  .b-receitas       { grid-column:4/6 !important; grid-row:3 !important; }
+  @page { size: A3 landscape; margin: 10mm; }
+}
+</style>
+</head>
+<body>
+
+<!-- ════════ HEADER ════════ -->
+<header class="page-header">
+  <div class="header-top">
+    <div class="header-brand">
+      <h1>Business Model Canvas</h1>
+      <span>Fundamentos da Administração e Empreendedorismo · P.I.</span>
+    </div>
+    <div class="header-actions">
+      <button class="btn btn-ghost" onclick="limpar()">✕ Limpar</button>
+      <button class="btn btn-ghost" onclick="carregar()">↑ Carregar</button>
+      <button class="btn btn-accent" onclick="salvar()">↓ Salvar</button>
+      <button class="btn btn-print" onclick="window.print()">⎙ Imprimir / PDF</button>
+    </div>
+  </div>
+  <div class="header-meta">
+    <div class="meta-field">
+      <span class="meta-label">Empresa</span>
+      <input id="f-empresa" type="text" placeholder="Nome da empresa do P.I.">
+    </div>
+    <div class="meta-field">
+      <span class="meta-label">Equipe</span>
+      <input id="f-equipe" type="text" placeholder="Integrantes">
+    </div>
+    <div class="meta-field">
+      <span class="meta-label">Turma</span>
+      <input id="f-turma" type="text" placeholder="Ex: DS - 3º Módulo">
+    </div>
+    <div class="meta-field">
+      <span class="meta-label">Data</span>
+      <input id="f-data" type="text" placeholder="___/___/______">
+    </div>
+  </div>
+</header>
+
+<!-- ════════ CANVAS ════════ -->
+<main>
+<div class="canvas-grid">
+
+  <div class="bloco b-parcerias">
+    <div class="bloco-head">
+      <span class="bloco-num">Bloco 8</span>
+      <div class="bloco-titulo">Parcerias-chave</div>
+      <div class="bloco-q">Quem pode ajudar a crescer? O que terceirizamos?</div>
+    </div>
+    <div class="bloco-body" id="b-parcerias"></div>
+  </div>
+
+  <div class="bloco b-atividades">
+    <div class="bloco-head">
+      <span class="bloco-num">Bloco 7</span>
+      <div class="bloco-titulo">Atividades-chave</div>
+      <div class="bloco-q">O que precisamos fazer bem todo dia?</div>
+    </div>
+    <div class="bloco-body" id="b-atividades"></div>
+  </div>
+
+  <div class="bloco b-proposta">
+    <div class="bloco-head">
+      <span class="bloco-num">Bloco 1 · o coração do canvas</span>
+      <div class="bloco-titulo">Proposta de Valor</div>
+      <div class="bloco-q">Para quem? · Que problema resolve? · Por que vocês e não a concorrência?</div>
+    </div>
+    <div class="bloco-body" id="b-proposta"></div>
+  </div>
+
+  <div class="bloco b-relacionamento">
+    <div class="bloco-head">
+      <span class="bloco-num">Bloco 4</span>
+      <div class="bloco-titulo">Relacionamento</div>
+      <div class="bloco-q">Como conquista e retém clientes?</div>
+    </div>
+    <div class="bloco-body" id="b-relacionamento"></div>
+  </div>
+
+  <div class="bloco b-clientes">
+    <div class="bloco-head">
+      <span class="bloco-num">Bloco 2</span>
+      <div class="bloco-titulo">Segmentos de Clientes</div>
+      <div class="bloco-q">Quem são? Qual o perfil específico?</div>
+    </div>
+    <div class="bloco-body" id="b-clientes"></div>
+  </div>
+
+  <div class="bloco b-recursos">
+    <div class="bloco-head">
+      <span class="bloco-num">Bloco 6</span>
+      <div class="bloco-titulo">Recursos-chave</div>
+      <div class="bloco-q">O que é indispensável para entregar valor?</div>
+    </div>
+    <div class="bloco-body" id="b-recursos"></div>
+  </div>
+
+  <div class="bloco b-canais">
+    <div class="bloco-head">
+      <span class="bloco-num">Bloco 5</span>
+      <div class="bloco-titulo">Canais</div>
+      <div class="bloco-q">Como o cliente descobre e compra?</div>
+    </div>
+    <div class="bloco-body" id="b-canais"></div>
+  </div>
+
+  <div class="bloco b-custos">
+    <div class="bloco-head">
+      <span class="bloco-num">Bloco 9</span>
+      <div class="bloco-titulo">Estrutura de Custos</div>
+      <div class="bloco-q">Quais são os maiores custos? O que é fixo e o que é variável?</div>
+    </div>
+    <div class="bloco-body" id="b-custos"></div>
+  </div>
+
+  <div class="bloco b-receitas">
+    <div class="bloco-head">
+      <span class="bloco-num">Bloco 3</span>
+      <div class="bloco-titulo">Fontes de Receita</div>
+      <div class="bloco-q">Como a empresa ganha dinheiro? Qual o modelo de receita?</div>
+    </div>
+    <div class="bloco-body" id="b-receitas"></div>
+  </div>
+
+</div>
+
+<!-- ════════ REFERÊNCIA ════════ -->
+<div class="ref-section">
+  <div class="ref-toggle" onclick="toggleRef(this)">
+    <span>📋  Guia rápido — o que escrever em cada bloco</span>
+    <span class="arrow">▼</span>
+  </div>
+  <div class="ref-body" id="ref-body">
+    <div class="ref-grid">
+      <!-- cards gerados pelo JS -->
+    </div>
+  </div>
+</div>
+</main>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ── CONFIG ───────────────────────────────────────────
+const BLOCOS = [
+  { id:'b-proposta',       num:'1', titulo:'Proposta de Valor',
+    q:'Para quem? · Que problema? · Por que vocês?',
+    cor:'var(--verde)', bg:'var(--verde-l)',
+    placeholder:'Ex: Sistema de agendamento simples para clínicas de MG',
+    dica:'Seja específico. Inclua o diferencial real — o que vocês fazem que a concorrência não faz.',
+    ex:'Nubank: serviço financeiro sem burocracia, anuidade zero, 100% digital.', n:5 },
+  { id:'b-clientes',       num:'2', titulo:'Segmentos de Clientes',
+    q:'Quem são? Qual o perfil específico?',
+    cor:'var(--ambar)', bg:'var(--ambar-l)',
+    placeholder:'Ex: Dentistas autônomos no interior de MG',
+    dica:'Quanto mais específico, melhor. Pode haver mais de um segmento.',
+    ex:'Nubank em 2013: brasileiros bancarizados e insatisfeitos com bancos tradicionais.', n:4 },
+  { id:'b-receitas',       num:'3', titulo:'Fontes de Receita',
+    q:'Como ganha dinheiro? Qual o modelo?',
+    cor:'var(--teal)', bg:'var(--teal-l)',
+    placeholder:'Ex: Assinatura mensal R$ 149/mês',
+    dica:'Modelos: assinatura, venda única, freemium, comissão por transação, marketplace.',
+    ex:'iFood: comissão sobre cada pedido feito pela plataforma.', n:3 },
+  { id:'b-relacionamento', num:'4', titulo:'Relacionamento',
+    q:'Como conquista e retém clientes?',
+    cor:'var(--coral)', bg:'var(--coral-l)',
+    placeholder:'Ex: Suporte humanizado via WhatsApp',
+    dica:'Pode ser: autoatendimento, suporte pessoal, comunidade, automação por e-mail.',
+    ex:'Nubank: atendimento humanizado por chat. Zero call center.', n:3 },
+  { id:'b-canais',         num:'5', titulo:'Canais',
+    q:'Como o cliente descobre e compra?',
+    cor:'var(--coral)', bg:'var(--coral-l)',
+    placeholder:'Ex: Google Ads + indicações de clientes',
+    dica:'Canais de marketing (como conhece) + venda (como compra) + entrega (como usa).',
+    ex:'Hotmart: afiliados, redes sociais, busca orgânica no Google.', n:3 },
+  { id:'b-recursos',       num:'6', titulo:'Recursos-chave',
+    q:'O que é indispensável para entregar valor?',
+    cor:'var(--azul)', bg:'var(--azul-l)',
+    placeholder:'Ex: Equipe de dev + algoritmo próprio',
+    dica:'Físicos, intelectuais, humanos, financeiros. O que, se perder, mata o negócio?',
+    ex:'99: algoritmo de rotas + base de motoristas cadastrados.', n:3 },
+  { id:'b-atividades',     num:'7', titulo:'Atividades-chave',
+    q:'O que precisamos fazer bem todo dia?',
+    cor:'var(--azul)', bg:'var(--azul-l)',
+    placeholder:'Ex: Desenvolvimento contínuo do app',
+    dica:'Produção? Resolução de problemas? Plataforma? O que sustenta a proposta de valor.',
+    ex:'Nubank: desenvolvimento do app + análise de crédito + gestão de risco.', n:3 },
+  { id:'b-parcerias',      num:'8', titulo:'Parcerias-chave',
+    q:'Quem pode ajudar a crescer? O que terceirizamos?',
+    cor:'var(--roxo)', bg:'var(--roxo-l)',
+    placeholder:'Ex: AWS (infraestrutura em nuvem)',
+    dica:'Não é cliente nem funcionário. É quem você precisa mas não quer ter dentro de casa.',
+    ex:'iFood: restaurantes parceiros + empresas de pagamento + entregadores.', n:4 },
+  { id:'b-custos',         num:'9', titulo:'Estrutura de Custos',
+    q:'Quais são os maiores custos? Fixos e variáveis?',
+    cor:'var(--grafite)', bg:'var(--grafite-l)',
+    placeholder:'Ex: Salários da equipe (fixo)',
+    dica:'Fixos: existem independente do volume. Variáveis: crescem com o negócio.',
+    ex:'Hotmart: infraestrutura de tecnologia + time de suporte ao produtor.', n:4 },
+];
+
+const DEFAULT_N = { 'b-proposta':5,'b-clientes':4,'b-receitas':3,'b-relacionamento':3,
+                    'b-canais':3,'b-recursos':3,'b-atividades':3,'b-parcerias':4,'b-custos':4 };
+
+// ── RENDER ────────────────────────────────────────────
+function criarItem(blocoId, valor) {
+  const cfg = BLOCOS.find(b => b.id === blocoId);
+  const row = document.createElement('div');
+  row.className = 'item';
+  const ta = document.createElement('textarea');
+  ta.className = 'item-input';
+  ta.placeholder = cfg ? cfg.placeholder : '';
+  ta.value = valor || '';
+  ta.rows = 1;
+  ta.addEventListener('input', () => {
+    ta.style.height = 'auto';
+    ta.style.height = ta.scrollHeight + 'px';
+  });
+  // auto-avançar para próximo item ao pressionar Enter
+  ta.addEventListener('keydown', e => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      const items = [...row.parentElement.querySelectorAll('.item-input')];
+      const idx = items.indexOf(ta);
+      if (idx < items.length - 1) items[idx + 1].focus();
+      else row.parentElement.querySelector('.add-btn')?.click();
+    }
+  });
+  const del = document.createElement('button');
+  del.className = 'item-del';
+  del.textContent = '×';
+  del.onclick = () => row.remove();
+  const dot = document.createElement('span');
+  dot.className = 'item-dot';
+  row.appendChild(dot);
+  row.appendChild(ta);
+  row.appendChild(del);
+  return row;
+}
+
+function addBtnAdicionar(blocoId, corpo) {
+  const btn = document.createElement('button');
+  btn.className = 'add-btn';
+  btn.innerHTML = '+ item';
+  btn.onclick = () => {
+    const item = criarItem(blocoId, '');
+    corpo.insertBefore(item, btn);
+    item.querySelector('.item-input').focus();
+  };
+  corpo.appendChild(btn);
+}
+
+function inicializar(dados) {
+  BLOCOS.forEach(cfg => {
+    const corpo = document.getElementById(cfg.id);
+    if (!corpo) return;
+    corpo.innerHTML = '';
+    const vals = dados?.[cfg.id] || Array(DEFAULT_N[cfg.id] || 3).fill('');
+    vals.forEach(v => corpo.appendChild(criarItem(cfg.id, v)));
+    addBtnAdicionar(cfg.id, corpo);
+  });
+}
+
+// ── GUIA RÁPIDO ───────────────────────────────────────
+function renderGuia() {
+  const grid = document.querySelector('.ref-grid');
+  if (!grid) return;
+  grid.innerHTML = BLOCOS.map(b => `
+    <div class="ref-card" style="--bloco-cor:${b.cor};--bloco-bg:${b.bg}">
+      <div class="ref-card-titulo">${b.num} · ${b.titulo}</div>
+      <p><strong>Pergunta:</strong> ${b.q}</p>
+      <p>${b.dica}</p>
+      <div class="ex">Ex real: ${b.ex}</div>
+    </div>
+  `).join('');
+}
+
+function toggleRef(btn) {
+  btn.classList.toggle('open');
+  document.getElementById('ref-body').classList.toggle('open');
+}
+
+// ── COLETAR ───────────────────────────────────────────
+function coletar() {
+  const d = {
+    empresa: document.getElementById('f-empresa').value,
+    equipe:  document.getElementById('f-equipe').value,
+    turma:   document.getElementById('f-turma').value,
+    data:    document.getElementById('f-data').value,
+  };
+  BLOCOS.forEach(b => {
+    d[b.id] = [...document.getElementById(b.id).querySelectorAll('.item-input')]
+      .map(el => el.value.trim()).filter(Boolean);
+  });
+  return d;
+}
+
+// ── SALVAR ────────────────────────────────────────────
+function salvar() {
+  const d = coletar();
+  const json = JSON.stringify(d, null, 2);
+  const blob = new Blob([json], { type:'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `canvas_${(d.empresa||'empresa').replace(/\s+/g,'_').toLowerCase()}.json`;
+  a.click();
+  toast('Canvas salvo! Use "Carregar" para retomar depois.');
+}
+
+// ── CARREGAR ──────────────────────────────────────────
+function carregar() {
+  const inp = document.createElement('input');
+  inp.type = 'file'; inp.accept = '.json';
+  inp.onchange = e => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const r = new FileReader();
+    r.onload = ev => {
+      try {
+        const d = JSON.parse(ev.target.result);
+        document.getElementById('f-empresa').value = d.empresa || '';
+        document.getElementById('f-equipe').value  = d.equipe  || '';
+        document.getElementById('f-turma').value   = d.turma   || '';
+        document.getElementById('f-data').value    = d.data    || '';
+        inicializar(d);
+        toast('Canvas carregado com sucesso!');
+      } catch { toast('Arquivo inválido.'); }
+    };
+    r.readAsText(file);
+  };
+  inp.click();
+}
+
+// ── LIMPAR ────────────────────────────────────────────
+function limpar() {
+  if (!confirm('Limpar todo o Canvas? O progresso não salvo será perdido.')) return;
+  ['f-empresa','f-equipe','f-turma','f-data'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+  inicializar(null);
+  toast('Canvas limpo.');
+}
+
+// ── TOAST ─────────────────────────────────────────────
+let toastTimer;
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('show'), 3000);
+}
+
+// ── INIT ─────────────────────────────────────────────
+inicializar(null);
+renderGuia();
+
+const hoje = new Date();
+document.getElementById('f-data').value =
+  `${String(hoje.getDate()).padStart(2,'0')}/${String(hoje.getMonth()+1).padStart(2,'0')}/${hoje.getFullYear()}`;
+</script>
+</body>
+</html>
