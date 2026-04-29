@@ -7,6 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
+/* CSS UNIFICADO DO SEU ECOSSISTEMA P.I. */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
@@ -26,15 +27,15 @@
 
 body { font-family: 'DM Sans', sans-serif; background: var(--paper); color: var(--ink); min-height: 100vh; }
 
-/* HEADER - IDÊNTICO AO CANVAS */
 .page-header { background: var(--ink); padding: 20px 24px 0; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 12px rgba(0,0,0,.25); }
 .header-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
 .header-brand h1 { font-family: 'DM Serif Display', serif; font-size: 1.35rem; color: var(--white); line-height: 1.15; }
 .header-brand span { font-size: .72rem; color: #7B98B2; text-transform: uppercase; display: block; margin-top: 1px; }
 
 .header-actions { display: flex; gap: 8px; align-items: center; }
-.btn { font-size: .78rem; font-weight: 600; padding: 7px 14px; border-radius: var(--r); cursor: pointer; border: none; display: flex; align-items: center; gap: 5px; transition: all .15s; white-space: nowrap; }
+.btn { font-size: .78rem; font-weight: 600; padding: 7px 14px; border-radius: var(--r); cursor: pointer; border: none; display: flex; align-items: center; gap: 5px; transition: all .15s; white-space: nowrap; text-decoration: none; }
 .btn-ghost { background: rgba(255,255,255,.08); color: #C8D8E4; border: 1px solid rgba(255,255,255,.12); }
+.btn-ghost:hover { background: rgba(255,255,255,.14); color: #fff; }
 .btn-accent { background: #2A5BDB; color: #fff; }
 .btn-print { background: var(--verde); color: #fff; }
 
@@ -43,7 +44,6 @@ body { font-family: 'DM Sans', sans-serif; background: var(--paper); color: var(
 .meta-label { font-size: .65rem; font-weight: 600; color: #5B7B94; text-transform: uppercase; display: block; margin-bottom: 4px; }
 .meta-field input { width: 100%; background: transparent; border: none; font-size: .82rem; color: #E0EAF2; outline: none; }
 
-/* GRID SWOT */
 main { padding: 20px; max-width: 1200px; margin: 0 auto; }
 .swot-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; min-height: 500px; }
 
@@ -57,18 +57,16 @@ main { padding: 20px; max-width: 1200px; margin: 0 auto; }
 .item { display: flex; align-items: flex-start; gap: 6px; padding: 3px 0; }
 .item-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--bloco-cor); margin-top: 8px; opacity: .7; }
 .item-input { flex: 1; border: none; background: transparent; font-family: inherit; font-size: .85rem; outline: none; resize: none; overflow: hidden; }
-.item-del { background: none; border: none; color: var(--line); cursor: pointer; display: none; }
-.item:hover .item-del { display: block; }
-.add-btn { font-size: .7rem; color: var(--ink3); background: none; border: 1px dashed var(--line); border-radius: 4px; padding: 4px 8px; cursor: pointer; margin-top: 8px; width: fit-content; }
+.item-del { background: none; border: none; color: var(--line); cursor: pointer; display: none; font-size: 1rem; }
+.item:hover .item-del { display: block; color: #E53E3E; }
+.add-btn { font-size: .7rem; color: var(--ink3); background: none; border: 1px dashed var(--line); border-radius: 4px; padding: 4px 8px; cursor: pointer; margin-top: 8px; width: fit-content; transition: .15s; }
+.add-btn:hover { border-color: var(--bloco-cor); color: var(--bloco-cor); }
 
 .b-forcas   { --bloco-cor: var(--verde); --bloco-bg: var(--verde-l); }
 .b-fraquezas { --bloco-cor: var(--coral); --bloco-bg: var(--coral-l); }
 .b-oportunidades { --bloco-cor: var(--ambar); --bloco-bg: var(--ambar-l); }
 .b-ameacas   { --bloco-cor: var(--roxo);  --bloco-bg: var(--roxo-l);  }
 
-/* ═══════════════════════════════════════
-   PRINT - O SEGREDO DO "LINDO"
-═══════════════════════════════════════ */
 @media print {
   * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
   body { background: white; }
@@ -76,12 +74,12 @@ main { padding: 20px; max-width: 1200px; margin: 0 auto; }
   .header-actions { display: none !important; }
   main { padding: 8px; }
   .bloco { box-shadow: none; page-break-inside: avoid; }
-  .item-del, .add-btn, .ref-section { display: none !important; }
+  .item-del, .add-btn { display: none !important; }
   .swot-grid { display: grid !important; grid-template-columns: 1fr 1fr !important; gap: 10px !important; }
   @page { size: A4 landscape; margin: 10mm; }
 }
 
-.toast { position: fixed; bottom: 24px; right: 24px; background: var(--ink); color: #fff; padding: 12px 18px; border-radius: 6px; opacity: 0; transition: .3s; pointer-events: none; }
+.toast { position: fixed; bottom: 24px; right: 24px; background: var(--ink); color: #fff; padding: 12px 18px; border-radius: 6px; opacity: 0; transition: .3s; pointer-events: none; z-index: 9999; }
 .toast.show { opacity: 1; }
 </style>
 </head>
@@ -96,13 +94,14 @@ main { padding: 20px; max-width: 1200px; margin: 0 auto; }
     <div class="header-actions">
       <a href="../index.html" class="btn btn-ghost">← Menu</a>
       <button class="btn btn-ghost" onclick="limpar()">✕ Limpar</button>
+      <button class="btn btn-ghost" onclick="carregar()">↑ Carregar</button>
       <button class="btn btn-accent" onclick="salvar()">↓ Salvar</button>
       <button class="btn btn-print" onclick="window.print()">⎙ Imprimir / PDF</button>
     </div>
   </div>
   <div class="header-meta">
-    <div class="meta-field"><span class="meta-label">Empresa</span><input id="f-empresa" type="text" placeholder="..."></div>
-    <div class="meta-field"><span class="meta-label">Equipe</span><input id="f-equipe" type="text" placeholder="..."></div>
+    <div class="meta-field"><span class="meta-label">Empresa</span><input id="f-empresa" type="text" placeholder="Nome do projeto"></div>
+    <div class="meta-field"><span class="meta-label">Equipe</span><input id="f-equipe" type="text" placeholder="Integrantes"></div>
     <div class="meta-field"><span class="meta-label">Data</span><input id="f-data" type="text"></div>
   </div>
 </header>
@@ -110,19 +109,19 @@ main { padding: 20px; max-width: 1200px; margin: 0 auto; }
 <main>
   <div class="swot-grid">
     <div class="bloco b-forcas">
-      <div class="bloco-head"><div class="bloco-titulo">Forças (Strengths)</div><div class="bloco-q">O que fazemos bem?</div></div>
+      <div class="bloco-head"><div class="bloco-titulo">Forças (Strengths)</div><div class="bloco-q">O que fazemos bem? Recursos?</div></div>
       <div class="bloco-body" id="b-forcas"></div>
     </div>
     <div class="bloco b-fraquezas">
-      <div class="bloco-head"><div class="bloco-titulo">Fraquezas (Weaknesses)</div><div class="bloco-q">Onde podemos melhorar?</div></div>
+      <div class="bloco-head"><div class="bloco-titulo">Fraquezas (Weaknesses)</div><div class="bloco-q">Onde podemos melhorar? Limites?</div></div>
       <div class="bloco-body" id="b-fraquezas"></div>
     </div>
     <div class="bloco b-oportunidades">
-      <div class="bloco-head"><div class="bloco-titulo">Oportunidades (Opportunities)</div><div class="bloco-q">O que podemos aproveitar?</div></div>
+      <div class="bloco-head"><div class="bloco-titulo">Oportunidades (Opportunities)</div><div class="bloco-q">Cenários favoráveis externos?</div></div>
       <div class="bloco-body" id="b-oportunidades"></div>
     </div>
     <div class="bloco b-ameacas">
-      <div class="bloco-head"><div class="bloco-titulo">Ameaças (Threats)</div><div class="bloco-q">O que nos coloca em risco?</div></div>
+      <div class="bloco-head"><div class="bloco-titulo">Ameaças (Threats)</div><div class="bloco-q">Obstáculos externos? Riscos?</div></div>
       <div class="bloco-body" id="b-ameacas"></div>
     </div>
   </div>
@@ -131,7 +130,7 @@ main { padding: 20px; max-width: 1200px; margin: 0 auto; }
 <div id="toast" class="toast"></div>
 
 <script>
-const BLOCOS_CONFIG = [
+const CONFIG = [
   { id: 'b-forcas', p: 'Ex: Equipe técnica dedicada' },
   { id: 'b-fraquezas', p: 'Ex: Orçamento limitado' },
   { id: 'b-oportunidades', p: 'Ex: Crescimento do mercado' },
@@ -139,19 +138,33 @@ const BLOCOS_CONFIG = [
 ];
 
 function criarItem(blocoId, valor = '') {
-  const cfg = BLOCOS_CONFIG.find(c => c.id === blocoId);
+  const cfg = CONFIG.find(c => c.id === blocoId);
   const div = document.createElement('div');
   div.className = 'item';
-  div.innerHTML = `<span class="item-dot"></span><textarea class="item-input" placeholder="${cfg.p}" rows="1">${valor}</textarea><button class="item-del" onclick="this.parentElement.remove()">×</button>`;
+  div.innerHTML = `<span class="item-dot"></span><textarea class="item-input" placeholder="${cfg.p}" rows="1">${valor}</textarea><button class="item-del">×</button>`;
+  
   const ta = div.querySelector('textarea');
   ta.addEventListener('input', function() { this.style.height = 'auto'; this.style.height = this.scrollHeight + 'px'; });
+  div.querySelector('.item-del').onclick = () => div.remove();
+  
+  // Enter cria novo item
+  ta.addEventListener('keydown', e => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      div.parentElement.querySelector('.add-btn').click();
+    }
+  });
+  
   return div;
 }
 
-function inicializar() {
-  BLOCOS_CONFIG.forEach(cfg => {
+function renderizar(dados = null) {
+  CONFIG.forEach(cfg => {
     const box = document.getElementById(cfg.id);
-    for(let i=0; i<4; i++) box.appendChild(criarItem(cfg.id));
+    box.innerHTML = '';
+    const lista = dados?.[cfg.id] || ['', '', '', ''];
+    lista.forEach(v => box.appendChild(criarItem(cfg.id, v)));
+    
     const btn = document.createElement('button');
     btn.className = 'add-btn'; btn.innerText = '+ item';
     btn.onclick = () => {
@@ -164,14 +177,38 @@ function inicializar() {
 }
 
 function salvar() {
-  const data = { empresa: document.getElementById('f-empresa').value };
-  BLOCOS_CONFIG.forEach(cfg => {
-    data[cfg.id] = [...document.getElementById(cfg.id).querySelectorAll('.item-input')].map(i => i.value).filter(v => v.trim());
+  const d = { 
+    empresa: document.getElementById('f-empresa').value,
+    equipe: document.getElementById('f-equipe').value,
+    data: document.getElementById('f-data').value
+  };
+  CONFIG.forEach(cfg => {
+    d[cfg.id] = [...document.getElementById(cfg.id).querySelectorAll('.item-input')].map(i => i.value).filter(v => v.trim());
   });
-  const blob = new Blob([JSON.stringify(data, null, 2)], {type:'application/json'});
+  const blob = new Blob([JSON.stringify(d, null, 2)], {type:'application/json'});
   const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
-  a.download = `swot_${data.empresa || 'projeto'}.json`; a.click();
-  toast('Salvo localmente!');
+  a.download = `swot_${(d.empresa || 'projeto').replace(/\s+/g,'_')}.json`; a.click();
+  toast('Salvo com sucesso!');
+}
+
+function carregar() {
+  const inp = document.createElement('input');
+  inp.type = 'file'; inp.accept = '.json';
+  inp.onchange = e => {
+    const r = new FileReader();
+    r.onload = ev => {
+      try {
+        const d = JSON.parse(ev.target.result);
+        document.getElementById('f-empresa').value = d.empresa || '';
+        document.getElementById('f-equipe').value = d.equipe || '';
+        document.getElementById('f-data').value = d.data || '';
+        renderizar(d);
+        toast('Carregado!');
+      } catch { toast('Erro no arquivo!'); }
+    };
+    r.readAsText(e.target.files[0]);
+  };
+  inp.click();
 }
 
 function limpar() { if(confirm('Limpar tudo?')) location.reload(); }
@@ -180,7 +217,7 @@ function toast(msg) {
   setTimeout(() => t.classList.remove('show'), 3000);
 }
 document.getElementById('f-data').value = new Date().toLocaleDateString();
-inicializar();
+renderizar();
 </script>
 </body>
 </html>
