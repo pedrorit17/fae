@@ -17,7 +17,6 @@
             --blue:   #2A5BDB;
             --verde:  #0B6E4F;
             --coral:  #C0410D;
-            --ambar:  #9A5000;
         }
 
         *, *::before, *::after { box-sizing: border-box; }
@@ -31,8 +30,6 @@
         }
 
         .container { max-width: 860px; margin: 0 auto; }
-
-        header { margin-bottom: 48px; }
 
         .back-link {
             display: inline-flex;
@@ -52,13 +49,8 @@
             margin: 0 0 10px;
         }
 
-        .subtitle {
-            color: var(--ink2);
-            font-size: 1.1rem;
-            margin: 0;
-        }
+        .subtitle { color: var(--ink2); font-size: 1.1rem; margin: 0 0 40px; }
 
-        /* Filtros */
         .filtros {
             display: flex;
             gap: 10px;
@@ -78,13 +70,8 @@
             transition: all 0.2s;
         }
         .filtro-btn:hover { border-color: var(--blue); color: var(--blue); }
-        .filtro-btn.ativo {
-            background: var(--blue);
-            border-color: var(--blue);
-            color: var(--white);
-        }
+        .filtro-btn.ativo { background: var(--blue); border-color: var(--blue); color: var(--white); }
 
-        /* Lista de atividades */
         .lista { display: flex; flex-direction: column; gap: 16px; }
 
         .atividade-card {
@@ -99,17 +86,9 @@
             transition: box-shadow 0.2s;
         }
         .atividade-card:hover { box-shadow: 0 4px 20px rgba(0,0,0,0.07); }
-
         .atividade-card.encerrada { opacity: 0.6; }
 
-        .card-info { min-width: 0; }
-
-        .card-tags {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-            margin-bottom: 10px;
-        }
+        .card-tags { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; }
 
         .tag {
             display: inline-block;
@@ -117,35 +96,20 @@
             border-radius: 20px;
             font-size: 0.75rem;
             font-weight: 500;
-            letter-spacing: 0.02em;
         }
-        .tag-turma  { background: #E8EFFE; color: var(--blue); }
-        .tag-aberta { background: #D1F0E4; color: var(--verde); }
+        .tag-turma     { background: #E8EFFE; color: var(--blue); }
+        .tag-aberta    { background: #D1F0E4; color: var(--verde); }
         .tag-encerrada { background: #FFE8DF; color: var(--coral); }
 
         .card-titulo {
             font-family: 'DM Serif Display', serif;
             font-size: 1.3rem;
             margin: 0 0 8px;
-            color: var(--ink);
         }
 
-        .card-desc {
-            font-size: 0.95rem;
-            color: var(--ink2);
-            line-height: 1.55;
-            margin: 0 0 12px;
-        }
+        .card-desc { font-size: 0.95rem; color: var(--ink2); line-height: 1.55; margin: 0 0 12px; }
 
-        .card-prazo {
-            font-size: 0.82rem;
-            color: var(--ink3);
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-
-        .card-acao { flex-shrink: 0; }
+        .card-prazo { font-size: 0.82rem; color: var(--ink3); }
 
         .btn-form {
             display: inline-flex;
@@ -170,20 +134,25 @@
             pointer-events: none;
         }
 
-        /* Estado vazio */
-        .estado-vazio {
+        /* Estados */
+        .estado {
             text-align: center;
             padding: 60px 20px;
             color: var(--ink3);
         }
-        .estado-vazio .icone { font-size: 3rem; margin-bottom: 16px; }
-        .estado-vazio h2 {
-            font-family: 'DM Serif Display', serif;
-            font-size: 1.4rem;
-            color: var(--ink2);
-            margin: 0 0 8px;
+        .estado .icone { font-size: 3rem; margin-bottom: 16px; }
+        .estado h2 { font-family: 'DM Serif Display', serif; font-size: 1.4rem; color: var(--ink2); margin: 0 0 8px; }
+        .estado p  { font-size: 0.95rem; margin: 0; }
+
+        .spinner {
+            width: 36px; height: 36px;
+            border: 3px solid var(--line);
+            border-top-color: var(--blue);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto 16px;
         }
-        .estado-vazio p { font-size: 0.95rem; margin: 0; }
+        @keyframes spin { to { transform: rotate(360deg); } }
 
         footer {
             margin-top: 60px;
@@ -202,11 +171,9 @@
 <body>
 <div class="container">
 
-    <header>
-        <a href="../index.html" class="back-link">← Voltar ao portal</a>
-        <h1>Atividades</h1>
-        <p class="subtitle">Links dos formulários para entrega das atividades do semestre.</p>
-    </header>
+    <a href="../index.html" class="back-link">← Voltar ao portal</a>
+    <h1>Atividades</h1>
+    <p class="subtitle">Links dos formulários para entrega das atividades do semestre.</p>
 
     <div class="filtros" id="filtros">
         <button class="filtro-btn ativo" data-filtro="todas">Todas</button>
@@ -214,101 +181,146 @@
         <button class="filtro-btn" data-filtro="encerrada">Encerradas</button>
     </div>
 
-    <div class="lista" id="lista"></div>
+    <div id="lista" class="lista">
+        <div class="estado">
+            <div class="spinner"></div>
+            <p>Carregando atividades…</p>
+        </div>
+    </div>
 
     <footer>P.I. — Desenvolvido para apoio acadêmico.</footer>
-
 </div>
 
 <script>
     let todasAtividades = [];
     let filtroAtivo = 'todas';
 
-    async function carregarAtividades() {
-        // Lê do localStorage (atualizado pelo admin) com fallback para o JSON estático
-        try {
-            const local = localStorage.getItem('fae_atividades');
-            if (local) {
-                todasAtividades = JSON.parse(local).atividades || [];
-                renderizar();
-                return;
-            }
-        } catch { /* ignora */ }
-
-        try {
-            const resp = await fetch('../data/atividades.json?_=' + Date.now());
-            const dados = await resp.json();
-            todasAtividades = dados.atividades || [];
-        } catch (e) {
-            todasAtividades = [];
-        }
-        renderizar();
+    function escHtml(s) {
+        if (!s) return '';
+        return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
     }
 
-    function formatarData(iso) {
-        if (!iso) return null;
-        const [y, m, d] = iso.split('-');
-        return `${d}/${m}/${y}`;
+    function formatarData(val) {
+        if (!val) return null;
+        // Aceita YYYY-MM-DD ou DD/MM/YYYY
+        const iso = /^\d{4}-\d{2}-\d{2}$/.test(val) ? val : null;
+        if (iso) {
+            const [y, m, d] = iso.split('-');
+            return `${d}/${m}/${y}`;
+        }
+        return val; // já está formatado
+    }
+
+    function toIso(val) {
+        if (!val) return null;
+        if (/^\d{4}-\d{2}-\d{2}$/.test(val)) return val;
+        // DD/MM/YYYY → YYYY-MM-DD
+        const m = val.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+        if (m) return `${m[3]}-${m[2]}-${m[1]}`;
+        return null;
+    }
+
+    // Extrai ID do Google Sheets de qualquer formato de URL
+    function extrairSheetId(url) {
+        const m = url.match(/\/spreadsheets\/d\/([a-zA-Z0-9_-]+)/);
+        return m ? m[1] : null;
+    }
+
+    async function carregarAtividades() {
+        try {
+            const cfg = await fetch('../data/config.json?_=' + Date.now()).then(r => r.json());
+            if (!cfg.sheetsUrl) {
+                mostrarEstado('📭', 'Nenhuma atividade configurada', 'O professor ainda não vinculou a planilha de atividades.');
+                return;
+            }
+
+            const id = extrairSheetId(cfg.sheetsUrl);
+            if (!id) {
+                mostrarEstado('⚠️', 'URL inválida', 'Fale com o professor para verificar a configuração.');
+                return;
+            }
+
+            const gvizUrl = `https://docs.google.com/spreadsheets/d/${id}/gviz/tq?tqx=out:json`;
+            const text = await fetch(gvizUrl).then(r => r.text());
+
+            // Remove wrapper JSONP do Google
+            const json = JSON.parse(text.slice(text.indexOf('{'), text.lastIndexOf('}') + 1));
+            const cols = json.table.cols.map(c => c.label.toLowerCase().trim());
+            const rows = json.table.rows || [];
+
+            todasAtividades = rows
+                .filter(row => row.c && row.c[0] && row.c[0].v)
+                .map((row, i) => {
+                    const obj = { id: String(i) };
+                    cols.forEach((col, ci) => {
+                        const cell = row.c[ci];
+                        obj[col] = cell ? String(cell.v || cell.f || '').trim() : '';
+                    });
+                    return obj;
+                });
+
+            renderizar();
+        } catch (e) {
+            mostrarEstado('❌', 'Erro ao carregar', 'Não foi possível buscar as atividades. Tente recarregar a página.');
+        }
+    }
+
+    function mostrarEstado(icone, titulo, msg) {
+        document.getElementById('lista').innerHTML = `
+            <div class="estado">
+                <div class="icone">${icone}</div>
+                <h2>${titulo}</h2>
+                <p>${msg}</p>
+            </div>`;
     }
 
     function renderizar() {
-        const lista = document.getElementById('lista');
         const hoje = new Date().toISOString().split('T')[0];
 
         let itens = todasAtividades;
 
         if (filtroAtivo === 'aberta') {
-            itens = itens.filter(a => a.status === 'aberta' || (a.status !== 'encerrada' && (!a.prazo || a.prazo >= hoje)));
+            itens = itens.filter(a => {
+                const prazoIso = toIso(a.prazo);
+                return a.status === 'aberta' || (a.status !== 'encerrada' && (!prazoIso || prazoIso >= hoje));
+            });
         } else if (filtroAtivo === 'encerrada') {
-            itens = itens.filter(a => a.status === 'encerrada' || (a.prazo && a.prazo < hoje));
+            itens = itens.filter(a => {
+                const prazoIso = toIso(a.prazo);
+                return a.status === 'encerrada' || (prazoIso && prazoIso < hoje);
+            });
         }
 
         if (itens.length === 0) {
-            lista.innerHTML = `
-                <div class="estado-vazio">
-                    <div class="icone">📭</div>
-                    <h2>Nenhuma atividade encontrada</h2>
-                    <p>Quando o professor adicionar atividades, elas aparecerão aqui.</p>
-                </div>`;
+            mostrarEstado('📭', 'Nenhuma atividade encontrada', 'Nenhuma atividade corresponde ao filtro selecionado.');
             return;
         }
 
-        lista.innerHTML = itens.map(a => {
-            const encerrada = a.status === 'encerrada' || (a.prazo && a.prazo < hoje);
-            const labelStatus = encerrada ? 'Encerrada' : 'Aberta';
-            const classStatus = encerrada ? 'tag-encerrada' : 'tag-aberta';
-            const prazoFormatado = formatarData(a.prazo);
+        document.getElementById('lista').innerHTML = itens.map(a => {
+            const prazoIso = toIso(a.prazo);
+            const encerrada = a.status === 'encerrada' || (prazoIso && prazoIso < hoje);
+            const tagCls = encerrada ? 'tag-encerrada' : 'tag-aberta';
+            const tagTxt = encerrada ? 'Encerrada' : 'Aberta';
 
             return `
             <div class="atividade-card${encerrada ? ' encerrada' : ''}">
                 <div class="card-info">
                     <div class="card-tags">
                         ${a.turma ? `<span class="tag tag-turma">${escHtml(a.turma)}</span>` : ''}
-                        <span class="tag ${classStatus}">${labelStatus}</span>
+                        <span class="tag ${tagCls}">${tagTxt}</span>
                     </div>
                     <h2 class="card-titulo">${escHtml(a.titulo)}</h2>
                     ${a.descricao ? `<p class="card-desc">${escHtml(a.descricao)}</p>` : ''}
-                    ${prazoFormatado ? `<span class="card-prazo">📅 Prazo: ${prazoFormatado}</span>` : ''}
+                    ${a.prazo ? `<span class="card-prazo">📅 Prazo: ${escHtml(formatarData(a.prazo))}</span>` : ''}
                 </div>
                 <div class="card-acao">
                     ${a.link
-                        ? `<a href="${escHtml(a.link)}" class="btn-form${encerrada ? ' encerrado' : ''}" target="_blank" rel="noopener">
-                                Acessar Formulário ↗
-                           </a>`
+                        ? `<a href="${escHtml(a.link)}" class="btn-form${encerrada ? ' encerrado' : ''}" target="_blank" rel="noopener">Acessar Formulário ↗</a>`
                         : `<span class="btn-form encerrado">Link indisponível</span>`
                     }
                 </div>
             </div>`;
         }).join('');
-    }
-
-    function escHtml(str) {
-        if (!str) return '';
-        return String(str)
-            .replace(/&/g,'&amp;')
-            .replace(/</g,'&lt;')
-            .replace(/>/g,'&gt;')
-            .replace(/"/g,'&quot;');
     }
 
     document.getElementById('filtros').addEventListener('click', e => {

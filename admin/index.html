@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin — Atividades</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:ital,wght@0,400;0,500;0,700;1,400&family=DM+Mono&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:ital,wght@0,400;0,500;0,700&family=DM+Mono&display=swap" rel="stylesheet">
     <style>
         :root {
             --ink:   #0F1923;
@@ -18,7 +18,6 @@
             --verde: #0B6E4F;
             --coral: #C0410D;
             --ambar: #9A5000;
-            --bg-blue: #E8EFFE;
         }
 
         *, *::before, *::after { box-sizing: border-box; }
@@ -28,6 +27,7 @@
             background: var(--paper);
             color: var(--ink);
             margin: 0;
+            min-height: 100vh;
         }
 
         /* ── Login ── */
@@ -45,26 +45,42 @@
             border-radius: 16px;
             padding: 48px 40px;
             width: 100%;
-            max-width: 400px;
+            max-width: 380px;
             box-shadow: 0 4px 24px rgba(0,0,0,0.07);
             text-align: center;
         }
 
-        .login-card h1 {
-            font-family: 'DM Serif Display', serif;
-            font-size: 1.9rem;
-            margin: 0 0 6px;
-        }
+        .login-card .lock { font-size: 2.5rem; margin-bottom: 16px; }
+        .login-card h1 { font-family: 'DM Serif Display', serif; font-size: 1.8rem; margin: 0 0 4px; }
+        .login-card p  { color: var(--ink3); font-size: 0.9rem; margin: 0 0 28px; }
 
-        .login-card p {
-            color: var(--ink3);
+        /* ── Botões ── */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 11px 22px;
+            border-radius: 8px;
+            font-family: 'DM Sans', sans-serif;
             font-size: 0.9rem;
-            margin: 0 0 32px;
+            font-weight: 500;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s;
+            text-decoration: none;
         }
+        .btn-primary   { background: var(--blue); color: var(--white); }
+        .btn-primary:hover { background: #1e4bc4; }
+        .btn-secondary { background: var(--white); color: var(--ink2); border: 1.5px solid var(--line); }
+        .btn-secondary:hover { border-color: var(--blue); color: var(--blue); }
+        .btn-success   { background: #D1F0E4; color: var(--verde); }
+        .btn-success:hover { background: #b8e8d2; }
+        .btn-full { width: 100%; }
 
-        .field { margin-bottom: 16px; text-align: left; }
+        /* ── Campo ── */
+        .field { margin-bottom: 18px; text-align: left; }
         .field label { display: block; font-size: 0.85rem; font-weight: 500; color: var(--ink2); margin-bottom: 6px; }
-
         .field input {
             width: 100%;
             padding: 10px 14px;
@@ -78,272 +94,122 @@
             transition: border-color 0.2s;
         }
         .field input:focus { border-color: var(--blue); }
+        .field .hint { font-size: 0.78rem; color: var(--ink3); margin-top: 5px; }
 
-        #erro-login {
-            color: var(--coral);
-            font-size: 0.85rem;
-            margin: 0 0 16px;
-            display: none;
-        }
-
-        /* ── Botões globais ── */
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 7px;
-            padding: 10px 20px;
-            border-radius: 8px;
-            font-family: 'DM Sans', sans-serif;
-            font-size: 0.9rem;
-            font-weight: 500;
-            cursor: pointer;
-            border: none;
-            transition: all 0.2s;
-        }
-        .btn-primary { background: var(--blue); color: var(--white); width: 100%; justify-content: center; }
-        .btn-primary:hover { background: #1e4bc4; }
-        .btn-secondary { background: var(--white); color: var(--ink2); border: 1.5px solid var(--line); }
-        .btn-secondary:hover { border-color: var(--blue); color: var(--blue); }
-        .btn-danger { background: #FEE9E2; color: var(--coral); }
-        .btn-danger:hover { background: #fdd5c8; }
-        .btn-success { background: #D1F0E4; color: var(--verde); }
-        .btn-success:hover { background: #b8e8d2; }
-        .btn-sm { padding: 6px 12px; font-size: 0.82rem; }
+        .erro { color: var(--coral); font-size: 0.85rem; margin: 0 0 14px; display: none; }
 
         /* ── App ── */
-        #app { display: none; }
+        #app { display: none; max-width: 760px; margin: 0 auto; padding: 48px 24px 80px; }
 
-        .sidebar {
-            position: fixed;
-            top: 0; left: 0; bottom: 0;
-            width: 240px;
-            background: var(--white);
-            border-right: 1.5px solid var(--line);
-            padding: 28px 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-        }
+        .app-header { margin-bottom: 40px; }
+        .app-header h1 { font-family: 'DM Serif Display', serif; font-size: 2rem; margin: 0 0 4px; }
+        .app-header p  { color: var(--ink3); margin: 0; font-size: 0.9rem; }
 
-        .sidebar-logo {
-            font-family: 'DM Serif Display', serif;
-            font-size: 1.2rem;
-            color: var(--ink);
-            margin-bottom: 24px;
-        }
-
-        .sidebar-logo span { color: var(--blue); }
-
-        .nav-item {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 10px 12px;
-            border-radius: 8px;
-            font-size: 0.9rem;
-            color: var(--ink2);
+        .btn-sair {
+            float: right;
+            font-size: 0.82rem;
+            color: var(--ink3);
             cursor: pointer;
-            transition: all 0.15s;
-            text-decoration: none;
-        }
-        .nav-item:hover { background: var(--paper); color: var(--ink); }
-        .nav-item.ativo { background: var(--bg-blue); color: var(--blue); font-weight: 500; }
-
-        .sidebar-footer {
-            margin-top: auto;
-            padding-top: 16px;
-            border-top: 1px solid var(--line);
-        }
-
-        .main {
-            margin-left: 240px;
-            padding: 40px 48px;
-            min-height: 100vh;
-        }
-
-        .page-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 32px;
-            gap: 16px;
-            flex-wrap: wrap;
-        }
-
-        .page-header h2 {
-            font-family: 'DM Serif Display', serif;
-            font-size: 2rem;
-            margin: 0;
-        }
-
-        .page-header p { color: var(--ink3); margin: 4px 0 0; font-size: 0.9rem; }
-
-        /* ── Tabela ── */
-        .tabela-wrap { overflow-x: auto; }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        th {
-            font-size: 0.78rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.06em;
-            color: var(--ink3);
-            padding: 0 16px 12px;
-            text-align: left;
-            border-bottom: 1.5px solid var(--line);
-        }
-
-        td {
-            padding: 16px 16px;
-            border-bottom: 1px solid var(--line);
-            font-size: 0.9rem;
-            color: var(--ink2);
-            vertical-align: middle;
-        }
-
-        tr:last-child td { border-bottom: none; }
-        tr:hover td { background: #fafaf8; }
-
-        td.titulo { color: var(--ink); font-weight: 500; max-width: 260px; }
-        td .link-curto {
-            display: inline-block;
-            max-width: 200px;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-            color: var(--blue);
-            text-decoration: none;
-            font-family: 'DM Mono', monospace;
-            font-size: 0.8rem;
-        }
-        td .link-curto:hover { text-decoration: underline; }
-
-        .tag {
-            display: inline-block;
-            padding: 3px 10px;
-            border-radius: 20px;
-            font-size: 0.75rem;
-            font-weight: 500;
-        }
-        .tag-aberta    { background: #D1F0E4; color: var(--verde); }
-        .tag-encerrada { background: #FFE8DF; color: var(--coral); }
-
-        .acoes { display: flex; gap: 8px; }
-
-        /* ── Vazio ── */
-        .vazio {
-            text-align: center;
-            padding: 60px 20px;
-            color: var(--ink3);
-        }
-        .vazio .icone { font-size: 3rem; margin-bottom: 16px; }
-        .vazio h3 { font-family: 'DM Serif Display', serif; color: var(--ink2); margin: 0 0 8px; }
-        .vazio p  { font-size: 0.9rem; margin: 0; }
-
-        /* ── Modal ── */
-        .overlay {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: rgba(15,25,35,0.45);
-            backdrop-filter: blur(3px);
-            z-index: 100;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-        }
-        .overlay.aberto { display: flex; }
-
-        .modal {
-            background: var(--white);
-            border-radius: 14px;
-            padding: 36px 40px;
-            width: 100%;
-            max-width: 560px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.15);
-            max-height: 90vh;
-            overflow-y: auto;
-        }
-
-        .modal h3 {
-            font-family: 'DM Serif Display', serif;
-            font-size: 1.5rem;
-            margin: 0 0 24px;
-        }
-
-        .modal .field { margin-bottom: 20px; }
-
-        .modal .field label {
-            display: block;
-            font-size: 0.85rem;
-            font-weight: 500;
-            color: var(--ink2);
-            margin-bottom: 6px;
-        }
-
-        .modal .field input,
-        .modal .field textarea,
-        .modal .field select {
-            width: 100%;
-            padding: 10px 14px;
-            border: 1.5px solid var(--line);
-            border-radius: 8px;
+            background: none;
+            border: none;
             font-family: 'DM Sans', sans-serif;
-            font-size: 0.95rem;
-            background: var(--paper);
-            color: var(--ink);
-            outline: none;
-            transition: border-color 0.2s;
-            resize: vertical;
+            padding: 0;
         }
-        .modal .field input:focus,
-        .modal .field textarea:focus,
-        .modal .field select:focus { border-color: var(--blue); }
+        .btn-sair:hover { color: var(--coral); }
 
-        .modal .field .hint { font-size: 0.78rem; color: var(--ink3); margin-top: 5px; }
-
-        .modal-footer {
-            display: flex;
-            justify-content: flex-end;
-            gap: 10px;
-            margin-top: 28px;
-        }
-
-        /* ── Exportar ── */
-        .export-card {
+        /* ── Cards de seção ── */
+        .card {
             background: var(--white);
             border: 1.5px solid var(--line);
             border-radius: 12px;
             padding: 28px 32px;
-            margin-bottom: 24px;
+            margin-bottom: 20px;
         }
-        .export-card h3 { font-family: 'DM Serif Display', serif; margin: 0 0 8px; font-size: 1.2rem; }
-        .export-card p  { color: var(--ink2); font-size: 0.9rem; margin: 0 0 16px; }
 
-        .code-box {
+        .card h2 {
+            font-family: 'DM Serif Display', serif;
+            font-size: 1.25rem;
+            margin: 0 0 6px;
+        }
+
+        .card .desc { color: var(--ink2); font-size: 0.9rem; margin: 0 0 20px; line-height: 1.5; }
+
+        .row-btns { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+
+        /* ── Passo a passo ── */
+        .steps { list-style: none; padding: 0; margin: 0 0 20px; counter-reset: step; }
+        .steps li {
+            counter-increment: step;
+            display: flex;
+            gap: 14px;
+            align-items: flex-start;
+            margin-bottom: 16px;
+            font-size: 0.9rem;
+            color: var(--ink2);
+            line-height: 1.5;
+        }
+        .steps li::before {
+            content: counter(step);
+            min-width: 26px; height: 26px;
+            background: var(--blue);
+            color: var(--white);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.78rem;
+            font-weight: 700;
+            flex-shrink: 0;
+            margin-top: 1px;
+        }
+
+        /* ── Sheet ID exibido ── */
+        .sheet-id {
             font-family: 'DM Mono', monospace;
             font-size: 0.82rem;
             background: var(--paper);
             border: 1px solid var(--line);
-            border-radius: 8px;
-            padding: 16px;
-            white-space: pre;
-            overflow-x: auto;
+            border-radius: 6px;
+            padding: 8px 12px;
             color: var(--ink2);
-            margin-bottom: 12px;
-            max-height: 200px;
-            overflow-y: auto;
+            word-break: break-all;
         }
+
+        /* ── Colunas template ── */
+        .cols-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; margin-bottom: 16px; }
+        .cols-table th {
+            font-family: 'DM Mono', monospace;
+            text-align: left;
+            padding: 8px 12px;
+            background: var(--paper);
+            border: 1px solid var(--line);
+            color: var(--blue);
+            font-weight: 600;
+        }
+        .cols-table td {
+            padding: 8px 12px;
+            border: 1px solid var(--line);
+            color: var(--ink2);
+        }
+
+        /* ── Status ── */
+        .status-strip {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 16px;
+            border-radius: 8px;
+            font-size: 0.88rem;
+            margin-top: 14px;
+        }
+        .status-ok   { background: #D1F0E4; color: var(--verde); }
+        .status-warn { background: #FFF4DC; color: var(--ambar); }
+        .status-err  { background: #FFE8DF; color: var(--coral); }
 
         /* ── Toast ── */
         #toast {
             position: fixed;
-            bottom: 24px;
-            right: 24px;
+            bottom: 24px; right: 24px;
             background: var(--ink);
             color: var(--white);
             padding: 12px 20px;
@@ -355,213 +221,146 @@
             transition: all 0.3s;
             pointer-events: none;
             z-index: 999;
+            max-width: 340px;
         }
         #toast.show { opacity: 1; transform: translateY(0); }
 
-        @media (max-width: 700px) {
-            .sidebar { display: none; }
-            .main { margin-left: 0; padding: 24px 16px; }
+        @media (max-width: 520px) {
+            .login-card { padding: 36px 24px; }
+            #app { padding: 32px 16px 60px; }
         }
     </style>
 </head>
 <body>
 
-<!-- ══════════ TELA DE LOGIN ══════════ -->
+<!-- ══ Login ══ -->
 <div id="tela-login">
     <div class="login-card">
+        <div class="lock">🔐</div>
         <h1>Admin</h1>
         <p>Acesso restrito ao professor</p>
         <div class="field">
             <label for="campo-senha">Senha</label>
-            <input type="password" id="campo-senha" placeholder="Digite a senha de acesso" autocomplete="current-password">
+            <input type="password" id="campo-senha" placeholder="Digite a senha" autocomplete="current-password">
         </div>
-        <p id="erro-login">Senha incorreta. Tente novamente.</p>
-        <button class="btn btn-primary" id="btn-entrar">Entrar →</button>
+        <p class="erro" id="erro-login">Senha incorreta.</p>
+        <button class="btn btn-primary btn-full" id="btn-entrar">Entrar →</button>
     </div>
 </div>
 
-<!-- ══════════ APP ══════════ -->
+<!-- ══ App ══ -->
 <div id="app">
-    <nav class="sidebar">
-        <div class="sidebar-logo">P.I. <span>Admin</span></div>
-        <a class="nav-item ativo" data-pagina="atividades">📋 Atividades</a>
-        <a class="nav-item" data-pagina="exportar">📤 Exportar / Importar</a>
-        <div class="sidebar-footer">
-            <button class="btn btn-secondary" style="width:100%;" id="btn-sair">Sair</button>
-        </div>
-    </nav>
 
-    <main class="main">
+    <div class="app-header">
+        <button class="btn-sair" id="btn-sair">Sair</button>
+        <h1>Gerenciar Atividades</h1>
+        <p>Configure a planilha do Google Sheets para exibir atividades aos alunos.</p>
+    </div>
 
-        <!-- ── Página: Atividades ── -->
-        <div id="pagina-atividades">
-            <div class="page-header">
-                <div>
-                    <h2>Atividades</h2>
-                    <p id="contador-ativ">Carregando…</p>
-                </div>
-                <button class="btn btn-primary" id="btn-nova">+ Nova Atividade</button>
-            </div>
-            <div class="tabela-wrap">
-                <table id="tabela-ativ">
-                    <thead>
-                        <tr>
-                            <th>Título</th>
-                            <th>Turma</th>
-                            <th>Prazo</th>
-                            <th>Status</th>
-                            <th>Link</th>
-                            <th></th>
-                        </tr>
-                    </thead>
-                    <tbody id="tbody-ativ"></tbody>
-                </table>
-                <div id="vazio-ativ" class="vazio" style="display:none;">
-                    <div class="icone">📭</div>
-                    <h3>Nenhuma atividade ainda</h3>
-                    <p>Clique em "Nova Atividade" para começar.</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- ── Página: Exportar ── -->
-        <div id="pagina-exportar" style="display:none;">
-            <div class="page-header">
-                <div>
-                    <h2>Exportar / Importar</h2>
-                    <p>Gerencie o arquivo de dados para publicação.</p>
-                </div>
-            </div>
-
-            <div class="export-card">
-                <h3>Exportar dados</h3>
-                <p>Baixe o arquivo <code>atividades.json</code> e substitua o arquivo em <code>data/atividades.json</code> no repositório para publicar as alterações para os alunos.</p>
-                <div class="code-box" id="preview-json"></div>
-                <button class="btn btn-primary" style="width:auto;" id="btn-exportar">⬇ Baixar atividades.json</button>
-            </div>
-
-            <div class="export-card">
-                <h3>Importar dados</h3>
-                <p>Carregue um arquivo <code>atividades.json</code> previamente exportado para continuar editando.</p>
-                <input type="file" id="input-importar" accept=".json" style="display:none;">
-                <button class="btn btn-secondary" id="btn-importar">📂 Carregar arquivo JSON</button>
-            </div>
-        </div>
-
-    </main>
-</div>
-
-<!-- ══════════ MODAL NOVA / EDITAR ══════════ -->
-<div class="overlay" id="modal-overlay">
-    <div class="modal">
-        <h3 id="modal-titulo">Nova Atividade</h3>
-        <input type="hidden" id="modal-id">
+    <!-- 1. Configurar planilha -->
+    <div class="card">
+        <h2>1. Configurar planilha</h2>
+        <p class="desc">Cole abaixo o link de compartilhamento da sua planilha Google Sheets.</p>
 
         <div class="field">
-            <label>Título *</label>
-            <input type="text" id="f-titulo" placeholder="Ex.: Entrega do Relatório Final">
-        </div>
-        <div class="field">
-            <label>Descrição</label>
-            <textarea id="f-desc" rows="3" placeholder="Instruções ou observações para os alunos…"></textarea>
-        </div>
-        <div class="field">
-            <label>Link do formulário *</label>
-            <input type="url" id="f-link" placeholder="https://forms.gle/…">
-            <p class="hint">Cole o link completo do Google Forms ou outro formulário.</p>
-        </div>
-        <div class="field">
-            <label>Turma</label>
-            <input type="text" id="f-turma" placeholder="Ex.: Turma A, ADM 2024, etc.">
-        </div>
-        <div class="field">
-            <label>Prazo</label>
-            <input type="date" id="f-prazo">
-        </div>
-        <div class="field">
-            <label>Status</label>
-            <select id="f-status">
-                <option value="aberta">Aberta</option>
-                <option value="encerrada">Encerrada</option>
-            </select>
+            <label>URL da planilha</label>
+            <input type="url" id="sheets-url" placeholder="https://docs.google.com/spreadsheets/d/…/edit">
+            <p class="hint">Vá em Compartilhar → "Qualquer pessoa com o link" → Visualizador → copie o link.</p>
         </div>
 
-        <div class="modal-footer">
-            <button class="btn btn-secondary" id="btn-cancelar">Cancelar</button>
-            <button class="btn btn-primary" style="width:auto;" id="btn-salvar-modal">Salvar</button>
+        <div class="row-btns">
+            <button class="btn btn-primary" id="btn-testar">Testar conexão</button>
+            <button class="btn btn-success" id="btn-baixar-config" style="display:none;">⬇ Baixar config.json</button>
+        </div>
+
+        <div id="status-conexao"></div>
+    </div>
+
+    <!-- 2. Estrutura da planilha -->
+    <div class="card">
+        <h2>2. Estrutura da planilha</h2>
+        <p class="desc">A primeira linha da planilha deve ter exatamente estes cabeçalhos (em minúsculas):</p>
+
+        <table class="cols-table">
+            <thead>
+                <tr>
+                    <th>titulo</th>
+                    <th>descricao</th>
+                    <th>link</th>
+                    <th>turma</th>
+                    <th>prazo</th>
+                    <th>status</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Nome da atividade</td>
+                    <td>Instrução opcional</td>
+                    <td>Link do Google Forms</td>
+                    <td>Ex: Turma A</td>
+                    <td>DD/MM/AAAA</td>
+                    <td><code>aberta</code> ou <code>encerrada</code></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="row-btns">
+            <a class="btn btn-secondary" id="link-template" href="#" target="_blank" style="pointer-events:none; opacity:0.5;">
+                Abrir planilha ↗
+            </a>
         </div>
     </div>
+
+    <!-- 3. Publicar -->
+    <div class="card">
+        <h2>3. Publicar alterações</h2>
+        <ol class="steps">
+            <li>Clique em "Testar conexão" acima e confirme que os dados aparecem corretamente.</li>
+            <li>Clique em <strong>Baixar config.json</strong> para salvar o arquivo de configuração.</li>
+            <li>Substitua o arquivo <code>data/config.json</code> no repositório por esse arquivo baixado.</li>
+            <li>Faça commit e push — a partir daí os alunos já veem as atividades.</li>
+            <li><strong>No dia a dia:</strong> só adicione linhas na planilha. As mudanças aparecem automaticamente.</li>
+        </ol>
+        <p class="desc" style="margin:0;">Dúvida? Abra a planilha e adicione uma linha de teste, depois acesse <a href="../atividades/" target="_blank" style="color:var(--blue);">a página dos alunos</a> para ver ao vivo.</p>
+    </div>
+
 </div>
 
-<!-- Toast -->
 <div id="toast"></div>
 
 <script>
-    /* ─── Configuração ─── */
-    // Para alterar a senha, troque o valor abaixo:
+    // Troque aqui para alterar a senha de acesso:
     const SENHA_ADMIN = 'professor';
 
-    const STORAGE_KEY = 'fae_atividades';
-
-    /* ─── Estado ─── */
-    let atividades = [];
-    let paginaAtual = 'atividades';
-
-    /* ─── Utilitários ─── */
-    function uid() {
-        return Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
-    }
-
-    function escHtml(s) {
-        if (!s) return '';
-        return String(s)
-            .replace(/&/g,'&amp;').replace(/</g,'&lt;')
-            .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-    }
-
+    /* ── Utilitários ── */
     function toast(msg, tipo = 'ok') {
         const el = document.getElementById('toast');
         el.textContent = msg;
         el.style.background = tipo === 'erro' ? '#C0410D' : '#0F1923';
         el.classList.add('show');
-        setTimeout(() => el.classList.remove('show'), 2800);
+        setTimeout(() => el.classList.remove('show'), 3000);
     }
 
-    function salvarStorage() {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify({ atividades }));
+    function extrairSheetId(url) {
+        const m = url.match(/\/spreadsheets\/d\/([a-zA-Z0-9_-]+)/);
+        return m ? m[1] : null;
     }
 
-    function carregarStorage() {
-        try {
-            const raw = localStorage.getItem(STORAGE_KEY);
-            if (raw) atividades = JSON.parse(raw).atividades || [];
-        } catch { atividades = []; }
-    }
-
-    function formatarData(iso) {
-        if (!iso) return '—';
-        const [y, m, d] = iso.split('-');
-        return `${d}/${m}/${y}`;
-    }
-
-    /* ─── Login ─── */
+    /* ── Login ── */
     function tentarLogin() {
         const senha = document.getElementById('campo-senha').value;
         if (senha === SENHA_ADMIN) {
             document.getElementById('tela-login').style.display = 'none';
             document.getElementById('app').style.display = 'block';
-            carregarStorage();
-            renderTabela();
-            atualizarPreviewJson();
+            carregarConfigAtual();
         } else {
             document.getElementById('erro-login').style.display = 'block';
+            document.getElementById('campo-senha').select();
         }
     }
 
     document.getElementById('btn-entrar').addEventListener('click', tentarLogin);
-    document.getElementById('campo-senha').addEventListener('keydown', e => {
-        if (e.key === 'Enter') tentarLogin();
-    });
+    document.getElementById('campo-senha').addEventListener('keydown', e => { if (e.key === 'Enter') tentarLogin(); });
 
     document.getElementById('btn-sair').addEventListener('click', () => {
         document.getElementById('tela-login').style.display = 'flex';
@@ -569,178 +368,80 @@
         document.getElementById('campo-senha').value = '';
     });
 
-    /* ─── Navegação ─── */
-    document.querySelectorAll('.nav-item[data-pagina]').forEach(link => {
-        link.addEventListener('click', e => {
-            e.preventDefault();
-            const pagina = link.dataset.pagina;
-            document.querySelectorAll('.nav-item').forEach(l => l.classList.remove('ativo'));
-            link.classList.add('ativo');
-            document.getElementById('pagina-atividades').style.display = pagina === 'atividades' ? 'block' : 'none';
-            document.getElementById('pagina-exportar').style.display  = pagina === 'exportar'   ? 'block' : 'none';
-            if (pagina === 'exportar') atualizarPreviewJson();
-        });
-    });
+    /* ── Carregar config existente ── */
+    async function carregarConfigAtual() {
+        try {
+            const cfg = await fetch('../data/config.json?_=' + Date.now()).then(r => r.json());
+            if (cfg.sheetsUrl) {
+                document.getElementById('sheets-url').value = cfg.sheetsUrl;
+                atualizarLinkPlanilha(cfg.sheetsUrl);
+            }
+        } catch { /* sem config ainda */ }
+    }
 
-    /* ─── Tabela ─── */
-    function renderTabela() {
-        const tbody = document.getElementById('tbody-ativ');
-        const vazio = document.getElementById('vazio-ativ');
-        const tabela = document.getElementById('tabela-ativ');
-        const contador = document.getElementById('contador-ativ');
-        const hoje = new Date().toISOString().split('T')[0];
+    function atualizarLinkPlanilha(url) {
+        const link = document.getElementById('link-template');
+        if (url && extrairSheetId(url)) {
+            link.href = url;
+            link.style.pointerEvents = 'auto';
+            link.style.opacity = '1';
+        }
+    }
 
-        contador.textContent = `${atividades.length} atividade${atividades.length !== 1 ? 's' : ''}`;
+    /* ── Testar conexão ── */
+    document.getElementById('btn-testar').addEventListener('click', async () => {
+        const url = document.getElementById('sheets-url').value.trim();
+        const status = document.getElementById('status-conexao');
+        const btnBaixar = document.getElementById('btn-baixar-config');
 
-        if (atividades.length === 0) {
-            tabela.style.display = 'none';
-            vazio.style.display = 'block';
+        if (!url) {
+            status.innerHTML = `<div class="status-strip status-warn">⚠️ Cole a URL da planilha primeiro.</div>`;
             return;
         }
 
-        tabela.style.display = 'table';
-        vazio.style.display = 'none';
-
-        tbody.innerHTML = atividades.map(a => {
-            const encerrada = a.status === 'encerrada' || (a.prazo && a.prazo < hoje);
-            const tagCls  = encerrada ? 'tag-encerrada' : 'tag-aberta';
-            const tagTxt  = encerrada ? 'Encerrada' : 'Aberta';
-            return `
-            <tr>
-                <td class="titulo">${escHtml(a.titulo)}</td>
-                <td>${a.turma ? escHtml(a.turma) : '—'}</td>
-                <td>${formatarData(a.prazo)}</td>
-                <td><span class="tag ${tagCls}">${tagTxt}</span></td>
-                <td>${a.link ? `<a href="${escHtml(a.link)}" class="link-curto" target="_blank">${escHtml(a.link)}</a>` : '—'}</td>
-                <td>
-                    <div class="acoes">
-                        <button class="btn btn-secondary btn-sm" onclick="abrirEditar('${a.id}')">Editar</button>
-                        <button class="btn btn-danger btn-sm" onclick="excluir('${a.id}')">Excluir</button>
-                    </div>
-                </td>
-            </tr>`;
-        }).join('');
-    }
-
-    /* ─── Modal ─── */
-    function abrirNovo() {
-        document.getElementById('modal-titulo').textContent = 'Nova Atividade';
-        document.getElementById('modal-id').value = '';
-        ['f-titulo','f-desc','f-link','f-turma','f-prazo'].forEach(id => document.getElementById(id).value = '');
-        document.getElementById('f-status').value = 'aberta';
-        document.getElementById('modal-overlay').classList.add('aberto');
-        document.getElementById('f-titulo').focus();
-    }
-
-    function abrirEditar(id) {
-        const a = atividades.find(x => x.id === id);
-        if (!a) return;
-        document.getElementById('modal-titulo').textContent = 'Editar Atividade';
-        document.getElementById('modal-id').value   = a.id;
-        document.getElementById('f-titulo').value   = a.titulo  || '';
-        document.getElementById('f-desc').value     = a.descricao || '';
-        document.getElementById('f-link').value     = a.link    || '';
-        document.getElementById('f-turma').value    = a.turma   || '';
-        document.getElementById('f-prazo').value    = a.prazo   || '';
-        document.getElementById('f-status').value   = a.status  || 'aberta';
-        document.getElementById('modal-overlay').classList.add('aberto');
-        document.getElementById('f-titulo').focus();
-    }
-
-    function fecharModal() {
-        document.getElementById('modal-overlay').classList.remove('aberto');
-    }
-
-    function salvarModal() {
-        const titulo = document.getElementById('f-titulo').value.trim();
-        const link   = document.getElementById('f-link').value.trim();
-        if (!titulo) { toast('O título é obrigatório.', 'erro'); document.getElementById('f-titulo').focus(); return; }
-        if (!link)   { toast('O link do formulário é obrigatório.', 'erro'); document.getElementById('f-link').focus(); return; }
-
-        const id = document.getElementById('modal-id').value;
-        const obj = {
-            id:       id || uid(),
-            titulo,
-            descricao: document.getElementById('f-desc').value.trim(),
-            link,
-            turma:    document.getElementById('f-turma').value.trim(),
-            prazo:    document.getElementById('f-prazo').value || null,
-            status:   document.getElementById('f-status').value,
-        };
-
-        if (id) {
-            const idx = atividades.findIndex(a => a.id === id);
-            if (idx !== -1) atividades[idx] = obj;
-        } else {
-            atividades.unshift(obj);
+        const id = extrairSheetId(url);
+        if (!id) {
+            status.innerHTML = `<div class="status-strip status-err">❌ URL inválida. Use o link completo do Google Sheets.</div>`;
+            return;
         }
 
-        salvarStorage();
-        renderTabela();
-        atualizarPreviewJson();
-        fecharModal();
-        toast(id ? 'Atividade atualizada!' : 'Atividade criada!');
-    }
+        status.innerHTML = `<div class="status-strip status-warn">⏳ Conectando…</div>`;
+        btnBaixar.style.display = 'none';
 
-    function excluir(id) {
-        if (!confirm('Tem certeza que deseja excluir esta atividade?')) return;
-        atividades = atividades.filter(a => a.id !== id);
-        salvarStorage();
-        renderTabela();
-        atualizarPreviewJson();
-        toast('Atividade excluída.');
-    }
+        try {
+            const gvizUrl = `https://docs.google.com/spreadsheets/d/${id}/gviz/tq?tqx=out:json`;
+            const text = await fetch(gvizUrl).then(r => r.text());
+            const json = JSON.parse(text.slice(text.indexOf('{'), text.lastIndexOf('}') + 1));
 
-    document.getElementById('btn-nova').addEventListener('click', abrirNovo);
-    document.getElementById('btn-cancelar').addEventListener('click', fecharModal);
-    document.getElementById('btn-salvar-modal').addEventListener('click', salvarModal);
+            const cols = json.table.cols.map(c => c.label.toLowerCase().trim());
+            const rows = (json.table.rows || []).filter(r => r.c && r.c[0] && r.c[0].v);
+            const temCols = ['titulo', 'link'].every(c => cols.includes(c));
 
-    document.getElementById('modal-overlay').addEventListener('click', e => {
-        if (e.target === document.getElementById('modal-overlay')) fecharModal();
-    });
-
-    /* ─── Exportar / Importar ─── */
-    function gerarJson() {
-        return JSON.stringify({ atividades }, null, 2);
-    }
-
-    function atualizarPreviewJson() {
-        document.getElementById('preview-json').textContent = gerarJson();
-    }
-
-    document.getElementById('btn-exportar').addEventListener('click', () => {
-        const blob = new Blob([gerarJson()], { type: 'application/json' });
-        const url  = URL.createObjectURL(blob);
-        const a    = document.createElement('a');
-        a.href = url; a.download = 'atividades.json';
-        a.click();
-        URL.revokeObjectURL(url);
-        toast('Arquivo baixado! Substitua data/atividades.json no repositório.');
-    });
-
-    document.getElementById('btn-importar').addEventListener('click', () => {
-        document.getElementById('input-importar').click();
-    });
-
-    document.getElementById('input-importar').addEventListener('change', e => {
-        const file = e.target.files[0];
-        if (!file) return;
-        const reader = new FileReader();
-        reader.onload = ev => {
-            try {
-                const dados = JSON.parse(ev.target.result);
-                if (!Array.isArray(dados.atividades)) throw new Error();
-                atividades = dados.atividades;
-                salvarStorage();
-                renderTabela();
-                atualizarPreviewJson();
-                toast(`${atividades.length} atividade(s) importadas!`);
-            } catch {
-                toast('Arquivo inválido. Use um JSON exportado daqui.', 'erro');
+            if (!temCols) {
+                status.innerHTML = `<div class="status-strip status-warn">⚠️ Conectado, mas faltam colunas obrigatórias (<strong>titulo</strong> e <strong>link</strong>). Verifique os cabeçalhos da planilha.</div>`;
+                return;
             }
-        };
-        reader.readAsText(file);
-        e.target.value = '';
+
+            status.innerHTML = `<div class="status-strip status-ok">✅ Conexão OK — ${rows.length} atividade(s) encontrada(s). Clique em "Baixar config.json".</div>`;
+            btnBaixar.style.display = 'inline-flex';
+            atualizarLinkPlanilha(url);
+            toast('Planilha conectada com sucesso!');
+        } catch (e) {
+            status.innerHTML = `<div class="status-strip status-err">❌ Não foi possível acessar a planilha. Verifique se o compartilhamento está como "Qualquer pessoa com o link".</div>`;
+        }
+    });
+
+    /* ── Baixar config.json ── */
+    document.getElementById('btn-baixar-config').addEventListener('click', () => {
+        const url = document.getElementById('sheets-url').value.trim();
+        const json = JSON.stringify({ sheetsUrl: url }, null, 2);
+        const blob = new Blob([json], { type: 'application/json' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = 'config.json';
+        a.click();
+        URL.revokeObjectURL(a.href);
+        toast('config.json baixado! Substitua data/config.json no repositório.');
     });
 </script>
 </body>
