@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Entregas — P.I.</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@400;500;700&family=DM+Mono&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --ink:   #0F1923;
+            --ink2:  #3D4F5C;
+            --ink3:  #8A9BAA;
+            --paper: #F6F4EF;
+            --white: #FFFFFF;
+            --line:  #DDD9D0;
+            --blue:  #2A5BDB;
+            --verde: #0B6E4F;
+            --coral: #C0410D;
+            --bg-verde: #D1F0E4;
+            --bg-coral: #FFE8DF;
+        }
+
+        *, *::before, *::after { box-sizing: border-box; }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--paper);
+            color: var(--ink);
+            margin: 0;
+            padding: 48px 24px 80px;
+        }
+
+        .container { max-width: 1100px; margin: 0 auto; }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.875rem;
+            color: var(--ink3);
+            text-decoration: none;
+            margin-bottom: 28px;
+            transition: color 0.2s;
+        }
+        .back-link:hover { color: var(--blue); }
+
+        header { margin-bottom: 36px; }
+        h1 { font-family: 'DM Serif Display', serif; font-size: 2.6rem; margin: 0 0 8px; }
+        .subtitle { color: var(--ink2); font-size: 1rem; margin: 0; }
+
+        /* ── Resumo ── */
+        .resumo {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+            margin-bottom: 32px;
+        }
+
+        .resumo-card {
+            background: var(--white);
+            border: 1.5px solid var(--line);
+            border-radius: 10px;
+            padding: 16px 24px;
+            min-width: 140px;
+        }
+        .resumo-card .num {
+            font-family: 'DM Serif Display', serif;
+            font-size: 2rem;
+            line-height: 1;
+            color: var(--ink);
+        }
+        .resumo-card .label {
+            font-size: 0.8rem;
+            color: var(--ink3);
+            margin-top: 4px;
+        }
+
+        /* ── Filtro ── */
+        .filtro-bar {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+
+        .filtro-bar label { font-size: 0.85rem; color: var(--ink2); font-weight: 500; }
+
+        .filtro-bar select {
+            padding: 7px 12px;
+            border: 1.5px solid var(--line);
+            border-radius: 8px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.875rem;
+            background: var(--white);
+            color: var(--ink);
+            outline: none;
+            cursor: pointer;
+        }
+        .filtro-bar select:focus { border-color: var(--blue); }
+
+        /* ── Tabela ── */
+        .tabela-wrap {
+            background: var(--white);
+            border: 1.5px solid var(--line);
+            border-radius: 12px;
+            overflow: hidden;
+            overflow-x: auto;
+        }
+
+        table { width: 100%; border-collapse: collapse; }
+
+        thead th {
+            position: sticky;
+            top: 0;
+            background: var(--white);
+            font-size: 0.78rem;
+            font-weight: 600;
+            color: var(--ink3);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            padding: 14px 16px;
+            text-align: left;
+            border-bottom: 1.5px solid var(--line);
+            white-space: nowrap;
+        }
+
+        thead th.col-atividade {
+            text-align: center;
+            max-width: 120px;
+        }
+
+        thead th.col-atividade .ativ-nome {
+            display: block;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 120px;
+            text-transform: none;
+            font-size: 0.82rem;
+            color: var(--ink2);
+            letter-spacing: 0;
+        }
+
+        thead th.col-atividade .ativ-pct {
+            display: block;
+            font-size: 0.72rem;
+            color: var(--ink3);
+            font-weight: 400;
+            margin-top: 2px;
+        }
+
+        tbody td {
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--line);
+            font-size: 0.9rem;
+            color: var(--ink2);
+            vertical-align: middle;
+        }
+        tbody tr:last-child td { border-bottom: none; }
+        tbody tr:hover td { background: #fafaf8; }
+
+        td.col-nome { color: var(--ink); font-weight: 500; white-space: nowrap; min-width: 160px; }
+
+        td.col-status {
+            text-align: center;
+            padding: 8px 6px;
+        }
+
+        .check-sim {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px; height: 28px;
+            background: var(--bg-verde);
+            color: var(--verde);
+            border-radius: 6px;
+            font-size: 1rem;
+            font-weight: 700;
+        }
+        .check-nao {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px; height: 28px;
+            background: var(--bg-coral);
+            color: var(--coral);
+            border-radius: 6px;
+            font-size: 0.9rem;
+        }
+
+        /* Linha de totais */
+        tfoot td {
+            padding: 10px 16px;
+            font-size: 0.82rem;
+            font-weight: 600;
+            color: var(--ink2);
+            background: var(--paper);
+            border-top: 1.5px solid var(--line);
+            text-align: center;
+        }
+        tfoot td.col-total-label { text-align: left; color: var(--ink3); font-weight: 400; }
+
+        .barra-progresso {
+            height: 4px;
+            background: var(--line);
+            border-radius: 2px;
+            margin-top: 4px;
+            overflow: hidden;
+        }
+        .barra-progresso .fill {
+            height: 100%;
+            background: var(--verde);
+            border-radius: 2px;
+            transition: width 0.4s;
+        }
+
+        /* ── Estado ── */
+        .estado {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--ink3);
+        }
+        .estado .icone { font-size: 3rem; margin-bottom: 16px; }
+        .estado h2 { font-family: 'DM Serif Display', serif; font-size: 1.4rem; color: var(--ink2); margin: 0 0 8px; }
+        .estado p  { font-size: 0.9rem; margin: 0; }
+
+        .spinner {
+            width: 32px; height: 32px;
+            border: 3px solid var(--line);
+            border-top-color: var(--blue);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto 14px;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        footer {
+            margin-top: 48px;
+            font-size: 0.82rem;
+            color: var(--ink3);
+            border-top: 1px solid var(--line);
+            padding-top: 20px;
+        }
+
+        @media (max-width: 600px) {
+            h1 { font-size: 2rem; }
+            body { padding: 32px 16px 60px; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+
+    <a href="../index.html" class="back-link">← Voltar ao portal</a>
+
+    <header>
+        <h1>Entregas</h1>
+        <p class="subtitle">Acompanhamento de entregas dos alunos por atividade.</p>
+    </header>
+
+    <div class="resumo" id="resumo" style="display:none;"></div>
+
+    <div class="filtro-bar" id="filtro-bar" style="display:none;">
+        <label for="sel-atividade">Filtrar por atividade:</label>
+        <select id="sel-atividade">
+            <option value="">Todas as atividades</option>
+        </select>
+        <label for="sel-status" style="margin-left:8px;">Status:</label>
+        <select id="sel-status">
+            <option value="">Todos</option>
+            <option value="sim">Entregou</option>
+            <option value="nao">Não entregou</option>
+        </select>
+    </div>
+
+    <div id="conteudo">
+        <div class="estado">
+            <div class="spinner"></div>
+            <p>Carregando entregas…</p>
+        </div>
+    </div>
+
+    <footer>P.I. — Desenvolvido para apoio acadêmico.</footer>
+</div>
+
+<script>
+    let alunos = [];       // [{ nome, entregas: { 'Atividade 1': true, ... } }]
+    let atividades = [];   // ['Atividade 1', 'Atividade 2', ...]
+
+    function extrairSheetId(url) {
+        const m = url.match(/\/spreadsheets\/d\/([a-zA-Z0-9_-]+)/);
+        return m ? m[1] : null;
+    }
+
+    async function carregar() {
+        try {
+            const cfg = await fetch('../data/config.json?_=' + Date.now()).then(r => r.json());
+
+            if (!cfg.entregasUrl) {
+                mostrarEstado('📋', 'Planilha não configurada', 'O professor ainda não vinculou a planilha de entregas. Acesse o admin para configurar.');
+                return;
+            }
+
+            const id = extrairSheetId(cfg.entregasUrl);
+            if (!id) {
+                mostrarEstado('⚠️', 'URL inválida', 'Verifique a configuração no painel admin.');
+                return;
+            }
+
+            const text = await fetch(`https://docs.google.com/spreadsheets/d/${id}/gviz/tq?tqx=out:json`).then(r => r.text());
+            const json = JSON.parse(text.slice(text.indexOf('{'), text.lastIndexOf('}') + 1));
+
+            const cols = json.table.cols.map(c => (c.label || '').trim());
+            const rows = (json.table.rows || []).filter(r => r.c && r.c[0] && r.c[0].v);
+
+            // Primeira coluna = nome, demais = atividades
+            atividades = cols.slice(1).filter(c => c);
+
+            alunos = rows.map(row => {
+                const nome = String(row.c[0].v || '').trim();
+                const entregas = {};
+                atividades.forEach((atv, i) => {
+                    const cell = row.c[i + 1];
+                    entregas[atv] = !!(cell && (cell.v || cell.f));
+                });
+                return { nome, entregas };
+            }).filter(a => a.nome);
+
+            renderizar();
+        } catch (e) {
+            mostrarEstado('❌', 'Erro ao carregar', 'Não foi possível buscar os dados. Verifique o compartilhamento da planilha.');
+        }
+    }
+
+    function mostrarEstado(icone, titulo, msg) {
+        document.getElementById('conteudo').innerHTML = `
+            <div class="estado">
+                <div class="icone">${icone}</div>
+                <h2>${titulo}</h2>
+                <p>${msg}</p>
+            </div>`;
+        document.getElementById('resumo').style.display = 'none';
+        document.getElementById('filtro-bar').style.display = 'none';
+    }
+
+    function renderizar() {
+        const filtroAtv = document.getElementById('sel-atividade')?.value || '';
+        const filtroStatus = document.getElementById('sel-status')?.value || '';
+
+        // Preencher select de atividades
+        const sel = document.getElementById('sel-atividade');
+        const valorAtual = sel.value;
+        sel.innerHTML = '<option value="">Todas as atividades</option>' +
+            atividades.map(a => `<option value="${esc(a)}"${a === valorAtual ? ' selected' : ''}>${esc(a)}</option>`).join('');
+
+        // Calcular totais por atividade
+        const totais = {};
+        atividades.forEach(a => {
+            totais[a] = alunos.filter(al => al.entregas[a]).length;
+        });
+
+        // Resumo geral
+        const totalEntregas = Object.values(totais).reduce((s, v) => s + v, 0);
+        const totalPossivel = alunos.length * atividades.length;
+        const pct = totalPossivel ? Math.round(totalEntregas / totalPossivel * 100) : 0;
+
+        document.getElementById('resumo').style.display = 'flex';
+        document.getElementById('resumo').innerHTML = `
+            <div class="resumo-card">
+                <div class="num">${alunos.length}</div>
+                <div class="label">Alunos</div>
+            </div>
+            <div class="resumo-card">
+                <div class="num">${atividades.length}</div>
+                <div class="label">Atividades</div>
+            </div>
+            <div class="resumo-card">
+                <div class="num">${pct}%</div>
+                <div class="label">Entregas realizadas</div>
+            </div>`;
+
+        document.getElementById('filtro-bar').style.display = 'flex';
+
+        // Filtrar alunos por status se necessário
+        let alunosFiltrados = alunos;
+        if (filtroStatus && filtroAtv) {
+            alunosFiltrados = alunos.filter(al =>
+                filtroStatus === 'sim' ? al.entregas[filtroAtv] : !al.entregas[filtroAtv]
+            );
+        } else if (filtroStatus) {
+            alunosFiltrados = alunos.filter(al => {
+                const entregou = atividades.some(a => al.entregas[a]);
+                const naoEntregou = atividades.some(a => !al.entregas[a]);
+                return filtroStatus === 'sim' ? entregou : naoEntregou;
+            });
+        }
+
+        // Colunas visíveis
+        const colsVisiveis = filtroAtv ? [filtroAtv] : atividades;
+
+        if (alunosFiltrados.length === 0) {
+            document.getElementById('conteudo').innerHTML = `
+                <div class="estado">
+                    <div class="icone">🔍</div>
+                    <h2>Nenhum resultado</h2>
+                    <p>Tente mudar os filtros.</p>
+                </div>`;
+            return;
+        }
+
+        const thead = `
+            <thead>
+                <tr>
+                    <th>Aluno</th>
+                    ${colsVisiveis.map(a => {
+                        const n = totais[a] || 0;
+                        const p = alunos.length ? Math.round(n / alunos.length * 100) : 0;
+                        return `<th class="col-atividade">
+                            <span class="ativ-nome" title="${esc(a)}">${esc(a)}</span>
+                            <span class="ativ-pct">${n}/${alunos.length} (${p}%)</span>
+                            <div class="barra-progresso"><div class="fill" style="width:${p}%"></div></div>
+                        </th>`;
+                    }).join('')}
+                </tr>
+            </thead>`;
+
+        const tbody = `
+            <tbody>
+                ${alunosFiltrados.map(al => `
+                <tr>
+                    <td class="col-nome">${esc(al.nome)}</td>
+                    ${colsVisiveis.map(a =>
+                        `<td class="col-status">
+                            ${al.entregas[a]
+                                ? `<span class="check-sim">✓</span>`
+                                : `<span class="check-nao">✗</span>`}
+                        </td>`
+                    ).join('')}
+                </tr>`).join('')}
+            </tbody>`;
+
+        const tfoot = `
+            <tfoot>
+                <tr>
+                    <td class="col-total-label">Total entregues</td>
+                    ${colsVisiveis.map(a => {
+                        const n = alunosFiltrados.filter(al => al.entregas[a]).length;
+                        return `<td>${n}/${alunosFiltrados.length}</td>`;
+                    }).join('')}
+                </tr>
+            </tfoot>`;
+
+        document.getElementById('conteudo').innerHTML = `
+            <div class="tabela-wrap">
+                <table>${thead}${tbody}${tfoot}</table>
+            </div>`;
+    }
+
+    function esc(s) {
+        if (!s) return '';
+        return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+
+    document.addEventListener('change', e => {
+        if (e.target.id === 'sel-atividade' || e.target.id === 'sel-status') renderizar();
+    });
+
+    carregar();
+</script>
+</body>
+</html>

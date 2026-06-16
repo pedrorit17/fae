@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin — Atividades</title>
+    <title>Admin — P.I.</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:ital,wght@0,400;0,500;0,700&family=DM+Mono&display=swap" rel="stylesheet">
     <style>
@@ -49,7 +49,6 @@
             box-shadow: 0 4px 24px rgba(0,0,0,0.07);
             text-align: center;
         }
-
         .login-card .lock { font-size: 2.5rem; margin-bottom: 16px; }
         .login-card h1 { font-family: 'DM Serif Display', serif; font-size: 1.8rem; margin: 0 0 4px; }
         .login-card p  { color: var(--ink3); font-size: 0.9rem; margin: 0 0 28px; }
@@ -95,13 +94,12 @@
         }
         .field input:focus { border-color: var(--blue); }
         .field .hint { font-size: 0.78rem; color: var(--ink3); margin-top: 5px; }
-
         .erro { color: var(--coral); font-size: 0.85rem; margin: 0 0 14px; display: none; }
 
         /* ── App ── */
-        #app { display: none; max-width: 760px; margin: 0 auto; padding: 48px 24px 80px; }
+        #app { display: none; max-width: 780px; margin: 0 auto; padding: 48px 24px 80px; }
 
-        .app-header { margin-bottom: 40px; }
+        .app-header { margin-bottom: 36px; }
         .app-header h1 { font-family: 'DM Serif Display', serif; font-size: 2rem; margin: 0 0 4px; }
         .app-header p  { color: var(--ink3); margin: 0; font-size: 0.9rem; }
 
@@ -117,7 +115,7 @@
         }
         .btn-sair:hover { color: var(--coral); }
 
-        /* ── Cards de seção ── */
+        /* ── Cards ── */
         .card {
             background: var(--white);
             border: 1.5px solid var(--line);
@@ -125,58 +123,12 @@
             padding: 28px 32px;
             margin-bottom: 20px;
         }
-
-        .card h2 {
-            font-family: 'DM Serif Display', serif;
-            font-size: 1.25rem;
-            margin: 0 0 6px;
-        }
-
+        .card h2 { font-family: 'DM Serif Display', serif; font-size: 1.25rem; margin: 0 0 4px; }
         .card .desc { color: var(--ink2); font-size: 0.9rem; margin: 0 0 20px; line-height: 1.5; }
-
         .row-btns { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
 
-        /* ── Passo a passo ── */
-        .steps { list-style: none; padding: 0; margin: 0 0 20px; counter-reset: step; }
-        .steps li {
-            counter-increment: step;
-            display: flex;
-            gap: 14px;
-            align-items: flex-start;
-            margin-bottom: 16px;
-            font-size: 0.9rem;
-            color: var(--ink2);
-            line-height: 1.5;
-        }
-        .steps li::before {
-            content: counter(step);
-            min-width: 26px; height: 26px;
-            background: var(--blue);
-            color: var(--white);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.78rem;
-            font-weight: 700;
-            flex-shrink: 0;
-            margin-top: 1px;
-        }
-
-        /* ── Sheet ID exibido ── */
-        .sheet-id {
-            font-family: 'DM Mono', monospace;
-            font-size: 0.82rem;
-            background: var(--paper);
-            border: 1px solid var(--line);
-            border-radius: 6px;
-            padding: 8px 12px;
-            color: var(--ink2);
-            word-break: break-all;
-        }
-
         /* ── Colunas template ── */
-        .cols-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; margin-bottom: 16px; }
+        .cols-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; margin: 12px 0 16px; overflow-x: auto; display: block; }
         .cols-table th {
             font-family: 'DM Mono', monospace;
             text-align: left;
@@ -185,26 +137,73 @@
             border: 1px solid var(--line);
             color: var(--blue);
             font-weight: 600;
+            white-space: nowrap;
         }
-        .cols-table td {
-            padding: 8px 12px;
-            border: 1px solid var(--line);
-            color: var(--ink2);
-        }
+        .cols-table td { padding: 8px 12px; border: 1px solid var(--line); color: var(--ink2); white-space: nowrap; }
 
-        /* ── Status ── */
+        /* ── Status strip ── */
         .status-strip {
             display: flex;
-            align-items: center;
+            align-items: flex-start;
             gap: 10px;
             padding: 12px 16px;
             border-radius: 8px;
             font-size: 0.88rem;
             margin-top: 14px;
+            line-height: 1.5;
         }
         .status-ok   { background: #D1F0E4; color: var(--verde); }
         .status-warn { background: #FFF4DC; color: var(--ambar); }
         .status-err  { background: #FFE8DF; color: var(--coral); }
+
+        /* ── Passos ── */
+        .steps { list-style: none; padding: 0; margin: 0 0 16px; counter-reset: step; }
+        .steps li {
+            counter-increment: step;
+            display: flex;
+            gap: 14px;
+            align-items: flex-start;
+            margin-bottom: 14px;
+            font-size: 0.9rem;
+            color: var(--ink2);
+            line-height: 1.5;
+        }
+        .steps li::before {
+            content: counter(step);
+            min-width: 24px; height: 24px;
+            background: var(--blue);
+            color: var(--white);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 700;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        /* ── Divisor entre planilhas ── */
+        .sheet-secao {
+            border-left: 3px solid var(--blue);
+            padding-left: 16px;
+            margin-bottom: 28px;
+        }
+        .sheet-secao:last-of-type { margin-bottom: 0; }
+        .sheet-secao h3 {
+            font-family: 'DM Serif Display', serif;
+            font-size: 1.1rem;
+            margin: 0 0 4px;
+        }
+        .sheet-secao .sheet-sub { font-size: 0.85rem; color: var(--ink3); margin: 0 0 16px; }
+
+        /* ── Destaque salvar ── */
+        .card-salvar {
+            background: var(--blue);
+            border-color: var(--blue);
+        }
+        .card-salvar h2 { color: var(--white); }
+        .card-salvar .desc { color: rgba(255,255,255,0.75); }
 
         /* ── Toast ── */
         #toast {
@@ -228,6 +227,7 @@
         @media (max-width: 520px) {
             .login-card { padding: 36px 24px; }
             #app { padding: 32px 16px 60px; }
+            .card { padding: 20px; }
         }
     </style>
 </head>
@@ -253,75 +253,90 @@
 
     <div class="app-header">
         <button class="btn-sair" id="btn-sair">Sair</button>
-        <h1>Gerenciar Atividades</h1>
-        <p>Configure a planilha do Google Sheets para exibir atividades aos alunos.</p>
+        <h1>Configurações</h1>
+        <p>Configure as planilhas do Google Sheets.</p>
     </div>
 
-    <!-- 1. Configurar planilha -->
+    <!-- ── Planilhas ── -->
     <div class="card">
-        <h2>1. Configurar planilha</h2>
-        <p class="desc">Cole abaixo o link de compartilhamento da sua planilha Google Sheets.</p>
+        <h2>Planilhas</h2>
+        <p class="desc">Configure as duas planilhas abaixo. Após preencher e testar, baixe o <code>config.json</code> e substitua no repositório.</p>
 
-        <div class="field">
-            <label>URL da planilha</label>
-            <input type="url" id="sheets-url" placeholder="https://docs.google.com/spreadsheets/d/…/edit">
-            <p class="hint">Vá em Compartilhar → "Qualquer pessoa com o link" → Visualizador → copie o link.</p>
+        <!-- Planilha 1: Atividades -->
+        <div class="sheet-secao">
+            <h3>📋 Planilha de Atividades</h3>
+            <p class="sheet-sub">Lista de formulários para entrega — exibida para os alunos.</p>
+
+            <div class="field">
+                <label>URL da planilha</label>
+                <input type="url" id="url-atividades" placeholder="https://docs.google.com/spreadsheets/d/…/edit">
+                <p class="hint">Compartilhar → "Qualquer pessoa com o link" → Visualizador.</p>
+            </div>
+
+            <p class="desc" style="margin-bottom:10px;">Estrutura esperada (linha 1 = cabeçalhos):</p>
+            <table class="cols-table">
+                <thead><tr>
+                    <th>titulo</th><th>descricao</th><th>link</th><th>turma</th><th>prazo</th><th>status</th>
+                </tr></thead>
+                <tbody><tr>
+                    <td>Nome da atividade</td><td>Instrução</td><td>Link do Forms</td><td>Ex: Turma A</td><td>DD/MM/AAAA</td><td>aberta / encerrada</td>
+                </tr></tbody>
+            </table>
+
+            <div class="row-btns">
+                <button class="btn btn-secondary" id="btn-testar-ativ">Testar conexão</button>
+                <a class="btn btn-secondary" id="link-ativ" href="#" target="_blank" style="pointer-events:none;opacity:0.4;">Abrir planilha ↗</a>
+            </div>
+            <div id="status-ativ"></div>
         </div>
 
-        <div class="row-btns">
-            <button class="btn btn-primary" id="btn-testar">Testar conexão</button>
-            <button class="btn btn-success" id="btn-baixar-config" style="display:none;">⬇ Baixar config.json</button>
-        </div>
+        <hr style="border:none;border-top:1px solid var(--line);margin:28px 0;">
 
-        <div id="status-conexao"></div>
+        <!-- Planilha 2: Entregas -->
+        <div class="sheet-secao" style="border-color:#0B6E4F;">
+            <h3>✅ Planilha de Entregas</h3>
+            <p class="sheet-sub">Controle de quem entregou cada atividade.</p>
+
+            <div class="field">
+                <label>URL da planilha</label>
+                <input type="url" id="url-entregas" placeholder="https://docs.google.com/spreadsheets/d/…/edit">
+                <p class="hint">Mesma configuração de compartilhamento da planilha anterior.</p>
+            </div>
+
+            <p class="desc" style="margin-bottom:10px;">Estrutura esperada (linha 1 = cabeçalhos):</p>
+            <table class="cols-table">
+                <thead><tr>
+                    <th>nome</th><th>Atividade 1</th><th>Atividade 2</th><th>…</th>
+                </tr></thead>
+                <tbody><tr>
+                    <td>Nome do aluno</td><td>✓ (entregou)</td><td style="color:var(--ink3);">vazio</td><td style="color:var(--ink3);">…</td>
+                </tr></tbody>
+            </table>
+            <p class="desc" style="margin:0 0 14px;font-size:0.82rem;">Coluna A = nome dos alunos. As demais colunas = nome de cada atividade. Célula preenchida (qualquer valor) = entregou.</p>
+
+            <div class="row-btns">
+                <button class="btn btn-secondary" id="btn-testar-entr">Testar conexão</button>
+                <a class="btn btn-secondary" id="link-entr" href="#" target="_blank" style="pointer-events:none;opacity:0.4;">Abrir planilha ↗</a>
+            </div>
+            <div id="status-entr"></div>
+        </div>
     </div>
 
-    <!-- 2. Estrutura da planilha -->
+    <!-- ── Salvar ── -->
     <div class="card">
-        <h2>2. Estrutura da planilha</h2>
-        <p class="desc">A primeira linha da planilha deve ter exatamente estes cabeçalhos (em minúsculas):</p>
-
-        <table class="cols-table">
-            <thead>
-                <tr>
-                    <th>titulo</th>
-                    <th>descricao</th>
-                    <th>link</th>
-                    <th>turma</th>
-                    <th>prazo</th>
-                    <th>status</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>Nome da atividade</td>
-                    <td>Instrução opcional</td>
-                    <td>Link do Google Forms</td>
-                    <td>Ex: Turma A</td>
-                    <td>DD/MM/AAAA</td>
-                    <td><code>aberta</code> ou <code>encerrada</code></td>
-                </tr>
-            </tbody>
-        </table>
-
-        <div class="row-btns">
-            <a class="btn btn-secondary" id="link-template" href="#" target="_blank" style="pointer-events:none; opacity:0.5;">
-                Abrir planilha ↗
-            </a>
-        </div>
-    </div>
-
-    <!-- 3. Publicar -->
-    <div class="card">
-        <h2>3. Publicar alterações</h2>
+        <h2>Publicar configuração</h2>
         <ol class="steps">
-            <li>Clique em "Testar conexão" acima e confirme que os dados aparecem corretamente.</li>
-            <li>Clique em <strong>Baixar config.json</strong> para salvar o arquivo de configuração.</li>
-            <li>Substitua o arquivo <code>data/config.json</code> no repositório por esse arquivo baixado.</li>
-            <li>Faça commit e push — a partir daí os alunos já veem as atividades.</li>
-            <li><strong>No dia a dia:</strong> só adicione linhas na planilha. As mudanças aparecem automaticamente.</li>
+            <li>Teste a conexão das duas planilhas acima.</li>
+            <li>Clique em <strong>Baixar config.json</strong>.</li>
+            <li>Substitua <code>data/config.json</code> no repositório e faça commit + push.</li>
+            <li><strong>No dia a dia:</strong> edite as planilhas diretamente — as páginas atualizam automaticamente.</li>
         </ol>
-        <p class="desc" style="margin:0;">Dúvida? Abra a planilha e adicione uma linha de teste, depois acesse <a href="../atividades/" target="_blank" style="color:var(--blue);">a página dos alunos</a> para ver ao vivo.</p>
+
+        <div class="row-btns">
+            <button class="btn btn-primary" id="btn-baixar-config">⬇ Baixar config.json</button>
+            <a class="btn btn-secondary" href="../atividades/" target="_blank">Ver página dos alunos ↗</a>
+            <a class="btn btn-secondary" href="../entregas/" target="_blank">Ver página de entregas ↗</a>
+        </div>
     </div>
 
 </div>
@@ -329,30 +344,37 @@
 <div id="toast"></div>
 
 <script>
-    // Troque aqui para alterar a senha de acesso:
+    // Troque aqui para alterar a senha:
     const SENHA_ADMIN = 'professor';
 
-    /* ── Utilitários ── */
+    /* ── Utils ── */
     function toast(msg, tipo = 'ok') {
         const el = document.getElementById('toast');
         el.textContent = msg;
         el.style.background = tipo === 'erro' ? '#C0410D' : '#0F1923';
         el.classList.add('show');
-        setTimeout(() => el.classList.remove('show'), 3000);
+        setTimeout(() => el.classList.remove('show'), 3200);
     }
 
     function extrairSheetId(url) {
-        const m = url.match(/\/spreadsheets\/d\/([a-zA-Z0-9_-]+)/);
+        const m = (url || '').match(/\/spreadsheets\/d\/([a-zA-Z0-9_-]+)/);
         return m ? m[1] : null;
+    }
+
+    function ativarLink(linkEl, url) {
+        if (url && extrairSheetId(url)) {
+            linkEl.href = url;
+            linkEl.style.pointerEvents = 'auto';
+            linkEl.style.opacity = '1';
+        }
     }
 
     /* ── Login ── */
     function tentarLogin() {
-        const senha = document.getElementById('campo-senha').value;
-        if (senha === SENHA_ADMIN) {
+        if (document.getElementById('campo-senha').value === SENHA_ADMIN) {
             document.getElementById('tela-login').style.display = 'none';
             document.getElementById('app').style.display = 'block';
-            carregarConfigAtual();
+            carregarConfig();
         } else {
             document.getElementById('erro-login').style.display = 'block';
             document.getElementById('campo-senha').select();
@@ -361,81 +383,79 @@
 
     document.getElementById('btn-entrar').addEventListener('click', tentarLogin);
     document.getElementById('campo-senha').addEventListener('keydown', e => { if (e.key === 'Enter') tentarLogin(); });
-
     document.getElementById('btn-sair').addEventListener('click', () => {
         document.getElementById('tela-login').style.display = 'flex';
         document.getElementById('app').style.display = 'none';
         document.getElementById('campo-senha').value = '';
     });
 
-    /* ── Carregar config existente ── */
-    async function carregarConfigAtual() {
+    /* ── Carregar config atual ── */
+    async function carregarConfig() {
         try {
             const cfg = await fetch('../data/config.json?_=' + Date.now()).then(r => r.json());
             if (cfg.sheetsUrl) {
-                document.getElementById('sheets-url').value = cfg.sheetsUrl;
-                atualizarLinkPlanilha(cfg.sheetsUrl);
+                document.getElementById('url-atividades').value = cfg.sheetsUrl;
+                ativarLink(document.getElementById('link-ativ'), cfg.sheetsUrl);
             }
-        } catch { /* sem config ainda */ }
+            if (cfg.entregasUrl) {
+                document.getElementById('url-entregas').value = cfg.entregasUrl;
+                ativarLink(document.getElementById('link-entr'), cfg.entregasUrl);
+            }
+        } catch { /* config ainda vazio */ }
     }
 
-    function atualizarLinkPlanilha(url) {
-        const link = document.getElementById('link-template');
-        if (url && extrairSheetId(url)) {
-            link.href = url;
-            link.style.pointerEvents = 'auto';
-            link.style.opacity = '1';
-        }
-    }
-
-    /* ── Testar conexão ── */
-    document.getElementById('btn-testar').addEventListener('click', async () => {
-        const url = document.getElementById('sheets-url').value.trim();
-        const status = document.getElementById('status-conexao');
-        const btnBaixar = document.getElementById('btn-baixar-config');
-
+    /* ── Testar conexão genérico ── */
+    async function testarConexao(url, statusEl, colObrigatoria) {
         if (!url) {
-            status.innerHTML = `<div class="status-strip status-warn">⚠️ Cole a URL da planilha primeiro.</div>`;
-            return;
+            statusEl.innerHTML = `<div class="status-strip status-warn">⚠️ Cole a URL da planilha primeiro.</div>`;
+            return false;
         }
-
         const id = extrairSheetId(url);
         if (!id) {
-            status.innerHTML = `<div class="status-strip status-err">❌ URL inválida. Use o link completo do Google Sheets.</div>`;
-            return;
+            statusEl.innerHTML = `<div class="status-strip status-err">❌ URL inválida. Use o link completo do Google Sheets.</div>`;
+            return false;
         }
 
-        status.innerHTML = `<div class="status-strip status-warn">⏳ Conectando…</div>`;
-        btnBaixar.style.display = 'none';
+        statusEl.innerHTML = `<div class="status-strip status-warn">⏳ Conectando…</div>`;
 
         try {
-            const gvizUrl = `https://docs.google.com/spreadsheets/d/${id}/gviz/tq?tqx=out:json`;
-            const text = await fetch(gvizUrl).then(r => r.text());
+            const text = await fetch(`https://docs.google.com/spreadsheets/d/${id}/gviz/tq?tqx=out:json`).then(r => r.text());
             const json = JSON.parse(text.slice(text.indexOf('{'), text.lastIndexOf('}') + 1));
-
-            const cols = json.table.cols.map(c => c.label.toLowerCase().trim());
+            const cols = json.table.cols.map(c => (c.label || '').toLowerCase().trim());
             const rows = (json.table.rows || []).filter(r => r.c && r.c[0] && r.c[0].v);
-            const temCols = ['titulo', 'link'].every(c => cols.includes(c));
 
-            if (!temCols) {
-                status.innerHTML = `<div class="status-strip status-warn">⚠️ Conectado, mas faltam colunas obrigatórias (<strong>titulo</strong> e <strong>link</strong>). Verifique os cabeçalhos da planilha.</div>`;
-                return;
+            if (!cols.includes(colObrigatoria)) {
+                statusEl.innerHTML = `<div class="status-strip status-warn">⚠️ Conectado, mas coluna obrigatória <strong>"${colObrigatoria}"</strong> não encontrada. Verifique os cabeçalhos da linha 1.</div>`;
+                return false;
             }
 
-            status.innerHTML = `<div class="status-strip status-ok">✅ Conexão OK — ${rows.length} atividade(s) encontrada(s). Clique em "Baixar config.json".</div>`;
-            btnBaixar.style.display = 'inline-flex';
-            atualizarLinkPlanilha(url);
-            toast('Planilha conectada com sucesso!');
-        } catch (e) {
-            status.innerHTML = `<div class="status-strip status-err">❌ Não foi possível acessar a planilha. Verifique se o compartilhamento está como "Qualquer pessoa com o link".</div>`;
+            statusEl.innerHTML = `<div class="status-strip status-ok">✅ Conexão OK — ${rows.length} linha(s) de dados encontrada(s).</div>`;
+            return true;
+        } catch {
+            statusEl.innerHTML = `<div class="status-strip status-err">❌ Não foi possível acessar a planilha. Verifique se o compartilhamento está como "Qualquer pessoa com o link pode visualizar".</div>`;
+            return false;
         }
+    }
+
+    document.getElementById('btn-testar-ativ').addEventListener('click', async () => {
+        const url = document.getElementById('url-atividades').value.trim();
+        const ok = await testarConexao(url, document.getElementById('status-ativ'), 'titulo');
+        if (ok) { ativarLink(document.getElementById('link-ativ'), url); toast('Planilha de atividades OK!'); }
+    });
+
+    document.getElementById('btn-testar-entr').addEventListener('click', async () => {
+        const url = document.getElementById('url-entregas').value.trim();
+        const ok = await testarConexao(url, document.getElementById('status-entr'), 'nome');
+        if (ok) { ativarLink(document.getElementById('link-entr'), url); toast('Planilha de entregas OK!'); }
     });
 
     /* ── Baixar config.json ── */
     document.getElementById('btn-baixar-config').addEventListener('click', () => {
-        const url = document.getElementById('sheets-url').value.trim();
-        const json = JSON.stringify({ sheetsUrl: url }, null, 2);
-        const blob = new Blob([json], { type: 'application/json' });
+        const config = {
+            sheetsUrl:   document.getElementById('url-atividades').value.trim(),
+            entregasUrl: document.getElementById('url-entregas').value.trim(),
+        };
+        const blob = new Blob([JSON.stringify(config, null, 2)], { type: 'application/json' });
         const a = document.createElement('a');
         a.href = URL.createObjectURL(blob);
         a.download = 'config.json';
