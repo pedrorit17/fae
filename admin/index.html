@@ -347,6 +347,31 @@
     // Troque aqui para alterar a senha:
     const SENHA_ADMIN = 'professor';
 
+    /* ── Parser robusto do gviz ── */
+    // A API do Google às vezes retorna os cabeçalhos como c.label, outras vezes
+    // como primeira linha de dados (especialmente quando a planilha está vazia).
+    function parseGviz(text) {
+        const json = JSON.parse(text.slice(text.indexOf('{'), text.lastIndexOf('}') + 1));
+        let cols = json.table.cols.map(c => (c.label || '').trim());
+        let rows = json.table.rows || [];
+
+        // Se os labels vieram vazios ou genéricos (A, B, C…), os cabeçalhos
+        // provavelmente estão na primeira linha de dados.
+        const temLabels = cols.some(l => l && !/^[A-Z]{1,2}$/.test(l));
+        if (!temLabels && rows.length > 0 && rows[0].c) {
+            const primeiraLinha = rows[0].c.map(cell => cell ? String(cell.v ?? '').trim() : '');
+            if (primeiraLinha.some(h => h)) {
+                cols = primeiraLinha;
+                rows = rows.slice(1);
+            }
+        }
+
+        return {
+            cols,
+            rows: rows.filter(r => r.c && r.c[0] && r.c[0].v != null),
+        };
+    }
+
     /* ── Utils ── */
     function toast(msg, tipo = 'ok') {
         const el = document.getElementById('toast');
@@ -420,12 +445,10 @@
 
         try {
             const text = await fetch(`https://docs.google.com/spreadsheets/d/${id}/gviz/tq?tqx=out:json&headers=1`).then(r => r.text());
-            const json = JSON.parse(text.slice(text.indexOf('{'), text.lastIndexOf('}') + 1));
-            const cols = json.table.cols.map(c => (c.label || '').toLowerCase().trim());
-            const rows = (json.table.rows || []).filter(r => r.c && r.c[0] && r.c[0].v);
+            const { cols, rows } = parseGviz(text);
 
-            if (!cols.includes(colObrigatoria)) {
-                statusEl.innerHTML = `<div class="status-strip status-warn">⚠️ Conectado, mas coluna obrigatória <strong>"${colObrigatoria}"</strong> não encontrada. Verifique os cabeçalhos da linha 1.</div>`;
+            if (!cols.map(c => c.toLowerCase()).includes(colObrigatoria)) {
+                statusEl.innerHTML = `<div class="status-strip status-warn">⚠️ Conectado, mas coluna obrigatória <strong>"${colObrigatoria}"</strong> não encontrada. Verifique os cabeçalhos da linha 1.<br><small style="opacity:.7">Colunas detectadas: ${cols.join(', ') || '(nenhuma)'}</small></div>`;
                 return false;
             }
 

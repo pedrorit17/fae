@@ -220,10 +220,21 @@
         return null;
     }
 
-    // Extrai ID do Google Sheets de qualquer formato de URL
     function extrairSheetId(url) {
-        const m = url.match(/\/spreadsheets\/d\/([a-zA-Z0-9_-]+)/);
+        const m = (url || '').match(/\/spreadsheets\/d\/([a-zA-Z0-9_-]+)/);
         return m ? m[1] : null;
+    }
+
+    function parseGviz(text) {
+        const json = JSON.parse(text.slice(text.indexOf('{'), text.lastIndexOf('}') + 1));
+        let cols = json.table.cols.map(c => (c.label || '').trim());
+        let rows = json.table.rows || [];
+        const temLabels = cols.some(l => l && !/^[A-Z]{1,2}$/.test(l));
+        if (!temLabels && rows.length > 0 && rows[0].c) {
+            const primeira = rows[0].c.map(cell => cell ? String(cell.v ?? '').trim() : '');
+            if (primeira.some(h => h)) { cols = primeira; rows = rows.slice(1); }
+        }
+        return { cols, rows: rows.filter(r => r.c && r.c[0] && r.c[0].v != null) };
     }
 
     async function carregarAtividades() {
@@ -240,19 +251,14 @@
                 return;
             }
 
-            const gvizUrl = `https://docs.google.com/spreadsheets/d/${id}/gviz/tq?tqx=out:json&headers=1`;
-            const text = await fetch(gvizUrl).then(r => r.text());
-
-            // Remove wrapper JSONP do Google
-            const json = JSON.parse(text.slice(text.indexOf('{'), text.lastIndexOf('}') + 1));
-            const cols = json.table.cols.map(c => c.label.toLowerCase().trim());
-            const rows = json.table.rows || [];
+            const text = await fetch(`https://docs.google.com/spreadsheets/d/${id}/gviz/tq?tqx=out:json&headers=1`).then(r => r.text());
+            const { cols, rows } = parseGviz(text);
+            const colsLower = cols.map(c => c.toLowerCase());
 
             todasAtividades = rows
-                .filter(row => row.c && row.c[0] && row.c[0].v)
                 .map((row, i) => {
                     const obj = { id: String(i) };
-                    cols.forEach((col, ci) => {
+                    colsLower.forEach((col, ci) => {
                         const cell = row.c[ci];
                         obj[col] = cell ? String(cell.v || cell.f || '').trim() : '';
                     });
