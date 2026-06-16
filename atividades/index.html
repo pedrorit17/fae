@@ -225,6 +225,16 @@
     let filtroAtivo = 'todas';
 
     async function carregarAtividades() {
+        // Lê do localStorage (atualizado pelo admin) com fallback para o JSON estático
+        try {
+            const local = localStorage.getItem('fae_atividades');
+            if (local) {
+                todasAtividades = JSON.parse(local).atividades || [];
+                renderizar();
+                return;
+            }
+        } catch { /* ignora */ }
+
         try {
             const resp = await fetch('../data/atividades.json?_=' + Date.now());
             const dados = await resp.json();
