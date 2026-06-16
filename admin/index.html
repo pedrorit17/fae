@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin — Atividades</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:ital,wght@0,400;0,500;0,700;1,400&family=DM+Mono&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --ink:   #0F1923;
+            --ink2:  #3D4F5C;
+            --ink3:  #8A9BAA;
+            --paper: #F6F4EF;
+            --white: #FFFFFF;
+            --line:  #DDD9D0;
+            --blue:  #2A5BDB;
+            --verde: #0B6E4F;
+            --coral: #C0410D;
+            --ambar: #9A5000;
+            --bg-blue: #E8EFFE;
+        }
+
+        *, *::before, *::after { box-sizing: border-box; }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--paper);
+            color: var(--ink);
+            margin: 0;
+        }
+
+        /* ── Login ── */
+        #tela-login {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .login-card {
+            background: var(--white);
+            border: 1.5px solid var(--line);
+            border-radius: 16px;
+            padding: 48px 40px;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.07);
+            text-align: center;
+        }
+
+        .login-card h1 {
+            font-family: 'DM Serif Display', serif;
+            font-size: 1.9rem;
+            margin: 0 0 6px;
+        }
+
+        .login-card p {
+            color: var(--ink3);
+            font-size: 0.9rem;
+            margin: 0 0 32px;
+        }
+
+        .field { margin-bottom: 16px; text-align: left; }
+        .field label { display: block; font-size: 0.85rem; font-weight: 500; color: var(--ink2); margin-bottom: 6px; }
+
+        .field input {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1.5px solid var(--line);
+            border-radius: 8px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.95rem;
+            background: var(--paper);
+            color: var(--ink);
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        .field input:focus { border-color: var(--blue); }
+
+        #erro-login {
+            color: var(--coral);
+            font-size: 0.85rem;
+            margin: 0 0 16px;
+            display: none;
+        }
+
+        /* ── Botões globais ── */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s;
+        }
+        .btn-primary { background: var(--blue); color: var(--white); width: 100%; justify-content: center; }
+        .btn-primary:hover { background: #1e4bc4; }
+        .btn-secondary { background: var(--white); color: var(--ink2); border: 1.5px solid var(--line); }
+        .btn-secondary:hover { border-color: var(--blue); color: var(--blue); }
+        .btn-danger { background: #FEE9E2; color: var(--coral); }
+        .btn-danger:hover { background: #fdd5c8; }
+        .btn-success { background: #D1F0E4; color: var(--verde); }
+        .btn-success:hover { background: #b8e8d2; }
+        .btn-sm { padding: 6px 12px; font-size: 0.82rem; }
+
+        /* ── App ── */
+        #app { display: none; }
+
+        .sidebar {
+            position: fixed;
+            top: 0; left: 0; bottom: 0;
+            width: 240px;
+            background: var(--white);
+            border-right: 1.5px solid var(--line);
+            padding: 28px 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .sidebar-logo {
+            font-family: 'DM Serif Display', serif;
+            font-size: 1.2rem;
+            color: var(--ink);
+            margin-bottom: 24px;
+        }
+
+        .sidebar-logo span { color: var(--blue); }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 12px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            color: var(--ink2);
+            cursor: pointer;
+            transition: all 0.15s;
+            text-decoration: none;
+        }
+        .nav-item:hover { background: var(--paper); color: var(--ink); }
+        .nav-item.ativo { background: var(--bg-blue); color: var(--blue); font-weight: 500; }
+
+        .sidebar-footer {
+            margin-top: auto;
+            padding-top: 16px;
+            border-top: 1px solid var(--line);
+        }
+
+        .main {
+            margin-left: 240px;
+            padding: 40px 48px;
+            min-height: 100vh;
+        }
+
+        .page-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 32px;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .page-header h2 {
+            font-family: 'DM Serif Display', serif;
+            font-size: 2rem;
+            margin: 0;
+        }
+
+        .page-header p { color: var(--ink3); margin: 4px 0 0; font-size: 0.9rem; }
+
+        /* ── Tabela ── */
+        .tabela-wrap { overflow-x: auto; }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            font-size: 0.78rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: var(--ink3);
+            padding: 0 16px 12px;
+            text-align: left;
+            border-bottom: 1.5px solid var(--line);
+        }
+
+        td {
+            padding: 16px 16px;
+            border-bottom: 1px solid var(--line);
+            font-size: 0.9rem;
+            color: var(--ink2);
+            vertical-align: middle;
+        }
+
+        tr:last-child td { border-bottom: none; }
+        tr:hover td { background: #fafaf8; }
+
+        td.titulo { color: var(--ink); font-weight: 500; max-width: 260px; }
+        td .link-curto {
+            display: inline-block;
+            max-width: 200px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            color: var(--blue);
+            text-decoration: none;
+            font-family: 'DM Mono', monospace;
+            font-size: 0.8rem;
+        }
+        td .link-curto:hover { text-decoration: underline; }
+
+        .tag {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+        .tag-aberta    { background: #D1F0E4; color: var(--verde); }
+        .tag-encerrada { background: #FFE8DF; color: var(--coral); }
+
+        .acoes { display: flex; gap: 8px; }
+
+        /* ── Vazio ── */
+        .vazio {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--ink3);
+        }
+        .vazio .icone { font-size: 3rem; margin-bottom: 16px; }
+        .vazio h3 { font-family: 'DM Serif Display', serif; color: var(--ink2); margin: 0 0 8px; }
+        .vazio p  { font-size: 0.9rem; margin: 0; }
+
+        /* ── Modal ── */
+        .overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(15,25,35,0.45);
+            backdrop-filter: blur(3px);
+            z-index: 100;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .overlay.aberto { display: flex; }
+
+        .modal {
+            background: var(--white);
+            border-radius: 14px;
+            padding: 36px 40px;
+            width: 100%;
+            max-width: 560px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal h3 {
+            font-family: 'DM Serif Display', serif;
+            font-size: 1.5rem;
+            margin: 0 0 24px;
+        }
+
+        .modal .field { margin-bottom: 20px; }
+
+        .modal .field label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--ink2);
+            margin-bottom: 6px;
+        }
+
+        .modal .field input,
+        .modal .field textarea,
+        .modal .field select {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1.5px solid var(--line);
+            border-radius: 8px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.95rem;
+            background: var(--paper);
+            color: var(--ink);
+            outline: none;
+            transition: border-color 0.2s;
+            resize: vertical;
+        }
+        .modal .field input:focus,
+        .modal .field textarea:focus,
+        .modal .field select:focus { border-color: var(--blue); }
+
+        .modal .field .hint { font-size: 0.78rem; color: var(--ink3); margin-top: 5px; }
+
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 28px;
+        }
+
+        /* ── Exportar ── */
+        .export-card {
+            background: var(--white);
+            border: 1.5px solid var(--line);
+            border-radius: 12px;
+            padding: 28px 32px;
+            margin-bottom: 24px;
+        }
+        .export-card h3 { font-family: 'DM Serif Display', serif; margin: 0 0 8px; font-size: 1.2rem; }
+        .export-card p  { color: var(--ink2); font-size: 0.9rem; margin: 0 0 16px; }
+
+        .code-box {
+            font-family: 'DM Mono', monospace;
+            font-size: 0.82rem;
+            background: var(--paper);
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            padding: 16px;
+            white-space: pre;
+            overflow-x: auto;
+            color: var(--ink2);
+            margin-bottom: 12px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        /* ── Toast ── */
+        #toast {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            background: var(--ink);
+            color: var(--white);
+            padding: 12px 20px;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+            opacity: 0;
+            transform: translateY(10px);
+            transition: all 0.3s;
+            pointer-events: none;
+            z-index: 999;
+        }
+        #toast.show { opacity: 1; transform: translateY(0); }
+
+        @media (max-width: 700px) {
+            .sidebar { display: none; }
+            .main { margin-left: 0; padding: 24px 16px; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ══════════ TELA DE LOGIN ══════════ -->
+<div id="tela-login">
+    <div class="login-card">
+        <h1>Admin</h1>
+        <p>Acesso restrito ao professor</p>
+        <div class="field">
+            <label for="campo-senha">Senha</label>
+            <input type="password" id="campo-senha" placeholder="Digite a senha de acesso" autocomplete="current-password">
+        </div>
+        <p id="erro-login">Senha incorreta. Tente novamente.</p>
+        <button class="btn btn-primary" id="btn-entrar">Entrar →</button>
+    </div>
+</div>
+
+<!-- ══════════ APP ══════════ -->
+<div id="app">
+    <nav class="sidebar">
+        <div class="sidebar-logo">P.I. <span>Admin</span></div>
+        <a class="nav-item ativo" data-pagina="atividades">📋 Atividades</a>
+        <a class="nav-item" data-pagina="exportar">📤 Exportar / Importar</a>
+        <div class="sidebar-footer">
+            <button class="btn btn-secondary" style="width:100%;" id="btn-sair">Sair</button>
+        </div>
+    </nav>
+
+    <main class="main">
+
+        <!-- ── Página: Atividades ── -->
+        <div id="pagina-atividades">
+            <div class="page-header">
+                <div>
+                    <h2>Atividades</h2>
+                    <p id="contador-ativ">Carregando…</p>
+                </div>
+                <button class="btn btn-primary" id="btn-nova">+ Nova Atividade</button>
+            </div>
+            <div class="tabela-wrap">
+                <table id="tabela-ativ">
+                    <thead>
+                        <tr>
+                            <th>Título</th>
+                            <th>Turma</th>
+                            <th>Prazo</th>
+                            <th>Status</th>
+                            <th>Link</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbody-ativ"></tbody>
+                </table>
+                <div id="vazio-ativ" class="vazio" style="display:none;">
+                    <div class="icone">📭</div>
+                    <h3>Nenhuma atividade ainda</h3>
+                    <p>Clique em "Nova Atividade" para começar.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── Página: Exportar ── -->
+        <div id="pagina-exportar" style="display:none;">
+            <div class="page-header">
+                <div>
+                    <h2>Exportar / Importar</h2>
+                    <p>Gerencie o arquivo de dados para publicação.</p>
+                </div>
+            </div>
+
+            <div class="export-card">
+                <h3>Exportar dados</h3>
+                <p>Baixe o arquivo <code>atividades.json</code> e substitua o arquivo em <code>data/atividades.json</code> no repositório para publicar as alterações para os alunos.</p>
+                <div class="code-box" id="preview-json"></div>
+                <button class="btn btn-primary" style="width:auto;" id="btn-exportar">⬇ Baixar atividades.json</button>
+            </div>
+
+            <div class="export-card">
+                <h3>Importar dados</h3>
+                <p>Carregue um arquivo <code>atividades.json</code> previamente exportado para continuar editando.</p>
+                <input type="file" id="input-importar" accept=".json" style="display:none;">
+                <button class="btn btn-secondary" id="btn-importar">📂 Carregar arquivo JSON</button>
+            </div>
+        </div>
+
+    </main>
+</div>
+
+<!-- ══════════ MODAL NOVA / EDITAR ══════════ -->
+<div class="overlay" id="modal-overlay">
+    <div class="modal">
+        <h3 id="modal-titulo">Nova Atividade</h3>
+        <input type="hidden" id="modal-id">
+
+        <div class="field">
+            <label>Título *</label>
+            <input type="text" id="f-titulo" placeholder="Ex.: Entrega do Relatório Final">
+        </div>
+        <div class="field">
+            <label>Descrição</label>
+            <textarea id="f-desc" rows="3" placeholder="Instruções ou observações para os alunos…"></textarea>
+        </div>
+        <div class="field">
+            <label>Link do formulário *</label>
+            <input type="url" id="f-link" placeholder="https://forms.gle/…">
+            <p class="hint">Cole o link completo do Google Forms ou outro formulário.</p>
+        </div>
+        <div class="field">
+            <label>Turma</label>
+            <input type="text" id="f-turma" placeholder="Ex.: Turma A, ADM 2024, etc.">
+        </div>
+        <div class="field">
+            <label>Prazo</label>
+            <input type="date" id="f-prazo">
+        </div>
+        <div class="field">
+            <label>Status</label>
+            <select id="f-status">
+                <option value="aberta">Aberta</option>
+                <option value="encerrada">Encerrada</option>
+            </select>
+        </div>
+
+        <div class="modal-footer">
+            <button class="btn btn-secondary" id="btn-cancelar">Cancelar</button>
+            <button class="btn btn-primary" style="width:auto;" id="btn-salvar-modal">Salvar</button>
+        </div>
+    </div>
+</div>
+
+<!-- Toast -->
+<div id="toast"></div>
+
+<script>
+    /* ─── Configuração ─── */
+    // Para alterar a senha, troque o valor abaixo:
+    const SENHA_ADMIN = 'professor';
+
+    const STORAGE_KEY = 'fae_atividades';
+
+    /* ─── Estado ─── */
+    let atividades = [];
+    let paginaAtual = 'atividades';
+
+    /* ─── Utilitários ─── */
+    function uid() {
+        return Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+    }
+
+    function escHtml(s) {
+        if (!s) return '';
+        return String(s)
+            .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+            .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+
+    function toast(msg, tipo = 'ok') {
+        const el = document.getElementById('toast');
+        el.textContent = msg;
+        el.style.background = tipo === 'erro' ? '#C0410D' : '#0F1923';
+        el.classList.add('show');
+        setTimeout(() => el.classList.remove('show'), 2800);
+    }
+
+    function salvarStorage() {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify({ atividades }));
+    }
+
+    function carregarStorage() {
+        try {
+            const raw = localStorage.getItem(STORAGE_KEY);
+            if (raw) atividades = JSON.parse(raw).atividades || [];
+        } catch { atividades = []; }
+    }
+
+    function formatarData(iso) {
+        if (!iso) return '—';
+        const [y, m, d] = iso.split('-');
+        return `${d}/${m}/${y}`;
+    }
+
+    /* ─── Login ─── */
+    function tentarLogin() {
+        const senha = document.getElementById('campo-senha').value;
+        if (senha === SENHA_ADMIN) {
+            document.getElementById('tela-login').style.display = 'none';
+            document.getElementById('app').style.display = 'block';
+            carregarStorage();
+            renderTabela();
+            atualizarPreviewJson();
+        } else {
+            document.getElementById('erro-login').style.display = 'block';
+        }
+    }
+
+    document.getElementById('btn-entrar').addEventListener('click', tentarLogin);
+    document.getElementById('campo-senha').addEventListener('keydown', e => {
+        if (e.key === 'Enter') tentarLogin();
+    });
+
+    document.getElementById('btn-sair').addEventListener('click', () => {
+        document.getElementById('tela-login').style.display = 'flex';
+        document.getElementById('app').style.display = 'none';
+        document.getElementById('campo-senha').value = '';
+    });
+
+    /* ─── Navegação ─── */
+    document.querySelectorAll('.nav-item[data-pagina]').forEach(link => {
+        link.addEventListener('click', e => {
+            e.preventDefault();
+            const pagina = link.dataset.pagina;
+            document.querySelectorAll('.nav-item').forEach(l => l.classList.remove('ativo'));
+            link.classList.add('ativo');
+            document.getElementById('pagina-atividades').style.display = pagina === 'atividades' ? 'block' : 'none';
+            document.getElementById('pagina-exportar').style.display  = pagina === 'exportar'   ? 'block' : 'none';
+            if (pagina === 'exportar') atualizarPreviewJson();
+        });
+    });
+
+    /* ─── Tabela ─── */
+    function renderTabela() {
+        const tbody = document.getElementById('tbody-ativ');
+        const vazio = document.getElementById('vazio-ativ');
+        const tabela = document.getElementById('tabela-ativ');
+        const contador = document.getElementById('contador-ativ');
+        const hoje = new Date().toISOString().split('T')[0];
+
+        contador.textContent = `${atividades.length} atividade${atividades.length !== 1 ? 's' : ''}`;
+
+        if (atividades.length === 0) {
+            tabela.style.display = 'none';
+            vazio.style.display = 'block';
+            return;
+        }
+
+        tabela.style.display = 'table';
+        vazio.style.display = 'none';
+
+        tbody.innerHTML = atividades.map(a => {
+            const encerrada = a.status === 'encerrada' || (a.prazo && a.prazo < hoje);
+            const tagCls  = encerrada ? 'tag-encerrada' : 'tag-aberta';
+            const tagTxt  = encerrada ? 'Encerrada' : 'Aberta';
+            return `
+            <tr>
+                <td class="titulo">${escHtml(a.titulo)}</td>
+                <td>${a.turma ? escHtml(a.turma) : '—'}</td>
+                <td>${formatarData(a.prazo)}</td>
+                <td><span class="tag ${tagCls}">${tagTxt}</span></td>
+                <td>${a.link ? `<a href="${escHtml(a.link)}" class="link-curto" target="_blank">${escHtml(a.link)}</a>` : '—'}</td>
+                <td>
+                    <div class="acoes">
+                        <button class="btn btn-secondary btn-sm" onclick="abrirEditar('${a.id}')">Editar</button>
+                        <button class="btn btn-danger btn-sm" onclick="excluir('${a.id}')">Excluir</button>
+                    </div>
+                </td>
+            </tr>`;
+        }).join('');
+    }
+
+    /* ─── Modal ─── */
+    function abrirNovo() {
+        document.getElementById('modal-titulo').textContent = 'Nova Atividade';
+        document.getElementById('modal-id').value = '';
+        ['f-titulo','f-desc','f-link','f-turma','f-prazo'].forEach(id => document.getElementById(id).value = '');
+        document.getElementById('f-status').value = 'aberta';
+        document.getElementById('modal-overlay').classList.add('aberto');
+        document.getElementById('f-titulo').focus();
+    }
+
+    function abrirEditar(id) {
+        const a = atividades.find(x => x.id === id);
+        if (!a) return;
+        document.getElementById('modal-titulo').textContent = 'Editar Atividade';
+        document.getElementById('modal-id').value   = a.id;
+        document.getElementById('f-titulo').value   = a.titulo  || '';
+        document.getElementById('f-desc').value     = a.descricao || '';
+        document.getElementById('f-link').value     = a.link    || '';
+        document.getElementById('f-turma').value    = a.turma   || '';
+        document.getElementById('f-prazo').value    = a.prazo   || '';
+        document.getElementById('f-status').value   = a.status  || 'aberta';
+        document.getElementById('modal-overlay').classList.add('aberto');
+        document.getElementById('f-titulo').focus();
+    }
+
+    function fecharModal() {
+        document.getElementById('modal-overlay').classList.remove('aberto');
+    }
+
+    function salvarModal() {
+        const titulo = document.getElementById('f-titulo').value.trim();
+        const link   = document.getElementById('f-link').value.trim();
+        if (!titulo) { toast('O título é obrigatório.', 'erro'); document.getElementById('f-titulo').focus(); return; }
+        if (!link)   { toast('O link do formulário é obrigatório.', 'erro'); document.getElementById('f-link').focus(); return; }
+
+        const id = document.getElementById('modal-id').value;
+        const obj = {
+            id:       id || uid(),
+            titulo,
+            descricao: document.getElementById('f-desc').value.trim(),
+            link,
+            turma:    document.getElementById('f-turma').value.trim(),
+            prazo:    document.getElementById('f-prazo').value || null,
+            status:   document.getElementById('f-status').value,
+        };
+
+        if (id) {
+            const idx = atividades.findIndex(a => a.id === id);
+            if (idx !== -1) atividades[idx] = obj;
+        } else {
+            atividades.unshift(obj);
+        }
+
+        salvarStorage();
+        renderTabela();
+        atualizarPreviewJson();
+        fecharModal();
+        toast(id ? 'Atividade atualizada!' : 'Atividade criada!');
+    }
+
+    function excluir(id) {
+        if (!confirm('Tem certeza que deseja excluir esta atividade?')) return;
+        atividades = atividades.filter(a => a.id !== id);
+        salvarStorage();
+        renderTabela();
+        atualizarPreviewJson();
+        toast('Atividade excluída.');
+    }
+
+    document.getElementById('btn-nova').addEventListener('click', abrirNovo);
+    document.getElementById('btn-cancelar').addEventListener('click', fecharModal);
+    document.getElementById('btn-salvar-modal').addEventListener('click', salvarModal);
+
+    document.getElementById('modal-overlay').addEventListener('click', e => {
+        if (e.target === document.getElementById('modal-overlay')) fecharModal();
+    });
+
+    /* ─── Exportar / Importar ─── */
+    function gerarJson() {
+        return JSON.stringify({ atividades }, null, 2);
+    }
+
+    function atualizarPreviewJson() {
+        document.getElementById('preview-json').textContent = gerarJson();
+    }
+
+    document.getElementById('btn-exportar').addEventListener('click', () => {
+        const blob = new Blob([gerarJson()], { type: 'application/json' });
+        const url  = URL.createObjectURL(blob);
+        const a    = document.createElement('a');
+        a.href = url; a.download = 'atividades.json';
+        a.click();
+        URL.revokeObjectURL(url);
+        toast('Arquivo baixado! Substitua data/atividades.json no repositório.');
+    });
+
+    document.getElementById('btn-importar').addEventListener('click', () => {
+        document.getElementById('input-importar').click();
+    });
+
+    document.getElementById('input-importar').addEventListener('change', e => {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = ev => {
+            try {
+                const dados = JSON.parse(ev.target.result);
+                if (!Array.isArray(dados.atividades)) throw new Error();
+                atividades = dados.atividades;
+                salvarStorage();
+                renderTabela();
+                atualizarPreviewJson();
+                toast(`${atividades.length} atividade(s) importadas!`);
+            } catch {
+                toast('Arquivo inválido. Use um JSON exportado daqui.', 'erro');
+            }
+        };
+        reader.readAsText(file);
+        e.target.value = '';
+    });
+</script>
+</body>
+</html>
