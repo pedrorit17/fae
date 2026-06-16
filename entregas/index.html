@@ -309,7 +309,7 @@
                 return;
             }
 
-            const text = await fetch(`https://docs.google.com/spreadsheets/d/${id}/gviz/tq?tqx=out:json`).then(r => r.text());
+            const text = await fetch(`https://docs.google.com/spreadsheets/d/${id}/gviz/tq?tqx=out:json&headers=1`).then(r => r.text());
             const json = JSON.parse(text.slice(text.indexOf('{'), text.lastIndexOf('}') + 1));
 
             const cols = json.table.cols.map(c => (c.label || '').trim());

@@ -240,7 +240,7 @@
                 return;
             }
 
-            const gvizUrl = `https://docs.google.com/spreadsheets/d/${id}/gviz/tq?tqx=out:json`;
+            const gvizUrl = `https://docs.google.com/spreadsheets/d/${id}/gviz/tq?tqx=out:json&headers=1`;
             const text = await fetch(gvizUrl).then(r => r.text());
 
             // Remove wrapper JSONP do Google
