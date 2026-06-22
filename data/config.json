@@ -1,4 +1,10 @@
 {
   "sheetsUrl": "",
-  "entregasUrl": ""
+  "entregasUrl": "",
+  "firebase": {
+    "apiKey": "",
+    "authDomain": "",
+    "databaseURL": "",
+    "projectId": ""
+  }
 }
