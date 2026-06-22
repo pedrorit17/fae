@@ -6,200 +6,239 @@
     <title>Jogo da Vida Empresarial — P.I.</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:ital,wght@0,400;0,500;0,700;1,400&family=DM+Mono&display=swap" rel="stylesheet">
+    <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-database-compat.js"></script>
     <style>
-        :root {
-            --ink:#0F1923;--ink2:#3D4F5C;--ink3:#8A9BAA;--paper:#F6F4EF;
-            --white:#FFF;--line:#DDD9D0;--blue:#2A5BDB;--verde:#0B6E4F;
-            --coral:#C0410D;--ambar:#9A5000;--roxo:#5B21A8;--teal:#0A6960;
-        }
+        :root{--ink:#0F1923;--ink2:#3D4F5C;--ink3:#8A9BAA;--paper:#F6F4EF;--white:#FFF;--line:#DDD9D0;--blue:#2A5BDB;--verde:#0B6E4F;--coral:#C0410D;--ambar:#9A5000;--roxo:#5B21A8;--teal:#0A6960;}
         *,*::before,*::after{box-sizing:border-box;}
         body{font-family:'DM Sans',sans-serif;background:var(--ink);color:var(--white);margin:0;min-height:100vh;}
-
-        /* ── TELAS ── */
         .tela{display:none;min-height:100vh;}
-        .tela.ativa{display:block;}
+        .tela.ativa{display:flex;}
 
-        /* ── SETUP ── */
-        #tela-setup{display:flex;align-items:center;justify-content:center;padding:24px;background:linear-gradient(135deg,#0F1923 0%,#1a2f42 100%);}
-        .setup-card{background:var(--white);color:var(--ink);border-radius:20px;padding:48px 44px;max-width:540px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,0.4);}
-        .setup-card h1{font-family:'DM Serif Display',serif;font-size:2.2rem;margin:0 0 4px;text-align:center;}
-        .setup-card .sub{color:var(--ink2);text-align:center;margin:0 0 32px;font-size:0.95rem;line-height:1.5;}
+        /* ── MENU ── */
+        .tela-centro{align-items:center;justify-content:center;padding:24px;background:linear-gradient(135deg,#0F1923,#1a2f42);}
+        .card-ui{background:var(--white);color:var(--ink);border-radius:20px;padding:48px 44px;max-width:480px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.4);}
+        .card-ui h1{font-family:'DM Serif Display',serif;font-size:2.2rem;margin:0 0 4px;text-align:center;}
+        .card-ui .sub{color:var(--ink2);text-align:center;margin:0 0 32px;font-size:.95rem;line-height:1.5;}
         .field{margin-bottom:18px;}
-        .field label{display:block;font-size:0.85rem;font-weight:500;color:var(--ink2);margin-bottom:6px;}
-        .field input,.field select{width:100%;padding:10px 14px;border:1.5px solid var(--line);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:0.95rem;background:var(--paper);color:var(--ink);outline:none;}
+        .field label{display:block;font-size:.85rem;font-weight:500;color:var(--ink2);margin-bottom:6px;}
+        .field input,.field select{width:100%;padding:10px 14px;border:1.5px solid var(--line);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:.95rem;background:var(--paper);color:var(--ink);outline:none;}
         .field input:focus,.field select:focus{border-color:var(--blue);}
-        .equipes-grid{display:flex;flex-direction:column;gap:12px;margin-bottom:24px;}
-        .equipe-row{display:flex;gap:10px;align-items:center;}
-        .equipe-row .cor{width:20px;height:20px;border-radius:50%;flex-shrink:0;border:2px solid var(--line);}
-        .equipe-row input{flex:1;}
-        .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:12px 24px;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:1rem;font-weight:600;cursor:pointer;border:none;transition:all .2s;text-decoration:none;}
+        .field .hint{font-size:.78rem;color:var(--ink3);margin-top:5px;}
+        .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:12px 24px;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:1rem;font-weight:600;cursor:pointer;border:none;transition:all .2s;text-decoration:none;color:var(--white);}
         .btn-big{width:100%;padding:14px;font-size:1.05rem;}
-        .btn-primary{background:var(--blue);color:var(--white);}
+        .btn-primary{background:var(--blue);}
         .btn-primary:hover{background:#1e4bc4;}
-        .btn-secondary{background:var(--paper);color:var(--ink2);border:1.5px solid var(--line);}
+        .btn-secondary{background:var(--white);color:var(--ink2);border:1.5px solid var(--line);}
         .btn-secondary:hover{border-color:var(--blue);color:var(--blue);}
-        .btn-ghost{background:transparent;color:var(--ink3);padding:8px 16px;font-size:0.85rem;}
-        .btn-ghost:hover{color:var(--white);}
+        .btn-ghost{background:transparent;color:var(--ink3);padding:8px 16px;font-size:.85rem;}
+        .btn-ghost:hover{color:var(--blue);}
+        .btn:disabled{opacity:.5;cursor:not-allowed;}
+        .menu-opcoes{display:flex;flex-direction:column;gap:12px;}
+        .divider{text-align:center;color:var(--ink3);font-size:.82rem;margin:8px 0;position:relative;}
+        .divider::before,.divider::after{content:'';position:absolute;top:50%;width:38%;height:1px;background:var(--line);}
+        .divider::before{left:0;}.divider::after{right:0;}
+        .aviso{background:#FFF4DC;color:var(--ambar);padding:10px 14px;border-radius:8px;font-size:.82rem;text-align:center;margin-bottom:16px;}
+
+        /* ── LOBBY ── */
+        .codigo-display{font-family:'DM Mono',monospace;font-size:3rem;text-align:center;letter-spacing:.3em;color:var(--blue);margin:16px 0 8px;font-weight:700;}
+        .codigo-hint{text-align:center;color:var(--ink3);font-size:.88rem;margin-bottom:24px;}
+        .equipes-lista{margin-bottom:24px;}
+        .eq-slot{display:flex;align-items:center;gap:12px;padding:12px 16px;border:1.5px solid var(--line);border-radius:10px;margin-bottom:8px;}
+        .eq-slot .dot{width:14px;height:14px;border-radius:50%;flex-shrink:0;}
+        .eq-slot .nome{flex:1;font-weight:500;font-size:.95rem;}
+        .eq-slot .status{font-size:.8rem;font-weight:500;}
+        .eq-slot .status.ok{color:var(--verde);}
+        .eq-slot .status.aguardando{color:var(--ink3);font-style:italic;}
 
         /* ── JOGO ── */
-        #tela-jogo{background:var(--paper);color:var(--ink);}
+        #tela-jogo{display:none;flex-direction:column;min-height:100vh;background:var(--paper);color:var(--ink);}
         .jogo-header{background:var(--ink);color:var(--white);padding:14px 24px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;}
-        .jogo-header .logo{font-family:'DM Serif Display',serif;font-size:1.1rem;}
-        .jogo-header .logo span{color:var(--blue);}
-        .rodada-badge{background:rgba(255,255,255,0.1);padding:4px 14px;border-radius:20px;font-size:0.82rem;font-weight:500;}
-        .fase-badge{background:var(--blue);padding:4px 14px;border-radius:20px;font-size:0.82rem;font-weight:600;margin-left:auto;}
-        .jogo-body{display:grid;grid-template-columns:260px 1fr;min-height:calc(100vh - 52px);}
+        .jogo-header .logo{font-family:'DM Serif Display',serif;font-size:1.1rem;}.jogo-header .logo span{color:var(--blue);}
+        .badge{padding:4px 14px;border-radius:20px;font-size:.82rem;font-weight:500;}
+        .badge-dark{background:rgba(255,255,255,.1);}
+        .badge-blue{background:var(--blue);font-weight:600;margin-left:auto;}
+        .jogo-body{display:grid;grid-template-columns:260px 1fr;flex:1;}
 
-        /* Sidebar equipes */
         .sidebar{background:var(--white);border-right:1.5px solid var(--line);padding:20px;overflow-y:auto;}
-        .sidebar h3{font-family:'DM Serif Display',serif;font-size:1rem;color:var(--ink3);margin:0 0 14px;text-transform:uppercase;letter-spacing:0.05em;font-size:0.75rem;}
+        .sidebar h3{font-size:.75rem;color:var(--ink3);text-transform:uppercase;letter-spacing:.05em;margin:0 0 14px;}
         .team-card{border:1.5px solid var(--line);border-radius:10px;padding:14px;margin-bottom:12px;transition:all .2s;}
-        .team-card.destaque{border-color:var(--blue);box-shadow:0 2px 12px rgba(42,91,219,0.15);}
-        .team-card .nome{font-weight:600;font-size:0.95rem;margin-bottom:10px;display:flex;align-items:center;gap:8px;}
-        .team-card .nome .dot{width:12px;height:12px;border-radius:50%;flex-shrink:0;}
+        .team-card.destaque{border-color:var(--blue);box-shadow:0 2px 12px rgba(42,91,219,.15);}
+        .team-card .nome{font-weight:600;font-size:.95rem;margin-bottom:10px;display:flex;align-items:center;gap:8px;}
+        .team-card .nome .dot{width:12px;height:12px;border-radius:50%;}
         .recursos{display:grid;grid-template-columns:1fr 1fr;gap:6px;}
         .recurso{background:var(--paper);border-radius:6px;padding:6px 8px;text-align:center;}
-        .recurso .val{font-family:'DM Mono',monospace;font-size:0.85rem;font-weight:700;}
-        .recurso .lbl{font-size:0.65rem;color:var(--ink3);text-transform:uppercase;letter-spacing:0.04em;}
-        .recurso .delta{font-size:0.72rem;font-weight:600;display:inline-block;margin-left:2px;}
-        .delta.pos{color:var(--verde);}
-        .delta.neg{color:var(--coral);}
+        .recurso .val{font-family:'DM Mono',monospace;font-size:.85rem;font-weight:700;}
+        .recurso .lbl{font-size:.65rem;color:var(--ink3);text-transform:uppercase;letter-spacing:.04em;}
+        .delta{font-size:.72rem;font-weight:600;margin-left:2px;display:inline-block;}.delta.pos{color:var(--verde);}.delta.neg{color:var(--coral);}
 
-        /* Área central */
         .centro{padding:32px 40px;display:flex;flex-direction:column;align-items:center;justify-content:center;max-width:720px;margin:0 auto;width:100%;}
-
-        /* Progresso */
         .progresso{width:100%;margin-bottom:32px;}
         .progresso-bar{height:8px;background:var(--line);border-radius:4px;overflow:hidden;}
-        .progresso-bar .fill{height:100%;background:linear-gradient(90deg,var(--blue),var(--verde));border-radius:4px;transition:width .6s ease;}
-        .progresso-lbl{display:flex;justify-content:space-between;font-size:0.75rem;color:var(--ink3);margin-top:6px;}
+        .progresso-bar .fill{height:100%;background:linear-gradient(90deg,var(--blue),var(--verde));border-radius:4px;transition:width .6s;}
+        .progresso-lbl{display:flex;justify-content:space-between;font-size:.75rem;color:var(--ink3);margin-top:6px;}
 
-        /* Dado */
         .dado-area{text-align:center;margin-bottom:24px;}
-        .dado{width:100px;height:100px;background:var(--white);border:3px solid var(--ink);border-radius:16px;display:inline-flex;align-items:center;justify-content:center;font-family:'DM Serif Display',serif;font-size:3rem;color:var(--ink);box-shadow:0 6px 20px rgba(0,0,0,0.1);cursor:pointer;transition:transform .15s;user-select:none;}
-        .dado:hover{transform:scale(1.05);}
-        .dado.rolando{animation:shake .5s ease;}
-        @keyframes shake{
-            0%,100%{transform:rotate(0)}
-            20%{transform:rotate(-15deg) scale(1.1)}
-            40%{transform:rotate(10deg) scale(0.95)}
-            60%{transform:rotate(-8deg) scale(1.05)}
-            80%{transform:rotate(5deg)}
-        }
-        .dado-instrucao{color:var(--ink3);font-size:0.9rem;margin-top:12px;}
-        .mercado-badge{display:inline-block;padding:6px 16px;border-radius:20px;font-size:0.85rem;font-weight:600;margin-top:10px;}
-        .mercado-desfavoravel{background:#FFE8DF;color:var(--coral);}
-        .mercado-estavel{background:#FFF4DC;color:var(--ambar);}
-        .mercado-favoravel{background:#D1F0E4;color:var(--verde);}
+        .dado{width:100px;height:100px;background:var(--white);border:3px solid var(--ink);border-radius:16px;display:inline-flex;align-items:center;justify-content:center;font-family:'DM Serif Display',serif;font-size:3rem;color:var(--ink);box-shadow:0 6px 20px rgba(0,0,0,.1);cursor:pointer;transition:transform .15s;user-select:none;}
+        .dado:hover{transform:scale(1.05);}.dado.rolando{animation:shake .5s ease;}
+        @keyframes shake{0%,100%{transform:rotate(0)}20%{transform:rotate(-15deg) scale(1.1)}40%{transform:rotate(10deg) scale(.95)}60%{transform:rotate(-8deg) scale(1.05)}80%{transform:rotate(5deg)}}
+        .dado-instrucao{color:var(--ink3);font-size:.9rem;margin-top:12px;}
+        .mercado-badge{display:inline-block;padding:6px 16px;border-radius:20px;font-size:.85rem;font-weight:600;margin:10px 0;}
+        .mercado-desfavoravel{background:#FFE8DF;color:var(--coral);}.mercado-estavel{background:#FFF4DC;color:var(--ambar);}.mercado-favoravel{background:#D1F0E4;color:var(--verde);}
 
-        /* Evento */
-        .evento-card{background:var(--white);border:1.5px solid var(--line);border-radius:16px;padding:32px;width:100%;box-shadow:0 4px 24px rgba(0,0,0,0.06);}
-        .evento-tipo{display:inline-block;padding:4px 12px;border-radius:20px;font-size:0.72rem;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:12px;}
-        .tipo-planejamento{background:#E8EFFE;color:var(--blue);}
-        .tipo-financeiro{background:#D1F0E4;color:var(--verde);}
-        .tipo-equipe{background:#F3E8FF;color:var(--roxo);}
-        .tipo-mercado{background:#FFE8DF;color:var(--coral);}
-        .tipo-crise{background:#FFE8DF;color:var(--coral);}
-        .tipo-marco{background:#FFF4DC;color:var(--ambar);}
-        .tipo-inovacao{background:#E0F5F3;color:var(--teal);}
-        .tipo-etica{background:#F3E8FF;color:var(--roxo);}
+        .evento-card{background:var(--white);border:1.5px solid var(--line);border-radius:16px;padding:32px;width:100%;box-shadow:0 4px 24px rgba(0,0,0,.06);}
+        .evento-tipo{display:inline-block;padding:4px 12px;border-radius:20px;font-size:.72rem;font-weight:600;text-transform:uppercase;letter-spacing:.05em;margin-bottom:12px;}
+        .tipo-planejamento{background:#E8EFFE;color:var(--blue);}.tipo-financeiro{background:#D1F0E4;color:var(--verde);}.tipo-equipe{background:#F3E8FF;color:var(--roxo);}.tipo-mercado,.tipo-crise{background:#FFE8DF;color:var(--coral);}.tipo-marco{background:#FFF4DC;color:var(--ambar);}.tipo-inovacao{background:#E0F5F3;color:var(--teal);}.tipo-etica{background:#F3E8FF;color:var(--roxo);}
         .evento-titulo{font-family:'DM Serif Display',serif;font-size:1.6rem;margin:0 0 8px;}
-        .evento-conceito{font-size:0.78rem;color:var(--blue);font-weight:500;margin-bottom:14px;}
-        .evento-desc{color:var(--ink2);font-size:0.95rem;line-height:1.6;margin-bottom:24px;}
-
+        .evento-conceito{font-size:.78rem;color:var(--blue);font-weight:500;margin-bottom:14px;}
+        .evento-desc{color:var(--ink2);font-size:.95rem;line-height:1.6;margin-bottom:24px;}
         .opcoes{display:flex;flex-direction:column;gap:10px;}
-        .opcao-btn{text-align:left;padding:14px 18px;border:1.5px solid var(--line);border-radius:10px;background:var(--paper);color:var(--ink);font-family:'DM Sans',sans-serif;font-size:0.9rem;cursor:pointer;transition:all .15s;line-height:1.4;}
-        .opcao-btn:hover{border-color:var(--blue);background:#f0f0ff;}
-        .opcao-btn.selecionada{border-color:var(--blue);background:var(--blue);color:var(--white);}
-        .opcao-btn:disabled{cursor:default;opacity:0.7;}
-        .opcao-btn:disabled:hover{border-color:var(--line);background:var(--paper);}
+        .opcao-btn{text-align:left;padding:14px 18px;border:1.5px solid var(--line);border-radius:10px;background:var(--paper);color:var(--ink);font-family:'DM Sans',sans-serif;font-size:.9rem;cursor:pointer;transition:all .15s;line-height:1.4;}
+        .opcao-btn:hover{border-color:var(--blue);background:#f0f0ff;}.opcao-btn.selecionada{border-color:var(--blue);background:var(--blue);color:var(--white);}
+        .opcao-btn:disabled{cursor:default;opacity:.6;}.opcao-btn:disabled:hover{border-color:var(--line);background:var(--paper);}
         .opcao-letra{font-weight:700;margin-right:8px;}
+        .vez-banner{text-align:center;padding:14px;border-radius:10px;font-weight:600;font-size:.95rem;margin-bottom:20px;}
+        .aguardando{text-align:center;padding:40px 20px;color:var(--ink3);}
+        .aguardando .icone{font-size:2.5rem;margin-bottom:12px;}
+        .aguardando h3{font-family:'DM Serif Display',serif;color:var(--ink2);margin:0 0 6px;font-size:1.1rem;}
+        .aguardando p{margin:0;font-size:.9rem;}
 
-        /* Vez do time */
-        .vez-banner{text-align:center;margin-bottom:20px;padding:12px;border-radius:10px;font-weight:600;font-size:0.95rem;}
-
-        /* Resultado */
         .resultado-card{background:var(--white);border:1.5px solid var(--line);border-radius:12px;padding:20px 24px;margin-bottom:12px;width:100%;}
         .resultado-card .nome{font-weight:600;margin-bottom:6px;display:flex;align-items:center;gap:8px;}
         .resultado-card .nome .dot{width:10px;height:10px;border-radius:50%;}
-        .resultado-card .escolha{font-size:0.88rem;color:var(--ink2);margin-bottom:8px;font-style:italic;}
-        .resultado-card .feedback{font-size:0.85rem;color:var(--ink2);line-height:1.4;margin-bottom:8px;}
-        .resultado-efeitos{display:flex;gap:12px;flex-wrap:wrap;font-size:0.82rem;}
-        .efeito{padding:3px 10px;border-radius:12px;font-weight:600;font-family:'DM Mono',monospace;}
-        .efeito.pos{background:#D1F0E4;color:var(--verde);}
-        .efeito.neg{background:#FFE8DF;color:var(--coral);}
+        .resultado-card .escolha{font-size:.88rem;color:var(--ink2);margin-bottom:8px;font-style:italic;}
+        .resultado-card .feedback{font-size:.85rem;color:var(--ink2);line-height:1.4;margin-bottom:8px;}
+        .resultado-efeitos{display:flex;gap:12px;flex-wrap:wrap;font-size:.82rem;}
+        .efeito{padding:3px 10px;border-radius:12px;font-weight:600;font-family:'DM Mono',monospace;}.efeito.pos{background:#D1F0E4;color:var(--verde);}.efeito.neg{background:#FFE8DF;color:var(--coral);}
 
         /* ── RELATÓRIO ── */
-        #tela-relatorio{background:var(--white);color:var(--ink);padding:48px 24px 80px;}
-        .relatorio{max-width:900px;margin:0 auto;}
+        #tela-relatorio{background:var(--white);color:var(--ink);padding:48px 24px 80px;display:none;flex-direction:column;}
+        .relatorio{max-width:900px;margin:0 auto;width:100%;}
         .relatorio h1{font-family:'DM Serif Display',serif;font-size:2.4rem;margin:0 0 8px;text-align:center;}
-        .relatorio .sub{text-align:center;color:var(--ink2);margin-bottom:40px;font-size:1rem;}
+        .relatorio .sub{text-align:center;color:var(--ink2);margin-bottom:40px;}
         .rel-section{margin-bottom:36px;}
         .rel-section h2{font-family:'DM Serif Display',serif;font-size:1.4rem;margin:0 0 16px;padding-bottom:8px;border-bottom:2px solid var(--line);}
         .ranking{display:flex;flex-direction:column;gap:16px;margin-bottom:32px;}
         .rank-card{background:var(--paper);border-radius:12px;padding:20px 24px;display:flex;align-items:center;gap:20px;}
         .rank-pos{font-family:'DM Serif Display',serif;font-size:2.5rem;color:var(--blue);min-width:50px;text-align:center;}
-        .rank-info{flex:1;}
-        .rank-info .nome{font-weight:700;font-size:1.1rem;margin-bottom:6px;}
-        .rank-recursos{display:flex;gap:16px;flex-wrap:wrap;}
-        .rank-recursos .r{font-size:0.85rem;color:var(--ink2);}
-        .rank-recursos .r strong{color:var(--ink);}
+        .rank-info{flex:1;}.rank-info .nome{font-weight:700;font-size:1.1rem;margin-bottom:6px;}
+        .rank-recursos{display:flex;gap:16px;flex-wrap:wrap;}.rank-recursos .r{font-size:.85rem;color:var(--ink2);}.rank-recursos .r strong{color:var(--ink);}
         .timeline{border-left:3px solid var(--line);padding-left:24px;margin-left:12px;}
-        .tl-item{margin-bottom:20px;position:relative;}
-        .tl-item::before{content:'';position:absolute;left:-30px;top:6px;width:12px;height:12px;border-radius:50%;background:var(--blue);}
-        .tl-item .tl-titulo{font-weight:600;font-size:0.95rem;margin-bottom:4px;}
-        .tl-item .tl-escolha{font-size:0.85rem;color:var(--ink2);font-style:italic;}
+        .tl-item{margin-bottom:20px;position:relative;}.tl-item::before{content:'';position:absolute;left:-30px;top:6px;width:12px;height:12px;border-radius:50%;background:var(--blue);}
+        .tl-item .tl-titulo{font-weight:600;font-size:.95rem;margin-bottom:4px;}.tl-item .tl-escolha{font-size:.85rem;color:var(--ink2);font-style:italic;}
         .rel-btns{display:flex;gap:12px;justify-content:center;margin-top:40px;flex-wrap:wrap;}
-
-        @media print{
-            .rel-btns,.jogo-header,.btn{display:none!important;}
-            body{background:#fff;color:#000;}
-            #tela-relatorio{padding:20px;}
-        }
-
-        @media(max-width:700px){
-            .jogo-body{grid-template-columns:1fr;}
-            .sidebar{border-right:none;border-bottom:1.5px solid var(--line);display:flex;gap:12px;overflow-x:auto;padding:12px;}
-            .sidebar h3{display:none;}
-            .team-card{min-width:180px;margin:0;}
-            .centro{padding:24px 16px;}
-            .setup-card{padding:32px 20px;}
-            .evento-titulo{font-size:1.3rem;}
-        }
+        @media print{.rel-btns,.jogo-header,.btn{display:none!important;}body{background:#fff;color:#000;}#tela-relatorio{padding:20px;}}
+        @media(max-width:700px){.jogo-body{grid-template-columns:1fr;}.sidebar{border-right:none;border-bottom:1.5px solid var(--line);display:flex;gap:12px;overflow-x:auto;padding:12px;}.sidebar h3{display:none;}.team-card{min-width:180px;margin:0;}.centro{padding:24px 16px;}.card-ui{padding:32px 20px;}.evento-titulo{font-size:1.3rem;}}
     </style>
 </head>
 <body>
 
-<!-- ═══════════ SETUP ═══════════ -->
-<div id="tela-setup" class="tela ativa">
-    <div class="setup-card">
+<!-- ═══ MENU ═══ -->
+<div id="tela-menu" class="tela tela-centro ativa">
+    <div class="card-ui">
         <h1>🎲 Vida Empresarial</h1>
-        <p class="sub">Simulador de desafios empresariais. Cada equipe fundará uma empresa e enfrentará 25 rodadas de decisões estratégicas. Ao final, um relatório será gerado.</p>
-
-        <div class="field">
-            <label>Quantas equipes?</label>
-            <select id="sel-equipes">
-                <option value="2">2 equipes</option>
-                <option value="3" selected>3 equipes</option>
-                <option value="4">4 equipes</option>
-            </select>
+        <p class="sub">Simulador de desafios empresariais. Cada equipe joga no seu próprio dispositivo.</p>
+        <div id="aviso-firebase" class="aviso" style="display:none;">Firebase não configurado. Acesse o <a href="../admin/" style="color:var(--ambar);font-weight:600;">Admin</a> para configurar. Apenas o modo local está disponível.</div>
+        <div class="menu-opcoes">
+            <button class="btn btn-primary btn-big" id="btn-criar-sala" disabled>🏫 Criar Sala (Professor)</button>
+            <button class="btn btn-secondary btn-big" id="btn-entrar-sala" disabled>🎓 Entrar na Sala (Equipe)</button>
+            <div class="divider">ou</div>
+            <button class="btn btn-ghost btn-big" id="btn-modo-local">💻 Modo Local (mesma tela)</button>
         </div>
-
-        <div id="equipes-container" class="equipes-grid"></div>
-
-        <button class="btn btn-primary btn-big" id="btn-iniciar">Iniciar Jogo →</button>
-        <div style="text-align:center;margin-top:16px;">
+        <div style="text-align:center;margin-top:20px;">
             <a href="../index.html" class="btn btn-ghost">← Voltar ao portal</a>
         </div>
     </div>
 </div>
 
-<!-- ═══════════ JOGO ═══════════ -->
+<!-- ═══ CRIAR SALA (Professor) ═══ -->
+<div id="tela-criar" class="tela tela-centro">
+    <div class="card-ui">
+        <h1>🏫 Criar Sala</h1>
+        <p class="sub">Configure a sala e compartilhe o código com os alunos.</p>
+        <div class="field">
+            <label>Quantas equipes?</label>
+            <select id="sel-num-equipes">
+                <option value="2">2 equipes</option>
+                <option value="3" selected>3 equipes</option>
+                <option value="4">4 equipes</option>
+            </select>
+        </div>
+        <button class="btn btn-primary btn-big" id="btn-gerar-sala">Gerar Sala →</button>
+        <button class="btn btn-ghost btn-big" onclick="mostrarTela('tela-menu')" style="margin-top:8px;">← Voltar</button>
+    </div>
+</div>
+
+<!-- ═══ LOBBY HOST ═══ -->
+<div id="tela-host-lobby" class="tela tela-centro">
+    <div class="card-ui">
+        <h1>Sala Criada!</h1>
+        <p class="sub">Compartilhe este código com os alunos:</p>
+        <div class="codigo-display" id="codigo-display">-----</div>
+        <p class="codigo-hint">Os alunos acessam o jogo e clicam em "Entrar na Sala"</p>
+        <div class="equipes-lista" id="host-equipes-lista"></div>
+        <button class="btn btn-primary btn-big" id="btn-iniciar-online" disabled>Iniciar Jogo →</button>
+        <button class="btn btn-ghost btn-big" id="btn-cancelar-sala" style="margin-top:8px;">Cancelar sala</button>
+    </div>
+</div>
+
+<!-- ═══ ENTRAR NA SALA (Equipe) ═══ -->
+<div id="tela-entrar" class="tela tela-centro">
+    <div class="card-ui">
+        <h1>🎓 Entrar na Sala</h1>
+        <p class="sub">Digite o código que o professor compartilhou.</p>
+        <div class="field">
+            <label>Código da sala</label>
+            <input type="text" id="input-codigo" placeholder="ABCDE" maxlength="5" style="text-align:center;font-family:'DM Mono',monospace;font-size:1.5rem;letter-spacing:.2em;text-transform:uppercase;">
+        </div>
+        <div class="field">
+            <label>Nome da sua equipe</label>
+            <input type="text" id="input-nome-equipe" placeholder="Ex: Os Empreendedores">
+        </div>
+        <button class="btn btn-primary btn-big" id="btn-entrar-codigo">Entrar →</button>
+        <p id="erro-entrar" style="color:var(--coral);font-size:.85rem;text-align:center;display:none;margin-top:8px;"></p>
+        <button class="btn btn-ghost btn-big" onclick="mostrarTela('tela-menu')" style="margin-top:8px;">← Voltar</button>
+    </div>
+</div>
+
+<!-- ═══ LOBBY EQUIPE ═══ -->
+<div id="tela-team-lobby" class="tela tela-centro">
+    <div class="card-ui">
+        <h1 id="team-lobby-titulo">Conectado!</h1>
+        <p class="sub">Aguardando o professor iniciar o jogo…</p>
+        <div class="equipes-lista" id="team-equipes-lista"></div>
+        <div class="aguardando">
+            <div class="icone">⏳</div>
+            <p>O jogo começará em breve.</p>
+        </div>
+    </div>
+</div>
+
+<!-- ═══ SETUP LOCAL ═══ -->
+<div id="tela-setup-local" class="tela tela-centro">
+    <div class="card-ui">
+        <h1>💻 Modo Local</h1>
+        <p class="sub">Todas as equipes jogam nesta tela. Ideal para projetor em sala de aula.</p>
+        <div class="field">
+            <label>Quantas equipes?</label>
+            <select id="sel-equipes-local">
+                <option value="2">2 equipes</option>
+                <option value="3" selected>3 equipes</option>
+                <option value="4">4 equipes</option>
+            </select>
+        </div>
+        <div id="equipes-local-container"></div>
+        <button class="btn btn-primary btn-big" id="btn-iniciar-local" style="margin-top:16px;">Iniciar Jogo →</button>
+        <button class="btn btn-ghost btn-big" onclick="mostrarTela('tela-menu')" style="margin-top:8px;">← Voltar</button>
+    </div>
+</div>
+
+<!-- ═══ JOGO ═══ -->
 <div id="tela-jogo" class="tela">
     <div class="jogo-header">
         <div class="logo">🎲 Vida <span>Empresarial</span></div>
-        <div class="rodada-badge" id="rodada-badge">Rodada 1/25</div>
-        <div class="fase-badge" id="fase-badge">Fundação</div>
+        <div class="badge badge-dark" id="rodada-badge">Rodada 1/25</div>
+        <div class="badge badge-blue" id="fase-badge">Fundação</div>
     </div>
     <div class="jogo-body">
         <div class="sidebar" id="sidebar-equipes"></div>
@@ -207,7 +246,7 @@
     </div>
 </div>
 
-<!-- ═══════════ RELATÓRIO ═══════════ -->
+<!-- ═══ RELATÓRIO ═══ -->
 <div id="tela-relatorio" class="tela">
     <div class="relatorio" id="relatorio-conteudo"></div>
 </div>
@@ -216,705 +255,545 @@
 /* ═══════════════════════════════════════════
    DADOS DOS EVENTOS (25 rodadas)
    ═══════════════════════════════════════════ */
-const CORES_EQUIPE = ['#2A5BDB','#C0410D','#0B6E4F','#5B21A8'];
-const NOMES_PADRAO = ['Alpha','Beta','Gamma','Delta'];
-
-const FASES = ['Fundação','Lançamento','Crescimento','Desafios','Maturidade'];
-
-const EVENTOS = [
-// ── FASE 1: FUNDAÇÃO ──
-{
-    fase:'Fundação',tipo:'planejamento',
-    titulo:'Proposta de Valor',
-    conceito:'Canvas — Proposta de Valor',
-    descricao:'Sua empresa está nascendo! Antes de tudo, vocês precisam decidir como se posicionar no mercado. Qual será o grande diferencial do negócio de vocês?',
-    opcoes:[
-        {texto:'Oferecer o menor preço do mercado, apostando em volume de vendas.',feedback:'Preço baixo atrai clientes rápido, mas as margens ficam apertadas e a reputação pode sofrer.',efeitos:{caixa:-3000,clientes:12,reputacao:-5,equipe:0}},
-        {texto:'Apostar em qualidade premium e experiência excepcional para o cliente.',feedback:'Qualidade conquista clientes fiéis e prestígio, mas exige investimento alto.',efeitos:{caixa:-12000,clientes:5,reputacao:15,equipe:5}},
-        {texto:'Inovar com tecnologia e resolver um problema real de forma inédita.',feedback:'Inovação é arriscada e cara, mas pode mudar o jogo se funcionar.',efeitos:{caixa:-8000,clientes:8,reputacao:10,equipe:3}}
-    ]
-},
-{
-    fase:'Fundação',tipo:'planejamento',
-    titulo:'Conheça seu Cliente',
-    conceito:'Canvas — Segmentos de Clientes',
-    descricao:'Para quem vocês vão vender? Definir o público-alvo é uma das decisões mais críticas dos primeiros meses.',
-    opcoes:[
-        {texto:'Consumidor final (B2C) — volume alto, ticket médio baixo.',feedback:'O mercado B2C é enorme, mas conquistar atenção custa caro e a concorrência é brutal.',efeitos:{caixa:-5000,clientes:14,reputacao:0,equipe:-3}},
-        {texto:'Empresas (B2B) — poucos clientes, contratos maiores e mais estáveis.',feedback:'Clientes corporativos pagam bem e são fiéis, mas o ciclo de venda é longo.',efeitos:{caixa:-3000,clientes:5,reputacao:10,equipe:5}},
-        {texto:'Nicho específico — mercado menor, mas com clientes apaixonados.',feedback:'Nichos têm menos concorrência e mais fidelidade, mas o teto de crescimento é baixo.',efeitos:{caixa:-2000,clientes:8,reputacao:8,equipe:0}}
-    ]
-},
-{
-    fase:'Fundação',tipo:'equipe',
-    titulo:'Montando a Equipe',
-    conceito:'Canvas — Recursos Principais',
-    descricao:'Com o orçamento apertado, vocês precisam decidir onde investir em talento. Quem contratar primeiro?',
-    opcoes:[
-        {texto:'Equipe técnica forte — foco na qualidade do produto/serviço.',feedback:'Produto sólido gera reputação, mas demora para gerar receita sem vendas.',efeitos:{caixa:-15000,clientes:0,reputacao:8,equipe:18}},
-        {texto:'Equipe de vendas experiente — foco em gerar receita rápida.',feedback:'Vendedores trazem clientes cedo, mas sem produto forte a retenção sofre.',efeitos:{caixa:-10000,clientes:12,reputacao:0,equipe:5}},
-        {texto:'Equipe enxuta e multitarefa — todos fazem um pouco de tudo.',feedback:'Economia no curto prazo, mas a sobrecarga pode desmotivar a equipe.',efeitos:{caixa:-4000,clientes:5,reputacao:0,equipe:-8}}
-    ]
-},
-{
-    fase:'Fundação',tipo:'planejamento',
-    titulo:'Análise do Cenário',
-    conceito:'SWOT — Análise Estratégica',
-    descricao:'Antes de investir pesado, vocês resolvem parar e fazer uma análise SWOT. O que priorizar neste momento?',
-    opcoes:[
-        {texto:'Reforçar nossos pontos fortes internos — melhorar o que já funciona.',feedback:'Fortalecer a base é seguro e motiva a equipe, mas pode deixar oportunidades passarem.',efeitos:{caixa:0,clientes:3,reputacao:5,equipe:10}},
-        {texto:'Explorar oportunidades externas — aproveitar tendências de mercado.',feedback:'Quem agarra tendências cresce rápido, mas pode perder foco e gastar demais.',efeitos:{caixa:-8000,clientes:10,reputacao:5,equipe:0}},
-        {texto:'Se preparar contra ameaças — criar proteções e planos B.',feedback:'Prudência protege contra crises, mas o excesso de cautela freia o crescimento.',efeitos:{caixa:-4000,clientes:0,reputacao:8,equipe:5}}
-    ]
-},
-{
-    fase:'Fundação',tipo:'mercado',
-    titulo:'Canais de Venda',
-    conceito:'Canvas — Canais de Distribuição',
-    descricao:'Como o produto/serviço de vocês vai chegar até o cliente? A escolha do canal impacta custos, alcance e imagem.',
-    opcoes:[
-        {texto:'Loja física própria — presença local, experiência presencial.',feedback:'Loja física gera confiança e reputação, mas o custo fixo é altíssimo.',efeitos:{caixa:-18000,clientes:8,reputacao:12,equipe:0}},
-        {texto:'E-commerce próprio — investir em plataforma digital.',feedback:'O digital tem alcance enorme e custo escalável, mas exige conhecimento técnico.',efeitos:{caixa:-8000,clientes:12,reputacao:5,equipe:-3}},
-        {texto:'Marketplaces e revendedores — alcance rápido, sem estrutura própria.',feedback:'Acesso rápido a clientes, mas a margem encolhe e vocês dependem de terceiros.',efeitos:{caixa:-3000,clientes:15,reputacao:-5,equipe:0}}
-    ]
-},
-// ── FASE 2: LANÇAMENTO ──
-{
-    fase:'Lançamento',tipo:'mercado',
-    titulo:'Estratégia de Marketing',
-    conceito:'Canvas — Relacionamento com Clientes',
-    descricao:'A empresa existe, o produto está pronto. Agora vocês precisam que as pessoas saibam disso! Qual estratégia de divulgação?',
-    opcoes:[
-        {texto:'Marketing digital — redes sociais, anúncios e influenciadores.',feedback:'Alcance rápido e mensurável, mas o custo pode escalar sem controle.',efeitos:{caixa:-8000,clientes:14,reputacao:5,equipe:0}},
-        {texto:'Marketing boca a boca — fidelização e programa de indicações.',feedback:'Crescimento orgânico e clientes fiéis, mas é lento no começo.',efeitos:{caixa:-2000,clientes:5,reputacao:12,equipe:5}},
-        {texto:'Marketing tradicional — eventos, feiras e mídia impressa.',feedback:'Credibilidade e presença, mas alcance limitado e custo alto.',efeitos:{caixa:-12000,clientes:8,reputacao:10,equipe:0}}
-    ]
-},
-{
-    fase:'Lançamento',tipo:'financeiro',
-    titulo:'Modelo de Receita',
-    conceito:'Canvas — Fontes de Receita',
-    descricao:'Hora de definir como o dinheiro entra! O modelo de precificação afeta crescimento, retenção e imagem.',
-    opcoes:[
-        {texto:'Preço baixo e acessível — penetração de mercado agressiva.',feedback:'Volume alto, mas margem apertada. Se não controlar custos, o caixa aperta.',efeitos:{caixa:8000,clientes:15,reputacao:-5,equipe:-3}},
-        {texto:'Preço premium — posicionamento de luxo e exclusividade.',feedback:'Margem excelente, mas o mercado é menor e mais exigente.',efeitos:{caixa:18000,clientes:-3,reputacao:12,equipe:5}},
-        {texto:'Modelo de assinatura — receita recorrente e previsível.',feedback:'Fluxo de caixa estável, mas convencer o cliente do primeiro pagamento é difícil.',efeitos:{caixa:12000,clientes:8,reputacao:5,equipe:0}}
-    ]
-},
-{
-    fase:'Lançamento',tipo:'mercado',
-    titulo:'O Primeiro Grande Cliente',
-    conceito:'SWOT — Oportunidades',
-    descricao:'Uma empresa grande entra em contato querendo contratar vocês! As condições são apertadas, com prazos curtos e preço negociado para baixo.',
-    opcoes:[
-        {texto:'Aceitar tudo — é a chance de colocar a empresa no mapa!',feedback:'A receita é ótima, mas a equipe fica sobrecarregada e vocês ficam dependentes de um cliente.',efeitos:{caixa:20000,clientes:5,reputacao:5,equipe:-10}},
-        {texto:'Negociar melhores termos — vale tentar equilibrar.',feedback:'Boa negociação mostra maturidade, mas há risco de perder o deal.',efeitos:{caixa:10000,clientes:5,reputacao:10,equipe:0}},
-        {texto:'Recusar — ainda não estamos prontos para esse volume.',feedback:'Preserva a equipe e a qualidade, mas a oportunidade pode não voltar.',efeitos:{caixa:0,clientes:2,reputacao:5,equipe:10}}
-    ]
-},
-{
-    fase:'Lançamento',tipo:'planejamento',
-    titulo:'Escolha de Fornecedores',
-    conceito:'Canvas — Parcerias Principais',
-    descricao:'Vocês precisam de fornecedores confiáveis. Qualidade, custo e risco entram na equação.',
-    opcoes:[
-        {texto:'Fornecedor premium e confiável — custo alto, qualidade garantida.',feedback:'Zero dor de cabeça com qualidade, mas o custo pressiona o caixa.',efeitos:{caixa:-12000,clientes:3,reputacao:10,equipe:5}},
-        {texto:'Fornecedor mais barato — economizar ao máximo.',feedback:'Economia imediata, mas defeitos e atrasos podem destruir sua reputação.',efeitos:{caixa:-3000,clientes:5,reputacao:-8,equipe:0}},
-        {texto:'Diversificar entre vários fornecedores — não depender de ninguém.',feedback:'Menor risco de ruptura, mas gerenciar muitos fornecedores é complexo.',efeitos:{caixa:-7000,clientes:3,reputacao:5,equipe:-5}}
-    ]
-},
-{
-    fase:'Lançamento',tipo:'marco',
-    titulo:'Revisão do 1º Trimestre',
-    conceito:'Planejamento Estratégico',
-    descricao:'Três meses se passaram. Vocês olham os números e percebem que é hora de decidir o rumo. O que priorizar agora?',
-    opcoes:[
-        {texto:'Pisar no acelerador — investir pesado em crescimento.',feedback:'Crescimento rápido consome caixa, mas pode posicionar vocês como líderes.',efeitos:{caixa:-15000,clientes:15,reputacao:5,equipe:-3}},
-        {texto:'Consolidar operações — eficiência antes de crescer.',feedback:'Processos sólidos evitam desperdício e motivam a equipe.',efeitos:{caixa:8000,clientes:0,reputacao:5,equipe:10}},
-        {texto:'Diversificar — lançar um novo produto ou serviço.',feedback:'Mais fontes de receita, mas atenção dividida pode enfraquecer tudo.',efeitos:{caixa:-10000,clientes:8,reputacao:3,equipe:-5}}
-    ]
-},
-// ── FASE 3: CRESCIMENTO ──
-{
-    fase:'Crescimento',tipo:'crise',
-    titulo:'Concorrência Agressiva',
-    conceito:'SWOT — Ameaças',
-    descricao:'Um concorrente forte entrou no mercado com um produto similar e preço 30% menor. Seus clientes começam a olhar para o outro lado.',
-    opcoes:[
-        {texto:'Baixar preços e competir diretamente — guerra de preços.',feedback:'Vocês seguram clientes, mas a margem desaparece e a equipe sente a pressão.',efeitos:{caixa:-10000,clientes:8,reputacao:-5,equipe:-5}},
-        {texto:'Reforçar o diferencial de qualidade — marketing de valor.',feedback:'Quem busca qualidade fica, mas vocês perdem os clientes sensíveis a preço.',efeitos:{caixa:-6000,clientes:-2,reputacao:15,equipe:5}},
-        {texto:'Pivotar para um segmento diferente — evitar o confronto direto.',feedback:'Novo território traz oportunidades, mas o custo de reposicionamento é real.',efeitos:{caixa:-12000,clientes:5,reputacao:0,equipe:-3}}
-    ]
-},
-{
-    fase:'Crescimento',tipo:'equipe',
-    titulo:'Crescimento da Equipe',
-    conceito:'Canvas — Atividades-Chave',
-    descricao:'A demanda está subindo! Vocês precisam de mais gente, mas contratar mal pode ser pior do que não contratar.',
-    opcoes:[
-        {texto:'Contratar rápido para atender a demanda — velocidade acima de tudo.',feedback:'Vocês atendem os clientes, mas alguns contratados não se encaixam na cultura.',efeitos:{caixa:-12000,clientes:10,reputacao:-3,equipe:-8}},
-        {texto:'Contratar devagar e com critério — qualidade do time em primeiro lugar.',feedback:'Time forte e alinhado, mas alguns clientes não esperam e vão embora.',efeitos:{caixa:-8000,clientes:2,reputacao:5,equipe:15}},
-        {texto:'Terceirizar parte das operações — flexibilidade e rapidez.',feedback:'Resolve no curto prazo, mas vocês perdem controle sobre a qualidade.',efeitos:{caixa:-6000,clientes:8,reputacao:0,equipe:-3}}
-    ]
-},
-{
-    fase:'Crescimento',tipo:'financeiro',
-    titulo:'Gestão do Fluxo de Caixa',
-    conceito:'Canvas — Estrutura de Custos',
-    descricao:'O caixa está apertado. As contas não fecham no fim do mês e vocês precisam tomar uma atitude agora.',
-    opcoes:[
-        {texto:'Cortar custos drasticamente — demissões, renegociações, austeridade.',feedback:'O caixa respira, mas a equipe fica desmotivada e a qualidade pode cair.',efeitos:{caixa:15000,clientes:-3,reputacao:-5,equipe:-12}},
-        {texto:'Buscar um empréstimo bancário — capital para manter tudo rodando.',feedback:'Fôlego financeiro, mas a dívida pesa e afeta a reputação de crédito.',efeitos:{caixa:20000,clientes:0,reputacao:-8,equipe:0}},
-        {texto:'Renegociar prazos com fornecedores e clientes — ganhar tempo.',feedback:'Solução elegante que preserva relações, mas o alívio é temporário.',efeitos:{caixa:8000,clientes:0,reputacao:5,equipe:5}}
-    ]
-},
-{
-    fase:'Crescimento',tipo:'planejamento',
-    titulo:'Parceria Estratégica',
-    conceito:'Canvas — Parcerias Principais',
-    descricao:'Uma empresa complementar à de vocês propõe uma parceria. Juntos poderiam atender clientes maiores, mas significa dividir decisões.',
-    opcoes:[
-        {texto:'Parceria completa — compartilhar recursos, clientes e lucros.',feedback:'O alcance dobra, mas vocês perdem autonomia e as culturas podem chocar.',efeitos:{caixa:-3000,clientes:14,reputacao:5,equipe:-5}},
-        {texto:'Parceria limitada — um projeto conjunto específico para testar.',feedback:'Baixo risco, mas o impacto também é moderado.',efeitos:{caixa:-2000,clientes:7,reputacao:5,equipe:3}},
-        {texto:'Declinar educadamente — manter controle total do negócio.',feedback:'Vocês mantêm a liberdade, mas a oportunidade de crescimento se perde.',efeitos:{caixa:0,clientes:0,reputacao:3,equipe:5}}
-    ]
-},
-{
-    fase:'Crescimento',tipo:'marco',
-    titulo:'Fim do 1º Ano',
-    conceito:'Planejamento Estratégico',
-    descricao:'Um ano inteiro de empresa! Os resultados estão na mesa. Hora de uma reflexão estratégica profunda sobre o próximo passo.',
-    opcoes:[
-        {texto:'Dobrar a aposta — investir pesado no que já funciona.',feedback:'Alta convicção gera alta recompensa ou alta perda. Sem meio termo.',efeitos:{caixa:-18000,clientes:18,reputacao:5,equipe:-5}},
-        {texto:'Diversificar — novos mercados e novas linhas de receita.',feedback:'Mais segurança no longo prazo, mas exige gestão de múltiplas frentes.',efeitos:{caixa:-12000,clientes:10,reputacao:5,equipe:3}},
-        {texto:'Reestruturar — reorganizar a empresa de dentro para fora.',feedback:'Doloroso no curto prazo, mas cria uma base muito mais sólida.',efeitos:{caixa:-5000,clientes:-3,reputacao:8,equipe:15}}
-    ]
-},
-// ── FASE 4: DESAFIOS ──
-{
-    fase:'Desafios',tipo:'crise',
-    titulo:'Crise Inesperada',
-    conceito:'SWOT — Ameaças',
-    descricao:'Uma crise econômica atinge o mercado. Seus clientes cortam gastos. As vendas caem 40% em um único mês. O pânico se instala.',
-    opcoes:[
-        {texto:'Modo sobrevivência — cortar tudo que não é essencial para resistir.',feedback:'O caixa se estabiliza, mas a empresa encolhe e a equipe sofre.',efeitos:{caixa:12000,clientes:-8,reputacao:-5,equipe:-10}},
-        {texto:'Aproveitar a crise — comprar ativos e concorrentes enfraquecidos.',feedback:'Movimento ousado! Se der certo, vocês saem da crise muito maiores.',efeitos:{caixa:-25000,clientes:15,reputacao:10,equipe:0}},
-        {texto:'Inovar — criar algo novo que faça sentido no momento de crise.',feedback:'Adaptação é a chave da sobrevivência. Mas inovar sob pressão é arriscado.',efeitos:{caixa:-12000,clientes:8,reputacao:12,equipe:5}}
-    ]
-},
-{
-    fase:'Desafios',tipo:'inovacao',
-    titulo:'Revolução Tecnológica',
-    conceito:'Canvas — Atividades-Chave',
-    descricao:'Uma nova tecnologia pode transformar completamente seu produto ou serviço. Mas adotá-la exige investimento e retreino da equipe.',
-    opcoes:[
-        {texto:'Adotar imediatamente — ser o primeiro gera vantagem competitiva.',feedback:'Pioneirismo gera destaque, mas bugs e curva de aprendizado custam caro.',efeitos:{caixa:-18000,clientes:8,reputacao:12,equipe:3}},
-        {texto:'Esperar e aprender — deixar outros testarem primeiro.',feedback:'Menos risco, mas vocês perdem a janela de ser referência.',efeitos:{caixa:-3000,clientes:0,reputacao:0,equipe:5}},
-        {texto:'Desenvolver tecnologia própria — máximo controle e diferenciação.',feedback:'Custoso e demorado, mas se funcionar, ninguém consegue copiar.',efeitos:{caixa:-25000,clientes:5,reputacao:18,equipe:8}}
-    ]
-},
-{
-    fase:'Desafios',tipo:'equipe',
-    titulo:'Conflito Interno',
-    conceito:'SWOT — Fraquezas',
-    descricao:'Dois líderes importantes da empresa estão em conflito aberto. A tensão contamina o ambiente e a produtividade cai.',
-    opcoes:[
-        {texto:'Demitir o que está mais errado — decisão rápida e firme.',feedback:'Resolve rápido, mas perder talento custa caro e assusta os outros.',efeitos:{caixa:3000,clientes:0,reputacao:-3,equipe:-12}},
-        {texto:'Mediar o conflito pessoalmente — investir tempo na resolução.',feedback:'Se funcionar, o time sai mais forte. Mas pode não funcionar.',efeitos:{caixa:-3000,clientes:0,reputacao:5,equipe:10}},
-        {texto:'Separar em departamentos — cada um no seu espaço.',feedback:'A convivência melhora, mas a comunicação entre áreas pode sofrer.',efeitos:{caixa:-5000,clientes:0,reputacao:0,equipe:5}}
-    ]
-},
-{
-    fase:'Desafios',tipo:'mercado',
-    titulo:'Nova Regulamentação',
-    conceito:'SWOT — Ameaças',
-    descricao:'O governo anuncia novas regras que afetam diretamente o seu setor. Vocês têm 3 meses para se adaptar ou enfrentar multas.',
-    opcoes:[
-        {texto:'Adaptar-se rapidamente e virar referência em compliance.',feedback:'Investimento pesado, mas clientes e parceiros veem vocês como confiáveis.',efeitos:{caixa:-10000,clientes:0,reputacao:15,equipe:3}},
-        {texto:'Fazer lobby e pressionar por mudanças via associações.',feedback:'Pode funcionar, mas é uma aposta política e a imagem pode manchar.',efeitos:{caixa:-6000,clientes:0,reputacao:-5,equipe:0}},
-        {texto:'Ajustar o mínimo necessário — cumprir a letra da lei e só.',feedback:'Econômico, mas arriscado. Qualquer falha vira multa e escândalo.',efeitos:{caixa:-2000,clientes:0,reputacao:-10,equipe:-5}}
-    ]
-},
-{
-    fase:'Desafios',tipo:'marco',
-    titulo:'Momento de Decisão',
-    conceito:'Planejamento Estratégico',
-    descricao:'Dois anos de empresa! Um grupo investidor faz uma proposta: comprar sua empresa por um valor atrativo. O que vocês fazem?',
-    opcoes:[
-        {texto:'Vender — lucro garantido e hora de recomeçar com mais experiência.',feedback:'O dinheiro entra, mas vocês perdem o controle da empresa que construíram.',efeitos:{caixa:40000,clientes:0,reputacao:0,equipe:-10}},
-        {texto:'Recusar e seguir — vocês acreditam que a empresa vale mais.',feedback:'Coragem e visão de longo prazo. A equipe se inspira com a decisão.',efeitos:{caixa:0,clientes:5,reputacao:10,equipe:12}},
-        {texto:'Contra-propor uma sociedade — aceitar investimento sem perder controle.',feedback:'Equilíbrio inteligente: capital novo com autonomia parcial preservada.',efeitos:{caixa:20000,clientes:5,reputacao:5,equipe:0}}
-    ]
-},
-// ── FASE 5: MATURIDADE ──
-{
-    fase:'Maturidade',tipo:'etica',
-    titulo:'Sustentabilidade',
-    conceito:'Canvas — Proposta de Valor / Ética',
-    descricao:'Clientes, investidores e a sociedade cobram práticas sustentáveis. ESG não é mais diferencial — é exigência.',
-    opcoes:[
-        {texto:'Programa ESG completo — investimento real e transparência total.',feedback:'Custa caro, mas gera lealdade genuína e atrai investidores sérios.',efeitos:{caixa:-15000,clientes:5,reputacao:18,equipe:8}},
-        {texto:'Ações pontuais — fazer o que dá dentro do orçamento.',feedback:'Demonstra boa vontade sem comprometer o caixa. Resultado moderado.',efeitos:{caixa:-5000,clientes:3,reputacao:8,equipe:5}},
-        {texto:'Greenwashing — parecer sustentável com investimento mínimo.',feedback:'Econômico, mas se descobrirem a farsa, a reputação é destruída.',efeitos:{caixa:-2000,clientes:5,reputacao:-15,equipe:-8}}
-    ]
-},
-{
-    fase:'Maturidade',tipo:'inovacao',
-    titulo:'Transformação Digital',
-    conceito:'Canvas — Canais / Atividades-Chave',
-    descricao:'O mercado migra cada vez mais para o digital. Seus concorrentes já estão lá. É hora de decidir o nível de digitalização.',
-    opcoes:[
-        {texto:'Digitalização total — migrar toda a operação para o digital.',feedback:'Vocês entram de cabeça no futuro, mas a transição é traumática.',efeitos:{caixa:-18000,clientes:14,reputacao:10,equipe:-5}},
-        {texto:'Modelo híbrido — o melhor dos dois mundos.',feedback:'Equilíbrio sensato que agrada mais gente, mas é complexo de gerenciar.',efeitos:{caixa:-8000,clientes:8,reputacao:5,equipe:5}},
-        {texto:'Manter o tradicional — "digital nem sempre é melhor".',feedback:'Menos custo, mas vocês ficam cada vez mais para trás.',efeitos:{caixa:0,clientes:-5,reputacao:-5,equipe:5}}
-    ]
-},
-{
-    fase:'Maturidade',tipo:'mercado',
-    titulo:'Mercado Internacional',
-    conceito:'Canvas — Segmentos de Clientes',
-    descricao:'Surge a oportunidade de levar a empresa para fora do país. O mercado internacional é enorme, mas as regras são outras.',
-    opcoes:[
-        {texto:'Expansão agressiva — abrir escritório e operação lá fora.',feedback:'Alcance global, mas o custo e a complexidade são absurdos.',efeitos:{caixa:-22000,clientes:18,reputacao:10,equipe:-8}},
-        {texto:'Exportar via parceiro local — testar com menos risco.',feedback:'Entrada gradual e inteligente, mas vocês dependem do parceiro.',efeitos:{caixa:-6000,clientes:10,reputacao:5,equipe:0}},
-        {texto:'Focar no mercado nacional — consolidar antes de expandir.',feedback:'Prudência que fortalece a base, mas a concorrência global não espera.',efeitos:{caixa:3000,clientes:3,reputacao:3,equipe:5}}
-    ]
-},
-{
-    fase:'Maturidade',tipo:'equipe',
-    titulo:'Cultura e Legado',
-    conceito:'SWOT — Forças',
-    descricao:'Três anos de empresa. Vocês já têm história. Que tipo de cultura vocês querem deixar como legado?',
-    opcoes:[
-        {texto:'Cultura de inovação e risco — mentalidade de startup permanente.',feedback:'Energia contagiante, mas a rotatividade é alta e a instabilidade cansa.',efeitos:{caixa:-3000,clientes:10,reputacao:5,equipe:-8}},
-        {texto:'Cultura de estabilidade e processos — crescimento previsível.',feedback:'Funcionários ficam mais tempo e as operações são sólidas.',efeitos:{caixa:5000,clientes:3,reputacao:5,equipe:10}},
-        {texto:'Cultura de pessoas em primeiro lugar — bem-estar e propósito.',feedback:'Retenção altíssima e reputação como empregador, mas custa investir em gente.',efeitos:{caixa:-5000,clientes:5,reputacao:10,equipe:15}}
-    ]
-},
-{
-    fase:'Maturidade',tipo:'marco',
-    titulo:'Decisão Final',
-    conceito:'Visão de Futuro',
-    descricao:'A última grande decisão define o futuro de longo prazo da empresa. Para onde vocês querem levar tudo isso?',
-    opcoes:[
-        {texto:'IPO — abrir capital na bolsa e crescer exponencialmente.',feedback:'Capital enorme entra, mas vocês respondem a acionistas e perdem liberdade.',efeitos:{caixa:30000,clientes:10,reputacao:8,equipe:-12}},
-        {texto:'Franquias — expandir via modelo de franquias pelo país.',feedback:'Crescimento escalável com custo menor, mas o controle de qualidade é desafiador.',efeitos:{caixa:15000,clientes:18,reputacao:3,equipe:-5}},
-        {texto:'Impacto social — transformar a empresa em referência de impacto.',feedback:'Prestígio, propósito e uma equipe orgulhosa. O financeiro desacelera, mas o legado é real.',efeitos:{caixa:-8000,clientes:5,reputacao:20,equipe:15}}
-    ]
-}
+const CORES=['#2A5BDB','#C0410D','#0B6E4F','#5B21A8'];
+const NOMES_PADRAO=['Alpha','Beta','Gamma','Delta'];
+const EVENTOS=[
+{fase:'Fundação',tipo:'planejamento',titulo:'Proposta de Valor',conceito:'Canvas — Proposta de Valor',descricao:'Sua empresa está nascendo! Antes de tudo, vocês precisam decidir como se posicionar no mercado. Qual será o grande diferencial do negócio de vocês?',opcoes:[{texto:'Oferecer o menor preço do mercado, apostando em volume de vendas.',feedback:'Preço baixo atrai clientes rápido, mas as margens ficam apertadas e a reputação pode sofrer.',efeitos:{caixa:-3000,clientes:12,reputacao:-5,equipe:0}},{texto:'Apostar em qualidade premium e experiência excepcional para o cliente.',feedback:'Qualidade conquista clientes fiéis e prestígio, mas exige investimento alto.',efeitos:{caixa:-12000,clientes:5,reputacao:15,equipe:5}},{texto:'Inovar com tecnologia e resolver um problema real de forma inédita.',feedback:'Inovação é arriscada e cara, mas pode mudar o jogo se funcionar.',efeitos:{caixa:-8000,clientes:8,reputacao:10,equipe:3}}]},
+{fase:'Fundação',tipo:'planejamento',titulo:'Conheça seu Cliente',conceito:'Canvas — Segmentos de Clientes',descricao:'Para quem vocês vão vender? Definir o público-alvo é uma das decisões mais críticas dos primeiros meses.',opcoes:[{texto:'Consumidor final (B2C) — volume alto, ticket médio baixo.',feedback:'O mercado B2C é enorme, mas conquistar atenção custa caro e a concorrência é brutal.',efeitos:{caixa:-5000,clientes:14,reputacao:0,equipe:-3}},{texto:'Empresas (B2B) — poucos clientes, contratos maiores e mais estáveis.',feedback:'Clientes corporativos pagam bem e são fiéis, mas o ciclo de venda é longo.',efeitos:{caixa:-3000,clientes:5,reputacao:10,equipe:5}},{texto:'Nicho específico — mercado menor, mas com clientes apaixonados.',feedback:'Nichos têm menos concorrência e mais fidelidade, mas o teto de crescimento é baixo.',efeitos:{caixa:-2000,clientes:8,reputacao:8,equipe:0}}]},
+{fase:'Fundação',tipo:'equipe',titulo:'Montando a Equipe',conceito:'Canvas — Recursos Principais',descricao:'Com o orçamento apertado, vocês precisam decidir onde investir em talento. Quem contratar primeiro?',opcoes:[{texto:'Equipe técnica forte — foco na qualidade do produto/serviço.',feedback:'Produto sólido gera reputação, mas demora para gerar receita sem vendas.',efeitos:{caixa:-15000,clientes:0,reputacao:8,equipe:18}},{texto:'Equipe de vendas experiente — foco em gerar receita rápida.',feedback:'Vendedores trazem clientes cedo, mas sem produto forte a retenção sofre.',efeitos:{caixa:-10000,clientes:12,reputacao:0,equipe:5}},{texto:'Equipe enxuta e multitarefa — todos fazem um pouco de tudo.',feedback:'Economia no curto prazo, mas a sobrecarga pode desmotivar a equipe.',efeitos:{caixa:-4000,clientes:5,reputacao:0,equipe:-8}}]},
+{fase:'Fundação',tipo:'planejamento',titulo:'Análise do Cenário',conceito:'SWOT — Análise Estratégica',descricao:'Antes de investir pesado, vocês resolvem parar e fazer uma análise SWOT. O que priorizar neste momento?',opcoes:[{texto:'Reforçar nossos pontos fortes internos — melhorar o que já funciona.',feedback:'Fortalecer a base é seguro e motiva a equipe, mas pode deixar oportunidades passarem.',efeitos:{caixa:0,clientes:3,reputacao:5,equipe:10}},{texto:'Explorar oportunidades externas — aproveitar tendências de mercado.',feedback:'Quem agarra tendências cresce rápido, mas pode perder foco e gastar demais.',efeitos:{caixa:-8000,clientes:10,reputacao:5,equipe:0}},{texto:'Se preparar contra ameaças — criar proteções e planos B.',feedback:'Prudência protege contra crises, mas o excesso de cautela freia o crescimento.',efeitos:{caixa:-4000,clientes:0,reputacao:8,equipe:5}}]},
+{fase:'Fundação',tipo:'mercado',titulo:'Canais de Venda',conceito:'Canvas — Canais de Distribuição',descricao:'Como o produto/serviço de vocês vai chegar até o cliente? A escolha do canal impacta custos, alcance e imagem.',opcoes:[{texto:'Loja física própria — presença local, experiência presencial.',feedback:'Loja física gera confiança e reputação, mas o custo fixo é altíssimo.',efeitos:{caixa:-18000,clientes:8,reputacao:12,equipe:0}},{texto:'E-commerce próprio — investir em plataforma digital.',feedback:'O digital tem alcance enorme e custo escalável, mas exige conhecimento técnico.',efeitos:{caixa:-8000,clientes:12,reputacao:5,equipe:-3}},{texto:'Marketplaces e revendedores — alcance rápido, sem estrutura própria.',feedback:'Acesso rápido a clientes, mas a margem encolhe e vocês dependem de terceiros.',efeitos:{caixa:-3000,clientes:15,reputacao:-5,equipe:0}}]},
+{fase:'Lançamento',tipo:'mercado',titulo:'Estratégia de Marketing',conceito:'Canvas — Relacionamento com Clientes',descricao:'A empresa existe, o produto está pronto. Agora vocês precisam que as pessoas saibam disso!',opcoes:[{texto:'Marketing digital — redes sociais, anúncios e influenciadores.',feedback:'Alcance rápido e mensurável, mas o custo pode escalar sem controle.',efeitos:{caixa:-8000,clientes:14,reputacao:5,equipe:0}},{texto:'Marketing boca a boca — fidelização e programa de indicações.',feedback:'Crescimento orgânico e clientes fiéis, mas é lento no começo.',efeitos:{caixa:-2000,clientes:5,reputacao:12,equipe:5}},{texto:'Marketing tradicional — eventos, feiras e mídia impressa.',feedback:'Credibilidade e presença, mas alcance limitado e custo alto.',efeitos:{caixa:-12000,clientes:8,reputacao:10,equipe:0}}]},
+{fase:'Lançamento',tipo:'financeiro',titulo:'Modelo de Receita',conceito:'Canvas — Fontes de Receita',descricao:'Hora de definir como o dinheiro entra! O modelo de precificação afeta crescimento, retenção e imagem.',opcoes:[{texto:'Preço baixo e acessível — penetração de mercado agressiva.',feedback:'Volume alto, mas margem apertada.',efeitos:{caixa:8000,clientes:15,reputacao:-5,equipe:-3}},{texto:'Preço premium — posicionamento de luxo e exclusividade.',feedback:'Margem excelente, mas o mercado é menor e mais exigente.',efeitos:{caixa:18000,clientes:-3,reputacao:12,equipe:5}},{texto:'Modelo de assinatura — receita recorrente e previsível.',feedback:'Fluxo de caixa estável, mas convencer o cliente do primeiro pagamento é difícil.',efeitos:{caixa:12000,clientes:8,reputacao:5,equipe:0}}]},
+{fase:'Lançamento',tipo:'mercado',titulo:'O Primeiro Grande Cliente',conceito:'SWOT — Oportunidades',descricao:'Uma empresa grande entra em contato querendo contratar vocês! As condições são apertadas.',opcoes:[{texto:'Aceitar tudo — é a chance de colocar a empresa no mapa!',feedback:'A receita é ótima, mas a equipe fica sobrecarregada.',efeitos:{caixa:20000,clientes:5,reputacao:5,equipe:-10}},{texto:'Negociar melhores termos — vale tentar equilibrar.',feedback:'Boa negociação mostra maturidade.',efeitos:{caixa:10000,clientes:5,reputacao:10,equipe:0}},{texto:'Recusar — ainda não estamos prontos para esse volume.',feedback:'Preserva a equipe e a qualidade.',efeitos:{caixa:0,clientes:2,reputacao:5,equipe:10}}]},
+{fase:'Lançamento',tipo:'planejamento',titulo:'Escolha de Fornecedores',conceito:'Canvas — Parcerias Principais',descricao:'Vocês precisam de fornecedores confiáveis. Qualidade, custo e risco entram na equação.',opcoes:[{texto:'Fornecedor premium e confiável — custo alto, qualidade garantida.',feedback:'Zero dor de cabeça com qualidade, mas o custo pressiona o caixa.',efeitos:{caixa:-12000,clientes:3,reputacao:10,equipe:5}},{texto:'Fornecedor mais barato — economizar ao máximo.',feedback:'Economia imediata, mas defeitos podem destruir sua reputação.',efeitos:{caixa:-3000,clientes:5,reputacao:-8,equipe:0}},{texto:'Diversificar entre vários fornecedores.',feedback:'Menor risco de ruptura, mas gerenciar muitos fornecedores é complexo.',efeitos:{caixa:-7000,clientes:3,reputacao:5,equipe:-5}}]},
+{fase:'Lançamento',tipo:'marco',titulo:'Revisão do 1º Trimestre',conceito:'Planejamento Estratégico',descricao:'Três meses se passaram. Os números estão na mesa. O que priorizar agora?',opcoes:[{texto:'Pisar no acelerador — investir pesado em crescimento.',feedback:'Crescimento rápido consome caixa, mas pode posicionar vocês como líderes.',efeitos:{caixa:-15000,clientes:15,reputacao:5,equipe:-3}},{texto:'Consolidar operações — eficiência antes de crescer.',feedback:'Processos sólidos evitam desperdício e motivam a equipe.',efeitos:{caixa:8000,clientes:0,reputacao:5,equipe:10}},{texto:'Diversificar — lançar um novo produto ou serviço.',feedback:'Mais fontes de receita, mas atenção dividida.',efeitos:{caixa:-10000,clientes:8,reputacao:3,equipe:-5}}]},
+{fase:'Crescimento',tipo:'crise',titulo:'Concorrência Agressiva',conceito:'SWOT — Ameaças',descricao:'Um concorrente forte entrou no mercado com produto similar e preço 30% menor!',opcoes:[{texto:'Baixar preços e competir diretamente — guerra de preços.',feedback:'Vocês seguram clientes, mas a margem desaparece.',efeitos:{caixa:-10000,clientes:8,reputacao:-5,equipe:-5}},{texto:'Reforçar o diferencial de qualidade.',feedback:'Quem busca qualidade fica, mas vocês perdem os sensíveis a preço.',efeitos:{caixa:-6000,clientes:-2,reputacao:15,equipe:5}},{texto:'Pivotar para um segmento diferente.',feedback:'Novo território traz oportunidades, mas o custo de reposicionamento é real.',efeitos:{caixa:-12000,clientes:5,reputacao:0,equipe:-3}}]},
+{fase:'Crescimento',tipo:'equipe',titulo:'Crescimento da Equipe',conceito:'Canvas — Atividades-Chave',descricao:'A demanda está subindo! Vocês precisam de mais gente, mas contratar mal pode ser pior do que não contratar.',opcoes:[{texto:'Contratar rápido para atender a demanda.',feedback:'Vocês atendem os clientes, mas alguns contratados não se encaixam.',efeitos:{caixa:-12000,clientes:10,reputacao:-3,equipe:-8}},{texto:'Contratar devagar e com critério.',feedback:'Time forte e alinhado, mas alguns clientes não esperam.',efeitos:{caixa:-8000,clientes:2,reputacao:5,equipe:15}},{texto:'Terceirizar parte das operações.',feedback:'Resolve no curto prazo, mas vocês perdem controle sobre a qualidade.',efeitos:{caixa:-6000,clientes:8,reputacao:0,equipe:-3}}]},
+{fase:'Crescimento',tipo:'financeiro',titulo:'Gestão do Fluxo de Caixa',conceito:'Canvas — Estrutura de Custos',descricao:'O caixa está apertado. As contas não fecham no fim do mês.',opcoes:[{texto:'Cortar custos drasticamente.',feedback:'O caixa respira, mas a equipe fica desmotivada.',efeitos:{caixa:15000,clientes:-3,reputacao:-5,equipe:-12}},{texto:'Buscar um empréstimo bancário.',feedback:'Fôlego financeiro, mas a dívida pesa.',efeitos:{caixa:20000,clientes:0,reputacao:-8,equipe:0}},{texto:'Renegociar prazos com fornecedores e clientes.',feedback:'Solução elegante que preserva relações.',efeitos:{caixa:8000,clientes:0,reputacao:5,equipe:5}}]},
+{fase:'Crescimento',tipo:'planejamento',titulo:'Parceria Estratégica',conceito:'Canvas — Parcerias Principais',descricao:'Uma empresa complementar propõe uma parceria. Juntos poderiam atender clientes maiores.',opcoes:[{texto:'Parceria completa — compartilhar recursos e clientes.',feedback:'O alcance dobra, mas vocês perdem autonomia.',efeitos:{caixa:-3000,clientes:14,reputacao:5,equipe:-5}},{texto:'Parceria limitada — um projeto conjunto específico.',feedback:'Baixo risco, impacto moderado.',efeitos:{caixa:-2000,clientes:7,reputacao:5,equipe:3}},{texto:'Declinar educadamente.',feedback:'Vocês mantêm a liberdade, mas a oportunidade se perde.',efeitos:{caixa:0,clientes:0,reputacao:3,equipe:5}}]},
+{fase:'Crescimento',tipo:'marco',titulo:'Fim do 1º Ano',conceito:'Planejamento Estratégico',descricao:'Um ano inteiro de empresa! Hora de uma reflexão estratégica profunda.',opcoes:[{texto:'Dobrar a aposta — investir pesado no que já funciona.',feedback:'Alta convicção gera alta recompensa ou alta perda.',efeitos:{caixa:-18000,clientes:18,reputacao:5,equipe:-5}},{texto:'Diversificar — novos mercados e novas linhas de receita.',feedback:'Mais segurança no longo prazo.',efeitos:{caixa:-12000,clientes:10,reputacao:5,equipe:3}},{texto:'Reestruturar — reorganizar a empresa de dentro para fora.',feedback:'Doloroso, mas cria uma base sólida.',efeitos:{caixa:-5000,clientes:-3,reputacao:8,equipe:15}}]},
+{fase:'Desafios',tipo:'crise',titulo:'Crise Inesperada',conceito:'SWOT — Ameaças',descricao:'Uma crise econômica atinge o mercado. Vendas caem 40% em um mês. O pânico se instala.',opcoes:[{texto:'Modo sobrevivência — cortar tudo que não é essencial.',feedback:'O caixa se estabiliza, mas a empresa encolhe.',efeitos:{caixa:12000,clientes:-8,reputacao:-5,equipe:-10}},{texto:'Aproveitar a crise — comprar ativos e concorrentes enfraquecidos.',feedback:'Movimento ousado! Se der certo, vocês saem muito maiores.',efeitos:{caixa:-25000,clientes:15,reputacao:10,equipe:0}},{texto:'Inovar — criar algo novo que faça sentido no momento de crise.',feedback:'Adaptação é a chave da sobrevivência.',efeitos:{caixa:-12000,clientes:8,reputacao:12,equipe:5}}]},
+{fase:'Desafios',tipo:'inovacao',titulo:'Revolução Tecnológica',conceito:'Canvas — Atividades-Chave',descricao:'Uma nova tecnologia pode transformar completamente seu produto ou serviço.',opcoes:[{texto:'Adotar imediatamente — ser o primeiro gera vantagem competitiva.',feedback:'Pioneirismo gera destaque, mas bugs e curva de aprendizado custam caro.',efeitos:{caixa:-18000,clientes:8,reputacao:12,equipe:3}},{texto:'Esperar e aprender — deixar outros testarem primeiro.',feedback:'Menos risco, mas vocês perdem a janela de ser referência.',efeitos:{caixa:-3000,clientes:0,reputacao:0,equipe:5}},{texto:'Desenvolver tecnologia própria.',feedback:'Custoso, mas se funcionar, ninguém consegue copiar.',efeitos:{caixa:-25000,clientes:5,reputacao:18,equipe:8}}]},
+{fase:'Desafios',tipo:'equipe',titulo:'Conflito Interno',conceito:'SWOT — Fraquezas',descricao:'Dois líderes importantes da empresa estão em conflito aberto. A tensão contamina o ambiente.',opcoes:[{texto:'Demitir o que está mais errado.',feedback:'Resolve rápido, mas perder talento custa caro.',efeitos:{caixa:3000,clientes:0,reputacao:-3,equipe:-12}},{texto:'Mediar o conflito pessoalmente.',feedback:'Se funcionar, o time sai mais forte.',efeitos:{caixa:-3000,clientes:0,reputacao:5,equipe:10}},{texto:'Separar em departamentos.',feedback:'A convivência melhora, mas a comunicação sofre.',efeitos:{caixa:-5000,clientes:0,reputacao:0,equipe:5}}]},
+{fase:'Desafios',tipo:'mercado',titulo:'Nova Regulamentação',conceito:'SWOT — Ameaças',descricao:'O governo anuncia novas regras que afetam diretamente o seu setor.',opcoes:[{texto:'Adaptar-se rapidamente e virar referência em compliance.',feedback:'Investimento pesado, mas clientes veem vocês como confiáveis.',efeitos:{caixa:-10000,clientes:0,reputacao:15,equipe:3}},{texto:'Fazer lobby e pressionar por mudanças.',feedback:'Pode funcionar, mas é aposta política.',efeitos:{caixa:-6000,clientes:0,reputacao:-5,equipe:0}},{texto:'Ajustar o mínimo necessário.',feedback:'Econômico, mas arriscado.',efeitos:{caixa:-2000,clientes:0,reputacao:-10,equipe:-5}}]},
+{fase:'Desafios',tipo:'marco',titulo:'Momento de Decisão',conceito:'Planejamento Estratégico',descricao:'Dois anos de empresa! Um investidor faz uma proposta de compra. O que vocês fazem?',opcoes:[{texto:'Vender — lucro garantido.',feedback:'O dinheiro entra, mas vocês perdem o controle.',efeitos:{caixa:40000,clientes:0,reputacao:0,equipe:-10}},{texto:'Recusar e seguir — vocês acreditam que vale mais.',feedback:'Coragem e visão de longo prazo. A equipe se inspira.',efeitos:{caixa:0,clientes:5,reputacao:10,equipe:12}},{texto:'Contra-propor uma sociedade.',feedback:'Capital novo com autonomia parcial preservada.',efeitos:{caixa:20000,clientes:5,reputacao:5,equipe:0}}]},
+{fase:'Maturidade',tipo:'etica',titulo:'Sustentabilidade',conceito:'Canvas — Proposta de Valor / Ética',descricao:'Clientes e investidores cobram práticas sustentáveis. ESG não é mais diferencial — é exigência.',opcoes:[{texto:'Programa ESG completo.',feedback:'Custa caro, mas gera lealdade genuína.',efeitos:{caixa:-15000,clientes:5,reputacao:18,equipe:8}},{texto:'Ações pontuais — fazer o que dá dentro do orçamento.',feedback:'Demonstra boa vontade sem comprometer o caixa.',efeitos:{caixa:-5000,clientes:3,reputacao:8,equipe:5}},{texto:'Greenwashing — parecer sustentável sem investir de verdade.',feedback:'Se descobrirem, a reputação é destruída.',efeitos:{caixa:-2000,clientes:5,reputacao:-15,equipe:-8}}]},
+{fase:'Maturidade',tipo:'inovacao',titulo:'Transformação Digital',conceito:'Canvas — Canais / Atividades-Chave',descricao:'O mercado migra para o digital. Seus concorrentes já estão lá.',opcoes:[{texto:'Digitalização total.',feedback:'Vocês entram no futuro, mas a transição é traumática.',efeitos:{caixa:-18000,clientes:14,reputacao:10,equipe:-5}},{texto:'Modelo híbrido — o melhor dos dois mundos.',feedback:'Equilíbrio sensato, mas complexo de gerenciar.',efeitos:{caixa:-8000,clientes:8,reputacao:5,equipe:5}},{texto:'Manter o tradicional.',feedback:'Menos custo, mas vocês ficam cada vez mais para trás.',efeitos:{caixa:0,clientes:-5,reputacao:-5,equipe:5}}]},
+{fase:'Maturidade',tipo:'mercado',titulo:'Mercado Internacional',conceito:'Canvas — Segmentos de Clientes',descricao:'Surge a oportunidade de levar a empresa para fora do país.',opcoes:[{texto:'Expansão agressiva — abrir operação lá fora.',feedback:'Alcance global, mas custo e complexidade são absurdos.',efeitos:{caixa:-22000,clientes:18,reputacao:10,equipe:-8}},{texto:'Exportar via parceiro local.',feedback:'Entrada gradual e inteligente.',efeitos:{caixa:-6000,clientes:10,reputacao:5,equipe:0}},{texto:'Focar no mercado nacional — consolidar antes.',feedback:'Prudência que fortalece a base.',efeitos:{caixa:3000,clientes:3,reputacao:3,equipe:5}}]},
+{fase:'Maturidade',tipo:'equipe',titulo:'Cultura e Legado',conceito:'SWOT — Forças',descricao:'Três anos de empresa. Que tipo de cultura vocês querem deixar como legado?',opcoes:[{texto:'Cultura de inovação e risco — mentalidade de startup.',feedback:'Energia contagiante, mas rotatividade alta.',efeitos:{caixa:-3000,clientes:10,reputacao:5,equipe:-8}},{texto:'Cultura de estabilidade e processos.',feedback:'Funcionários ficam mais tempo, operações sólidas.',efeitos:{caixa:5000,clientes:3,reputacao:5,equipe:10}},{texto:'Cultura de pessoas em primeiro lugar.',feedback:'Retenção altíssima e reputação como empregador.',efeitos:{caixa:-5000,clientes:5,reputacao:10,equipe:15}}]},
+{fase:'Maturidade',tipo:'marco',titulo:'Decisão Final',conceito:'Visão de Futuro',descricao:'A última grande decisão define o futuro de longo prazo da empresa.',opcoes:[{texto:'IPO — abrir capital na bolsa.',feedback:'Capital enorme, mas vocês respondem a acionistas.',efeitos:{caixa:30000,clientes:10,reputacao:8,equipe:-12}},{texto:'Franquias — expandir via modelo de franquias.',feedback:'Crescimento escalável, mas controle de qualidade é desafiador.',efeitos:{caixa:15000,clientes:18,reputacao:3,equipe:-5}},{texto:'Impacto social — virar referência de impacto.',feedback:'Prestígio, propósito e equipe orgulhosa.',efeitos:{caixa:-8000,clientes:5,reputacao:20,equipe:15}}]}
 ];
 
 /* ═══════════════════════════════════════════
-   ESTADO DO JOGO
+   ESTADO
    ═══════════════════════════════════════════ */
-let estado = {
-    equipes: [],
-    rodadaAtual: 0,
-    fase: 'roll',       // roll | event | choosing | reveal | fim
-    equipeSelecionando: 0,
-    escolhas: [],        // [indiceOpcao, ...] por equipe na rodada atual
-    mercado: 0,          // resultado do dado
-    historico: [],       // [{rodada, titulo, escolhas: [{equipe, opcaoIdx, opcaoTexto, efeitos}]}]
+let modo = null; // 'local' | 'host' | 'team'
+let db = null;
+let roomRef = null;
+let roomCode = null;
+let meuTimeIdx = -1;
+let listeners = [];
+
+let G = {
+    equipes:[],
+    rodada:0,
+    fase:'roll',
+    dado:0,
+    escolhas:[],
+    historico:[]
 };
 
 /* ═══════════════════════════════════════════
-   SETUP
+   FIREBASE & TELAS
    ═══════════════════════════════════════════ */
-const selEquipes = document.getElementById('sel-equipes');
-const containerEquipes = document.getElementById('equipes-container');
-
-function renderSetupEquipes() {
-    const n = parseInt(selEquipes.value);
-    containerEquipes.innerHTML = Array.from({length:n}, (_, i) => `
-        <div class="equipe-row">
-            <div class="cor" style="background:${CORES_EQUIPE[i]}"></div>
-            <input type="text" placeholder="Nome da equipe ${i+1}" id="nome-eq-${i}" value="${NOMES_PADRAO[i]}">
-        </div>
-    `).join('');
+async function initFirebase() {
+    try {
+        const cfg = await fetch('../data/config.json?_='+Date.now()).then(r=>r.json());
+        if (!cfg.firebase || !cfg.firebase.apiKey) return false;
+        firebase.initializeApp(cfg.firebase);
+        db = firebase.database();
+        return true;
+    } catch { return false; }
 }
 
-selEquipes.addEventListener('change', renderSetupEquipes);
-renderSetupEquipes();
-
-document.getElementById('btn-iniciar').addEventListener('click', () => {
-    const n = parseInt(selEquipes.value);
-    estado.equipes = Array.from({length:n}, (_, i) => ({
-        nome: document.getElementById(`nome-eq-${i}`).value.trim() || NOMES_PADRAO[i],
-        cor: CORES_EQUIPE[i],
-        caixa: 100000,
-        reputacao: 50,
-        equipe: 50,
-        clientes: 10,
-    }));
-    estado.rodadaAtual = 0;
-    estado.historico = [];
-    mostrarTela('tela-jogo');
-    iniciarRodada();
-});
-
 function mostrarTela(id) {
-    document.querySelectorAll('.tela').forEach(t => t.classList.remove('ativa'));
+    document.querySelectorAll('.tela').forEach(t=>t.classList.remove('ativa'));
     document.getElementById(id).classList.add('ativa');
 }
 
-/* ═══════════════════════════════════════════
-   SIDEBAR EQUIPES
-   ═══════════════════════════════════════════ */
-function renderSidebar(deltas) {
-    const sb = document.getElementById('sidebar-equipes');
-    sb.innerHTML = '<h3>Equipes</h3>' + estado.equipes.map((eq, i) => {
-        const d = deltas && deltas[i] ? deltas[i] : null;
-        const dest = estado.fase === 'choosing' && estado.equipeSelecionando === i ? ' destaque' : '';
-        return `
-        <div class="team-card${dest}">
-            <div class="nome"><div class="dot" style="background:${eq.cor}"></div>${esc(eq.nome)}</div>
-            <div class="recursos">
-                ${recursoHtml('R$',formatCaixa(eq.caixa),d?.caixa)}
-                ${recursoHtml('Rep',eq.reputacao,d?.reputacao)}
-                ${recursoHtml('Equipe',eq.equipe,d?.equipe)}
-                ${recursoHtml('Clientes',eq.clientes,d?.clientes)}
-            </div>
-        </div>`;
-    }).join('');
-}
-
-function recursoHtml(label, val, delta) {
-    let deltaHtml = '';
-    if (delta && delta !== 0) {
-        const cls = delta > 0 ? 'pos' : 'neg';
-        const sign = delta > 0 ? '+' : '';
-        const dVal = label === 'R$' ? sign + formatCaixa(delta) : sign + delta;
-        deltaHtml = `<span class="delta ${cls}">${dVal}</span>`;
-    }
-    return `<div class="recurso"><div class="val">${val}${deltaHtml}</div><div class="lbl">${label}</div></div>`;
-}
-
-function formatCaixa(v) {
-    if (Math.abs(v) >= 1000) return (v/1000).toFixed(0) + 'k';
-    return String(v);
-}
-
-function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function clamp(v,mn,mx){return Math.max(mn,Math.min(mx,v));}
+function formatCaixa(v){return Math.abs(v)>=1000?(v/1000).toFixed(0)+'k':String(v);}
+function gerarCodigo(){const c='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';return Array.from({length:5},()=>c[Math.floor(Math.random()*c.length)]).join('');}
+function mercadoInfo(v){if(v<=2)return{texto:'Mercado Desfavorável',classe:'mercado-desfavoravel',mod:-3000};if(v<=4)return{texto:'Mercado Estável',classe:'mercado-estavel',mod:0};return{texto:'Mercado Favorável',classe:'mercado-favoravel',mod:3000};}
+function tipoLabel(t){return{planejamento:'Planejamento',financeiro:'Financeiro',equipe:'RH & Equipe',mercado:'Mercado',crise:'Crise',marco:'Marco',inovacao:'Inovação',etica:'Ética'}[t]||t;}
 
 /* ═══════════════════════════════════════════
-   FLUXO DO JOGO
+   INIT
    ═══════════════════════════════════════════ */
-function iniciarRodada() {
-    if (estado.rodadaAtual >= EVENTOS.length) {
-        mostrarRelatorio();
-        return;
+(async function(){
+    const ok = await initFirebase();
+    if(ok){
+        document.getElementById('btn-criar-sala').disabled=false;
+        document.getElementById('btn-entrar-sala').disabled=false;
+    } else {
+        document.getElementById('aviso-firebase').style.display='block';
     }
-    estado.fase = 'roll';
-    estado.escolhas = [];
-    estado.equipeSelecionando = 0;
-    const ev = EVENTOS[estado.rodadaAtual];
-    document.getElementById('rodada-badge').textContent = `Rodada ${estado.rodadaAtual + 1}/${EVENTOS.length}`;
-    document.getElementById('fase-badge').textContent = ev.fase;
-    renderSidebar();
-    renderDado();
+})();
+
+/* ── Menu ── */
+document.getElementById('btn-criar-sala').addEventListener('click',()=>mostrarTela('tela-criar'));
+document.getElementById('btn-entrar-sala').addEventListener('click',()=>mostrarTela('tela-entrar'));
+document.getElementById('btn-modo-local').addEventListener('click',()=>{
+    mostrarTela('tela-setup-local');
+    renderLocalSetup();
+});
+
+/* ═══════════════════════════════════════════
+   MODO LOCAL (mesma tela — existente)
+   ═══════════════════════════════════════════ */
+function renderLocalSetup(){
+    const sel=document.getElementById('sel-equipes-local');
+    const c=document.getElementById('equipes-local-container');
+    function r(){
+        const n=parseInt(sel.value);
+        c.innerHTML=Array.from({length:n},(_,i)=>`
+            <div style="display:flex;gap:10px;align-items:center;margin-top:10px;">
+                <div style="width:16px;height:16px;border-radius:50%;background:${CORES[i]};flex-shrink:0;"></div>
+                <input type="text" id="local-eq-${i}" value="${NOMES_PADRAO[i]}" placeholder="Equipe ${i+1}" style="flex:1;padding:8px 12px;border:1.5px solid var(--line);border-radius:8px;font-family:'DM Sans',sans-serif;background:var(--paper);color:var(--ink);">
+            </div>`).join('');
+    }
+    sel.addEventListener('change',r); r();
 }
 
-function renderDado() {
-    const centro = document.getElementById('centro');
-    const progresso = renderProgresso();
-    centro.innerHTML = `
-        ${progresso}
-        <div class="dado-area">
-            <div class="dado" id="dado" onclick="rolarDado()">?</div>
-            <p class="dado-instrucao">Clique no dado para rolar!</p>
-        </div>`;
+document.getElementById('btn-iniciar-local').addEventListener('click',()=>{
+    modo='local';
+    const n=parseInt(document.getElementById('sel-equipes-local').value);
+    G.equipes=Array.from({length:n},(_,i)=>({
+        nome:document.getElementById('local-eq-'+i)?.value.trim()||NOMES_PADRAO[i],
+        cor:CORES[i],caixa:100000,reputacao:50,equipe:50,clientes:10
+    }));
+    G.rodada=0;G.historico=[];
+    mostrarTela('tela-jogo');
+    localIniciarRodada();
+});
+
+function localIniciarRodada(){
+    if(G.rodada>=EVENTOS.length){mostrarRelatorio();return;}
+    G.fase='roll';G.escolhas=[];
+    atualizarHeader();renderSidebar();renderDado(true);
 }
 
-function rolarDado() {
-    const dado = document.getElementById('dado');
-    if (dado.classList.contains('rolando')) return;
-    dado.classList.add('rolando');
-    const resultado = Math.floor(Math.random() * 6) + 1;
-    estado.mercado = resultado;
+/* ═══════════════════════════════════════════
+   MODO ONLINE — HOST
+   ═══════════════════════════════════════════ */
+document.getElementById('btn-gerar-sala').addEventListener('click',async()=>{
+    modo='host';
+    roomCode=gerarCodigo();
+    const numEq=parseInt(document.getElementById('sel-num-equipes').value);
+    const equipes={};
+    for(let i=0;i<numEq;i++) equipes[i]={nome:'',cor:CORES[i],caixa:100000,reputacao:50,equipe:50,clientes:10,joined:false};
 
-    let ticks = 0;
-    const interval = setInterval(() => {
-        dado.textContent = Math.floor(Math.random() * 6) + 1;
-        ticks++;
-        if (ticks > 10) {
-            clearInterval(interval);
-            dado.textContent = resultado;
-            dado.classList.remove('rolando');
-            setTimeout(mostrarEvento, 600);
+    roomRef=db.ref('rooms/'+roomCode);
+    await roomRef.set({status:'lobby',numEquipes:numEq,rodada:0,fase:'roll',dado:0,equipes,escolhas:{}});
+
+    document.getElementById('codigo-display').textContent=roomCode;
+    mostrarTela('tela-host-lobby');
+    document.getElementById('btn-iniciar-online').disabled=true;
+
+    const eqRef=roomRef.child('equipes');
+    const l=eqRef.on('value',snap=>{
+        const eqs=snap.val()||{};
+        const lista=document.getElementById('host-equipes-lista');
+        lista.innerHTML='';
+        let todosJoined=true;
+        for(let i=0;i<numEq;i++){
+            const e=eqs[i]||{};
+            const joined=e.joined;
+            if(!joined)todosJoined=false;
+            lista.innerHTML+=`<div class="eq-slot"><div class="dot" style="background:${CORES[i]}"></div><div class="nome">${joined?esc(e.nome):'Aguardando…'}</div><span class="status ${joined?'ok':'aguardando'}">${joined?'Conectado':'Aguardando'}</span></div>`;
         }
-    }, 80);
+        document.getElementById('btn-iniciar-online').disabled=!todosJoined;
+    });
+    listeners.push(()=>eqRef.off('value',l));
+});
+
+document.getElementById('btn-iniciar-online').addEventListener('click',async()=>{
+    const snap=await roomRef.child('equipes').once('value');
+    const eqs=snap.val();
+    const numEq=Object.keys(eqs).length;
+    G.equipes=Array.from({length:numEq},(_,i)=>({...eqs[i]}));
+    G.rodada=0;G.historico=[];
+    await roomRef.update({status:'playing',rodada:0,fase:'roll',dado:0});
+    mostrarTela('tela-jogo');
+    onlineHostRodada();
+});
+
+document.getElementById('btn-cancelar-sala').addEventListener('click',async()=>{
+    if(roomRef)await roomRef.remove();
+    limparListeners();
+    mostrarTela('tela-menu');
+});
+
+function onlineHostRodada(){
+    if(G.rodada>=EVENTOS.length){
+        roomRef.update({status:'finished'});
+        mostrarRelatorio();return;
+    }
+    G.fase='roll';G.escolhas=[];
+    roomRef.update({rodada:G.rodada,fase:'roll',dado:0});
+    atualizarHeader();renderSidebar();renderDado(true);
+
+    // Escutar escolhas
+    const choRef=roomRef.child('escolhas/'+G.rodada);
+    const l=choRef.on('value',snap=>{
+        const ch=snap.val()||{};
+        const total=G.equipes.length;
+        let count=0;
+        for(let i=0;i<total;i++)if(ch[i]!==undefined)count++;
+        const statusEl=document.getElementById('host-escolhas-status');
+        if(statusEl)statusEl.textContent=`${count}/${total} equipes responderam`;
+        if(count>=total&&G.fase==='choosing'){
+            G.escolhas=Array.from({length:total},(_,i)=>ch[i]);
+            processarResultados();
+        }
+    });
+    listeners.push(()=>choRef.off('value',l));
 }
 
-function mercadoInfo(val) {
-    if (val <= 2) return {texto:'Mercado Desfavorável', classe:'mercado-desfavoravel', mod:-3000};
-    if (val <= 4) return {texto:'Mercado Estável', classe:'mercado-estavel', mod:0};
-    return {texto:'Mercado Favorável', classe:'mercado-favoravel', mod:3000};
+/* ═══════════════════════════════════════════
+   MODO ONLINE — EQUIPE
+   ═══════════════════════════════════════════ */
+document.getElementById('btn-entrar-codigo').addEventListener('click',async()=>{
+    const code=document.getElementById('input-codigo').value.trim().toUpperCase();
+    const nome=document.getElementById('input-nome-equipe').value.trim();
+    const erroEl=document.getElementById('erro-entrar');
+
+    if(!code||code.length<5){erroEl.textContent='Código inválido.';erroEl.style.display='block';return;}
+    if(!nome){erroEl.textContent='Digite o nome da equipe.';erroEl.style.display='block';return;}
+    erroEl.style.display='none';
+
+    roomRef=db.ref('rooms/'+code);
+    const snap=await roomRef.once('value');
+    if(!snap.exists()){erroEl.textContent='Sala não encontrada.';erroEl.style.display='block';return;}
+
+    const room=snap.val();
+    if(room.status!=='lobby'){erroEl.textContent='Jogo já começou.';erroEl.style.display='block';return;}
+
+    // Encontrar slot disponível
+    const eqs=room.equipes;
+    let slot=-1;
+    for(let i=0;i<room.numEquipes;i++){if(!eqs[i]?.joined){slot=i;break;}}
+    if(slot===-1){erroEl.textContent='Sala cheia.';erroEl.style.display='block';return;}
+
+    modo='team';
+    meuTimeIdx=slot;
+    roomCode=code;
+    await roomRef.child('equipes/'+slot).update({nome,joined:true});
+
+    document.getElementById('team-lobby-titulo').textContent=nome;
+    mostrarTela('tela-team-lobby');
+
+    // Mostrar quem já entrou
+    const eqRef=roomRef.child('equipes');
+    const l1=eqRef.on('value',snap=>{
+        const eqs=snap.val()||{};
+        const lista=document.getElementById('team-equipes-lista');
+        lista.innerHTML='';
+        for(const [i,e] of Object.entries(eqs)){
+            if(e.joined)lista.innerHTML+=`<div class="eq-slot"><div class="dot" style="background:${e.cor}"></div><div class="nome">${esc(e.nome)}</div><span class="status ok">${parseInt(i)===meuTimeIdx?'Você':'Conectado'}</span></div>`;
+        }
+    });
+    listeners.push(()=>eqRef.off('value',l1));
+
+    // Esperar início
+    const l2=roomRef.child('status').on('value',snap=>{
+        if(snap.val()==='playing'){
+            roomRef.child('equipes').once('value').then(s=>{
+                const eqs=s.val();
+                G.equipes=Object.values(eqs);
+                G.rodada=0;G.historico=[];
+                mostrarTela('tela-jogo');
+                onlineTeamEscutar();
+            });
+        }
+    });
+    listeners.push(()=>roomRef.child('status').off('value',l2));
+});
+
+function onlineTeamEscutar(){
+    // Escutar mudanças de fase/rodada
+    const l=roomRef.on('value',snap=>{
+        const room=snap.val();
+        if(!room)return;
+        G.rodada=room.rodada||0;
+        G.fase=room.fase||'roll';
+        G.dado=room.dado||0;
+
+        // Atualizar recursos das equipes
+        if(room.equipes) G.equipes=Object.values(room.equipes);
+
+        atualizarHeader();renderSidebar();
+
+        if(room.status==='finished'){mostrarRelatorio();return;}
+
+        const ev=EVENTOS[G.rodada];
+        if(!ev)return;
+        const centro=document.getElementById('centro');
+
+        if(G.fase==='roll'){
+            centro.innerHTML=`${renderProgresso()}<div class="aguardando"><div class="icone">🎲</div><h3>Aguardando o professor rolar o dado…</h3><p>Rodada ${G.rodada+1}: ${esc(ev.titulo)}</p></div>`;
+        } else if(G.fase==='choosing'){
+            const m=mercadoInfo(G.dado);
+            // Checar se já escolhi
+            const minhaEscolha=room.escolhas?.[G.rodada]?.[meuTimeIdx];
+            if(minhaEscolha!==undefined){
+                centro.innerHTML=`${renderProgresso()}<div style="text-align:center;margin-bottom:16px;"><span class="mercado-badge ${m.classe}">🎲 ${G.dado} — ${m.texto}</span></div><div class="aguardando"><div class="icone">✅</div><h3>Escolha registrada!</h3><p>Aguardando as outras equipes…</p></div>`;
+            } else {
+                renderTeamEscolha(ev,m);
+            }
+        } else if(G.fase==='reveal'){
+            renderResultadosView(room);
+        }
+    });
+    listeners.push(()=>roomRef.off('value',l));
 }
 
-function mostrarEvento() {
-    estado.fase = 'event';
-    const ev = EVENTOS[estado.rodadaAtual];
-    const m = mercadoInfo(estado.mercado);
-    const progresso = renderProgresso();
-
-    const centro = document.getElementById('centro');
-    centro.innerHTML = `
-        ${progresso}
-        <div style="text-align:center;margin-bottom:20px;">
-            <span class="mercado-badge ${m.classe}">🎲 ${estado.mercado} — ${m.texto}</span>
+function renderTeamEscolha(ev,m){
+    const centro=document.getElementById('centro');
+    centro.innerHTML=`
+        ${renderProgresso()}
+        <div style="text-align:center;margin-bottom:16px;"><span class="mercado-badge ${m.classe}">🎲 ${G.dado} — ${m.texto}</span></div>
+        <div class="vez-banner" style="background:${G.equipes[meuTimeIdx].cor}15;color:${G.equipes[meuTimeIdx].cor};border:2px solid ${G.equipes[meuTimeIdx].cor};">
+            🎯 Sua vez de escolher!
         </div>
         <div class="evento-card">
             <span class="evento-tipo tipo-${ev.tipo}">${tipoLabel(ev.tipo)}</span>
             <h2 class="evento-titulo">${esc(ev.titulo)}</h2>
             <p class="evento-conceito">📚 ${esc(ev.conceito)}</p>
             <p class="evento-desc">${esc(ev.descricao)}</p>
-        </div>
-        <div style="margin-top:20px;width:100%;">
-            <button class="btn btn-primary btn-big" onclick="iniciarEscolhas()">Hora de Decidir →</button>
-        </div>`;
-}
-
-function tipoLabel(t) {
-    const m = {planejamento:'Planejamento',financeiro:'Financeiro',equipe:'RH & Equipe',mercado:'Mercado',crise:'Crise',marco:'Marco',inovacao:'Inovação',etica:'Ética'};
-    return m[t]||t;
-}
-
-function iniciarEscolhas() {
-    estado.fase = 'choosing';
-    estado.equipeSelecionando = 0;
-    estado.escolhas = new Array(estado.equipes.length).fill(-1);
-    renderEscolha();
-}
-
-function renderEscolha() {
-    const eq = estado.equipes[estado.equipeSelecionando];
-    const ev = EVENTOS[estado.rodadaAtual];
-    const progresso = renderProgresso();
-    const centro = document.getElementById('centro');
-
-    centro.innerHTML = `
-        ${progresso}
-        <div class="vez-banner" style="background:${eq.cor}15;color:${eq.cor};border:2px solid ${eq.cor};">
-            🎯 Vez de: ${esc(eq.nome)}
-            <br><small style="font-weight:400;opacity:.7;">As outras equipes não devem olhar!</small>
-        </div>
-        <div class="evento-card">
-            <span class="evento-tipo tipo-${ev.tipo}">${tipoLabel(ev.tipo)}</span>
-            <h2 class="evento-titulo">${esc(ev.titulo)}</h2>
-            <p class="evento-desc">${esc(ev.descricao)}</p>
             <div class="opcoes">
-                ${ev.opcoes.map((op, idx) => `
-                    <button class="opcao-btn" onclick="selecionarOpcao(${idx})">
-                        <span class="opcao-letra">${'ABC'[idx]})</span>${esc(op.texto)}
-                    </button>
-                `).join('')}
+                ${ev.opcoes.map((op,idx)=>`<button class="opcao-btn" onclick="teamEscolher(${idx})"><span class="opcao-letra">${'ABC'[idx]})</span>${esc(op.texto)}</button>`).join('')}
             </div>
         </div>`;
+}
 
+function teamEscolher(idx){
+    roomRef.child('escolhas/'+G.rodada+'/'+meuTimeIdx).set(idx);
+}
+
+function renderResultadosView(room){
+    const ev=EVENTOS[G.rodada];
+    const m=mercadoInfo(G.dado);
+    const escolhas=room.escolhas?.[G.rodada]||{};
+    let html=`${renderProgresso()}<h2 style="font-family:'DM Serif Display',serif;text-align:center;margin-bottom:24px;">Resultados da Rodada</h2>`;
+
+    G.equipes.forEach((eq,i)=>{
+        const opcIdx=escolhas[i];
+        if(opcIdx===undefined)return;
+        const opc=ev.opcoes[opcIdx];
+        const ef={...opc.efeitos};
+        ef.caixa=(ef.caixa||0)+m.mod;
+        html+=renderResultadoCard(eq,opcIdx,opc,ef);
+    });
+
+    html+=`<div class="aguardando" style="padding:20px;"><p>Aguardando o professor avançar…</p></div>`;
+    document.getElementById('centro').innerHTML=html;
     renderSidebar();
 }
 
-function selecionarOpcao(idx) {
-    estado.escolhas[estado.equipeSelecionando] = idx;
-    estado.equipeSelecionando++;
+/* ═══════════════════════════════════════════
+   RENDER COMPARTILHADO
+   ═══════════════════════════════════════════ */
+function atualizarHeader(){
+    const ev=EVENTOS[G.rodada];
+    if(!ev)return;
+    document.getElementById('rodada-badge').textContent=`Rodada ${G.rodada+1}/${EVENTOS.length}`;
+    document.getElementById('fase-badge').textContent=ev.fase;
+}
 
-    if (estado.equipeSelecionando >= estado.equipes.length) {
-        mostrarResultados();
+function renderSidebar(deltas){
+    const sb=document.getElementById('sidebar-equipes');
+    sb.innerHTML='<h3>Equipes</h3>'+G.equipes.map((eq,i)=>{
+        const d=deltas?.[i];
+        const dest=(modo==='local'&&G.fase==='choosing'&&G._localIdx===i)?' destaque':(modo==='team'&&i===meuTimeIdx?' destaque':'');
+        return`<div class="team-card${dest}"><div class="nome"><div class="dot" style="background:${eq.cor}"></div>${esc(eq.nome)}</div><div class="recursos">${recursoHtml('R$',formatCaixa(eq.caixa),d?.caixa)}${recursoHtml('Rep',eq.reputacao,d?.reputacao)}${recursoHtml('Equipe',eq.equipe,d?.equipe)}${recursoHtml('Clientes',eq.clientes,d?.clientes)}</div></div>`;
+    }).join('');
+}
+
+function recursoHtml(lbl,val,delta){
+    let dh='';
+    if(delta&&delta!==0){const cls=delta>0?'pos':'neg';const s=delta>0?'+':'';const dv=lbl==='R$'?s+formatCaixa(delta):s+delta;dh=`<span class="delta ${cls}">${dv}</span>`;}
+    return`<div class="recurso"><div class="val">${val}${dh}</div><div class="lbl">${lbl}</div></div>`;
+}
+
+function renderProgresso(){
+    const pct=(G.rodada/EVENTOS.length*100).toFixed(0);
+    const f=EVENTOS[G.rodada]?.fase||'Fim';
+    return`<div class="progresso"><div class="progresso-bar"><div class="fill" style="width:${pct}%"></div></div><div class="progresso-lbl"><span>${f}</span><span>${G.rodada}/${EVENTOS.length}</span></div></div>`;
+}
+
+/* ═══════════════════════════════════════════
+   DADO & EVENTO (Host + Local)
+   ═══════════════════════════════════════════ */
+function renderDado(interativo){
+    const centro=document.getElementById('centro');
+    centro.innerHTML=`${renderProgresso()}<div class="dado-area"><div class="dado" id="dado" ${interativo?'onclick="rolarDado()"':''}>?</div><p class="dado-instrucao">${interativo?'Clique no dado para rolar!':'Aguardando…'}</p></div>`;
+}
+
+function rolarDado(){
+    const dado=document.getElementById('dado');
+    if(!dado||dado.classList.contains('rolando'))return;
+    dado.classList.add('rolando');
+    const resultado=Math.floor(Math.random()*6)+1;
+    G.dado=resultado;
+
+    let ticks=0;
+    const iv=setInterval(()=>{dado.textContent=Math.floor(Math.random()*6)+1;ticks++;if(ticks>10){clearInterval(iv);dado.textContent=resultado;dado.classList.remove('rolando');
+        if(modo==='host')roomRef.update({dado:resultado,fase:'choosing'});
+        setTimeout(()=>mostrarEvento(),600);
+    }},80);
+}
+
+function mostrarEvento(){
+    G.fase='choosing';
+    const ev=EVENTOS[G.rodada];
+    const m=mercadoInfo(G.dado);
+    const centro=document.getElementById('centro');
+
+    if(modo==='local'){
+        centro.innerHTML=`${renderProgresso()}<div style="text-align:center;margin-bottom:16px;"><span class="mercado-badge ${m.classe}">🎲 ${G.dado} — ${m.texto}</span></div>
+            <div class="evento-card"><span class="evento-tipo tipo-${ev.tipo}">${tipoLabel(ev.tipo)}</span><h2 class="evento-titulo">${esc(ev.titulo)}</h2><p class="evento-conceito">📚 ${esc(ev.conceito)}</p><p class="evento-desc">${esc(ev.descricao)}</p></div>
+            <div style="margin-top:20px;width:100%;"><button class="btn btn-primary btn-big" onclick="localIniciarEscolhas()">Hora de Decidir →</button></div>`;
     } else {
-        renderEscolha();
+        // Host: mostra evento e espera equipes escolherem
+        centro.innerHTML=`${renderProgresso()}<div style="text-align:center;margin-bottom:16px;"><span class="mercado-badge ${m.classe}">🎲 ${G.dado} — ${m.texto}</span></div>
+            <div class="evento-card"><span class="evento-tipo tipo-${ev.tipo}">${tipoLabel(ev.tipo)}</span><h2 class="evento-titulo">${esc(ev.titulo)}</h2><p class="evento-conceito">📚 ${esc(ev.conceito)}</p><p class="evento-desc">${esc(ev.descricao)}</p></div>
+            <div class="aguardando" style="margin-top:20px;"><div class="icone">⏳</div><h3>Aguardando equipes…</h3><p id="host-escolhas-status">0/${G.equipes.length} equipes responderam</p></div>`;
     }
 }
 
-function mostrarResultados() {
-    estado.fase = 'reveal';
-    const ev = EVENTOS[estado.rodadaAtual];
-    const m = mercadoInfo(estado.mercado);
-    const progresso = renderProgresso();
+/* ═══════════════════════════════════════════
+   ESCOLHAS LOCAL
+   ═══════════════════════════════════════════ */
+function localIniciarEscolhas(){
+    G.fase='choosing';
+    G._localIdx=0;
+    G.escolhas=new Array(G.equipes.length).fill(-1);
+    localRenderEscolha();
+}
 
-    const deltas = [];
-    const historicoRodada = {rodada: estado.rodadaAtual, titulo: ev.titulo, conceito: ev.conceito, escolhas: []};
-
-    let html = `${progresso}<h2 style="font-family:'DM Serif Display',serif;text-align:center;margin-bottom:24px;">Resultados da Rodada</h2>`;
-
-    estado.equipes.forEach((eq, i) => {
-        const opcIdx = estado.escolhas[i];
-        const opc = ev.opcoes[opcIdx];
-        const ef = {...opc.efeitos};
-        ef.caixa = (ef.caixa || 0) + m.mod;
-
-        eq.caixa += ef.caixa;
-        eq.reputacao = clamp(eq.reputacao + (ef.reputacao||0), 0, 100);
-        eq.equipe = clamp(eq.equipe + (ef.equipe||0), 0, 100);
-        eq.clientes = Math.max(0, eq.clientes + (ef.clientes||0));
-
-        deltas.push(ef);
-        historicoRodada.escolhas.push({
-            equipe: eq.nome,
-            opcaoIdx: opcIdx,
-            opcaoTexto: opc.texto,
-            feedback: opc.feedback,
-            efeitos: ef,
-        });
-
-        html += `
-        <div class="resultado-card">
-            <div class="nome"><div class="dot" style="background:${eq.cor}"></div>${esc(eq.nome)}</div>
-            <div class="escolha">"${'ABC'[opcIdx]}) ${esc(opc.texto)}"</div>
-            <div class="feedback">${esc(opc.feedback)}</div>
-            <div class="resultado-efeitos">
-                ${efeitoTag('Caixa',ef.caixa,true)}
-                ${efeitoTag('Rep',ef.reputacao)}
-                ${efeitoTag('Equipe',ef.equipe)}
-                ${efeitoTag('Clientes',ef.clientes)}
-            </div>
+function localRenderEscolha(){
+    const eq=G.equipes[G._localIdx];
+    const ev=EVENTOS[G.rodada];
+    document.getElementById('centro').innerHTML=`${renderProgresso()}
+        <div class="vez-banner" style="background:${eq.cor}15;color:${eq.cor};border:2px solid ${eq.cor};">🎯 Vez de: ${esc(eq.nome)}<br><small style="font-weight:400;opacity:.7;">As outras equipes não devem olhar!</small></div>
+        <div class="evento-card"><span class="evento-tipo tipo-${ev.tipo}">${tipoLabel(ev.tipo)}</span><h2 class="evento-titulo">${esc(ev.titulo)}</h2><p class="evento-desc">${esc(ev.descricao)}</p>
+            <div class="opcoes">${ev.opcoes.map((op,idx)=>`<button class="opcao-btn" onclick="localEscolher(${idx})"><span class="opcao-letra">${'ABC'[idx]})</span>${esc(op.texto)}</button>`).join('')}</div>
         </div>`;
+    renderSidebar();
+}
+
+function localEscolher(idx){
+    G.escolhas[G._localIdx]=idx;
+    G._localIdx++;
+    if(G._localIdx>=G.equipes.length){processarResultados();}
+    else localRenderEscolha();
+}
+
+/* ═══════════════════════════════════════════
+   PROCESSAR RESULTADOS (Host + Local)
+   ═══════════════════════════════════════════ */
+function processarResultados(){
+    G.fase='reveal';
+    const ev=EVENTOS[G.rodada];
+    const m=mercadoInfo(G.dado);
+    const deltas=[];
+    const hist={rodada:G.rodada,titulo:ev.titulo,conceito:ev.conceito,escolhas:[]};
+
+    let html=`${renderProgresso()}<h2 style="font-family:'DM Serif Display',serif;text-align:center;margin-bottom:24px;">Resultados da Rodada</h2>`;
+
+    G.equipes.forEach((eq,i)=>{
+        const opcIdx=G.escolhas[i];
+        const opc=ev.opcoes[opcIdx];
+        const ef={...opc.efeitos};
+        ef.caixa=(ef.caixa||0)+m.mod;
+        eq.caixa+=ef.caixa;
+        eq.reputacao=clamp(eq.reputacao+(ef.reputacao||0),0,100);
+        eq.equipe=clamp(eq.equipe+(ef.equipe||0),0,100);
+        eq.clientes=Math.max(0,eq.clientes+(ef.clientes||0));
+        deltas.push(ef);
+        hist.escolhas.push({equipe:eq.nome,opcaoIdx:opcIdx,opcaoTexto:opc.texto,feedback:opc.feedback,efeitos:ef});
+        html+=renderResultadoCard(eq,opcIdx,opc,ef);
     });
 
-    estado.historico.push(historicoRodada);
+    G.historico.push(hist);
 
-    html += `<div style="margin-top:24px;text-align:center;">
-        <button class="btn btn-primary btn-big" onclick="proximaRodada()">
-            ${estado.rodadaAtual < EVENTOS.length - 1 ? 'Próxima Rodada →' : 'Ver Relatório Final →'}
-        </button>
-    </div>`;
+    // Sync com Firebase se host
+    if(modo==='host'){
+        const eqUpdate={};
+        G.equipes.forEach((eq,i)=>{eqUpdate[i]={...eq};});
+        roomRef.update({fase:'reveal',equipes:eqUpdate});
+    }
 
-    document.getElementById('centro').innerHTML = html;
+    html+=`<div style="margin-top:24px;text-align:center;"><button class="btn btn-primary btn-big" onclick="avancarRodada()">${G.rodada<EVENTOS.length-1?'Próxima Rodada →':'Ver Relatório Final →'}</button></div>`;
+
+    document.getElementById('centro').innerHTML=html;
     renderSidebar(deltas);
 }
 
-function efeitoTag(label, val, isCaixa) {
-    if (!val) return '';
-    const cls = val > 0 ? 'pos' : 'neg';
-    const sign = val > 0 ? '+' : '';
-    const display = isCaixa ? sign + 'R$' + Math.abs(val/1000).toFixed(0) + 'k' : sign + val;
-    return `<span class="efeito ${cls}">${label}: ${display}</span>`;
+function renderResultadoCard(eq,opcIdx,opc,ef){
+    return`<div class="resultado-card"><div class="nome"><div class="dot" style="background:${eq.cor}"></div>${esc(eq.nome)}</div><div class="escolha">"${'ABC'[opcIdx]}) ${esc(opc.texto)}"</div><div class="feedback">${esc(opc.feedback)}</div><div class="resultado-efeitos">${efeitoTag('Caixa',ef.caixa,true)}${efeitoTag('Rep',ef.reputacao)}${efeitoTag('Equipe',ef.equipe)}${efeitoTag('Clientes',ef.clientes)}</div></div>`;
 }
 
-function clamp(v, min, max) { return Math.max(min, Math.min(max, v)); }
-
-function proximaRodada() {
-    estado.rodadaAtual++;
-    iniciarRodada();
+function efeitoTag(lbl,val,cash){
+    if(!val)return'';
+    const cls=val>0?'pos':'neg';const s=val>0?'+':'';
+    const d=cash?s+'R$'+Math.abs(val/1000).toFixed(0)+'k':s+val;
+    return`<span class="efeito ${cls}">${lbl}: ${d}</span>`;
 }
 
-function renderProgresso() {
-    const pct = ((estado.rodadaAtual) / EVENTOS.length * 100).toFixed(0);
-    const faseAtual = estado.rodadaAtual < EVENTOS.length ? EVENTOS[estado.rodadaAtual].fase : 'Fim';
-    return `
-    <div class="progresso">
-        <div class="progresso-bar"><div class="fill" style="width:${pct}%"></div></div>
-        <div class="progresso-lbl"><span>${faseAtual}</span><span>${estado.rodadaAtual}/${EVENTOS.length}</span></div>
-    </div>`;
+function avancarRodada(){
+    G.rodada++;
+    if(modo==='local')localIniciarRodada();
+    else if(modo==='host')onlineHostRodada();
 }
 
 /* ═══════════════════════════════════════════
    RELATÓRIO
    ═══════════════════════════════════════════ */
-function mostrarRelatorio() {
+function mostrarRelatorio(){
     mostrarTela('tela-relatorio');
-    const rel = document.getElementById('relatorio-conteudo');
+    limparListeners();
+    const ranking=G.equipes.map((eq,i)=>({...eq,idx:i,score:Math.round(eq.caixa/500+eq.reputacao*12+eq.equipe*10+eq.clientes*18)})).sort((a,b)=>b.score-a.score);
 
-    // Ranking por pontuação ponderada
-    const ranking = estado.equipes.map((eq, i) => ({
-        ...eq, idx: i,
-        score: Math.round(eq.caixa/500 + eq.reputacao*12 + eq.equipe*10 + eq.clientes*18)
-    })).sort((a, b) => b.score - a.score);
+    let html=`<h1>📊 Relatório Final</h1><p class="sub">Jogo da Vida Empresarial — ${new Date().toLocaleDateString('pt-BR')}</p>
+    <div class="rel-section"><h2>🏆 Ranking Final</h2><div class="ranking">
+    ${ranking.map((eq,pos)=>`<div class="rank-card" style="border-left:4px solid ${eq.cor};"><div class="rank-pos">${pos+1}º</div><div class="rank-info"><div class="nome" style="color:${eq.cor}">${esc(eq.nome)}</div><div class="rank-recursos"><span class="r"><strong>R$ ${eq.caixa.toLocaleString('pt-BR')}</strong> Caixa</span><span class="r"><strong>${eq.reputacao}</strong> Reputação</span><span class="r"><strong>${eq.equipe}</strong> Equipe</span><span class="r"><strong>${eq.clientes}</strong> Clientes</span></div></div></div>`).join('')}
+    </div></div>
+    <div class="rel-section"><h2>📈 Análise Estratégica</h2>${ranking.map(eq=>analisarEquipe(eq)).join('')}</div>
+    <div class="rel-section"><h2>📋 Linha do Tempo</h2><div class="timeline">
+    ${G.historico.map((h,i)=>`<div class="tl-item"><div class="tl-titulo">Rodada ${i+1}: ${esc(h.titulo)} <small style="color:var(--ink3)">(${esc(h.conceito)})</small></div>${h.escolhas.map(c=>`<div class="tl-escolha"><strong>${esc(c.equipe)}:</strong> ${esc(c.opcaoTexto)}</div>`).join('')}</div>`).join('')}
+    </div></div>
+    <div class="rel-section"><h2>💡 Conceitos Aplicados</h2><p style="color:var(--ink2);line-height:1.6;">Durante o jogo, as equipes enfrentaram decisões envolvendo <strong>Business Model Canvas</strong> (Proposta de Valor, Segmentos de Clientes, Canais, Relacionamento, Fontes de Receita, Recursos Principais, Atividades-Chave, Parcerias, Estrutura de Custos), <strong>Análise SWOT</strong> (Forças, Fraquezas, Oportunidades, Ameaças) e <strong>Planejamento Estratégico</strong>.</p></div>
+    <div class="rel-btns"><button class="btn btn-primary" onclick="window.print()">🖨 Imprimir Relatório</button><button class="btn btn-secondary" onclick="location.reload()">🔄 Jogar Novamente</button><a href="../index.html" class="btn btn-secondary">← Voltar ao Portal</a></div>`;
 
-    let html = `
-    <h1>📊 Relatório Final</h1>
-    <p class="sub">Jogo da Vida Empresarial — ${new Date().toLocaleDateString('pt-BR')}</p>
-
-    <div class="rel-section">
-        <h2>🏆 Ranking Final</h2>
-        <div class="ranking">
-            ${ranking.map((eq, pos) => `
-            <div class="rank-card" style="border-left:4px solid ${eq.cor};">
-                <div class="rank-pos">${pos+1}º</div>
-                <div class="rank-info">
-                    <div class="nome" style="color:${eq.cor}">${esc(eq.nome)}</div>
-                    <div class="rank-recursos">
-                        <span class="r"><strong>R$ ${eq.caixa.toLocaleString('pt-BR')}</strong> Caixa</span>
-                        <span class="r"><strong>${eq.reputacao}</strong> Reputação</span>
-                        <span class="r"><strong>${eq.equipe}</strong> Equipe</span>
-                        <span class="r"><strong>${eq.clientes}</strong> Clientes</span>
-                    </div>
-                </div>
-            </div>`).join('')}
-        </div>
-    </div>
-
-    <div class="rel-section">
-        <h2>📈 Análise Estratégica</h2>
-        ${ranking.map(eq => analisarEquipe(eq)).join('')}
-    </div>
-
-    <div class="rel-section">
-        <h2>📋 Linha do Tempo — Decisões</h2>
-        <div class="timeline">
-            ${estado.historico.map((h, i) => `
-            <div class="tl-item">
-                <div class="tl-titulo">Rodada ${i+1}: ${esc(h.titulo)} <small style="color:var(--ink3)">(${esc(h.conceito)})</small></div>
-                ${h.escolhas.map(c => `
-                    <div class="tl-escolha" style="margin-top:2px;">
-                        <strong>${esc(c.equipe)}:</strong> ${esc(c.opcaoTexto)}
-                    </div>
-                `).join('')}
-            </div>`).join('')}
-        </div>
-    </div>
-
-    <div class="rel-section">
-        <h2>💡 Conceitos Aplicados</h2>
-        <p style="color:var(--ink2);line-height:1.6;">
-            Durante o jogo, as equipes enfrentaram decisões que envolvem os seguintes conceitos:
-            <strong>Business Model Canvas</strong> (Proposta de Valor, Segmentos de Clientes, Canais, Relacionamento, Fontes de Receita, Recursos Principais, Atividades-Chave, Parcerias, Estrutura de Custos),
-            <strong>Análise SWOT</strong> (Forças, Fraquezas, Oportunidades, Ameaças) e
-            <strong>Planejamento Estratégico</strong> (revisões periódicas, pivotagem, visão de longo prazo).
-        </p>
-    </div>
-
-    <div class="rel-btns">
-        <button class="btn btn-primary" onclick="window.print()">🖨 Imprimir Relatório</button>
-        <button class="btn btn-secondary" onclick="reiniciar()">🔄 Jogar Novamente</button>
-        <a href="../index.html" class="btn btn-secondary">← Voltar ao Portal</a>
-    </div>`;
-
-    rel.innerHTML = html;
+    document.getElementById('relatorio-conteudo').innerHTML=html;
 }
 
-function analisarEquipe(eq) {
-    const perfil = [];
-    if (eq.caixa > 120000) perfil.push('financeiramente conservadora');
-    else if (eq.caixa < 30000) perfil.push('investidora agressiva');
-    if (eq.reputacao >= 75) perfil.push('forte em reputação');
-    else if (eq.reputacao < 35) perfil.push('com reputação fragilizada');
-    if (eq.equipe >= 75) perfil.push('com equipe motivada');
-    else if (eq.equipe < 35) perfil.push('com equipe desgastada');
-    if (eq.clientes >= 60) perfil.push('com boa base de clientes');
-    else if (eq.clientes < 20) perfil.push('com poucos clientes');
-
-    const texto = perfil.length
-        ? `A empresa <strong>${esc(eq.nome)}</strong> se mostrou ${perfil.join(', ')}. `
-        : `A empresa <strong>${esc(eq.nome)}</strong> manteve um equilíbrio entre os indicadores. `;
-
-    const dica = eq.reputacao < eq.clientes
-        ? 'Investir mais em reputação poderia fidelizar os clientes conquistados.'
-        : eq.equipe < 40
-        ? 'A equipe precisa de atenção — colaboradores desmotivados afetam tudo.'
-        : 'Manter o equilíbrio é a chave para a sustentabilidade no longo prazo.';
-
-    return `<p style="color:var(--ink2);line-height:1.6;margin-bottom:12px;">${texto}${dica}</p>`;
+function analisarEquipe(eq){
+    const p=[];
+    if(eq.caixa>120000)p.push('financeiramente conservadora');else if(eq.caixa<30000)p.push('investidora agressiva');
+    if(eq.reputacao>=75)p.push('forte em reputação');else if(eq.reputacao<35)p.push('com reputação fragilizada');
+    if(eq.equipe>=75)p.push('com equipe motivada');else if(eq.equipe<35)p.push('com equipe desgastada');
+    if(eq.clientes>=60)p.push('com boa base de clientes');else if(eq.clientes<20)p.push('com poucos clientes');
+    const t=p.length?`A empresa <strong>${esc(eq.nome)}</strong> se mostrou ${p.join(', ')}. `:`A empresa <strong>${esc(eq.nome)}</strong> manteve equilíbrio entre os indicadores. `;
+    const d=eq.reputacao<eq.clientes?'Investir mais em reputação poderia fidelizar os clientes conquistados.':eq.equipe<40?'A equipe precisa de atenção — colaboradores desmotivados afetam tudo.':'Manter o equilíbrio é a chave para sustentabilidade no longo prazo.';
+    return`<p style="color:var(--ink2);line-height:1.6;margin-bottom:12px;">${t}${d}</p>`;
 }
 
-function reiniciar() {
-    estado.rodadaAtual = 0;
-    estado.historico = [];
-    estado.equipes.forEach(eq => {
-        eq.caixa = 100000; eq.reputacao = 50; eq.equipe = 50; eq.clientes = 10;
-    });
-    mostrarTela('tela-jogo');
-    iniciarRodada();
-}
+function limparListeners(){listeners.forEach(fn=>fn());listeners=[];}
 </script>
 </body>
 </html>

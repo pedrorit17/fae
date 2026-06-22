@@ -322,6 +322,46 @@
         </div>
     </div>
 
+    <!-- ── Firebase ── -->
+    <div class="card">
+        <h2>🔥 Firebase (Jogo Multiplayer)</h2>
+        <p class="desc">Configure o Firebase Realtime Database para o modo multiplayer do Jogo da Vida Empresarial. Essa seção é <strong>opcional</strong> — o jogo funciona em modo local sem Firebase.</p>
+
+        <ol class="steps">
+            <li>Acesse o <a href="https://console.firebase.google.com/" target="_blank" rel="noopener" style="color:var(--blue);">Firebase Console</a> e crie um projeto (ou use um existente).</li>
+            <li>Vá em <strong>Realtime Database → Criar banco</strong> e escolha o modo <strong>teste</strong>.</li>
+            <li>Vá em <strong>Configurações do projeto → Geral</strong> e copie os dados do app web abaixo.</li>
+        </ol>
+
+        <div class="sheet-secao" style="border-color:#F59E0B;">
+            <h3>Credenciais do Firebase</h3>
+            <p class="sheet-sub">Copie os valores de <code>firebaseConfig</code> do console.</p>
+
+            <div class="field">
+                <label>API Key</label>
+                <input type="text" id="fb-apiKey" placeholder="AIzaSy…">
+            </div>
+            <div class="field">
+                <label>Auth Domain</label>
+                <input type="text" id="fb-authDomain" placeholder="meu-projeto.firebaseapp.com">
+            </div>
+            <div class="field">
+                <label>Database URL</label>
+                <input type="url" id="fb-databaseURL" placeholder="https://meu-projeto-default-rtdb.firebaseio.com">
+                <p class="hint">Encontrado na aba Realtime Database do console.</p>
+            </div>
+            <div class="field">
+                <label>Project ID</label>
+                <input type="text" id="fb-projectId" placeholder="meu-projeto">
+            </div>
+
+            <div class="row-btns">
+                <button class="btn btn-secondary" id="btn-testar-fb">Testar conexão</button>
+            </div>
+            <div id="status-fb"></div>
+        </div>
+    </div>
+
     <!-- ── Salvar ── -->
     <div class="card">
         <h2>Publicar configuração</h2>
@@ -426,6 +466,12 @@
                 document.getElementById('url-entregas').value = cfg.entregasUrl;
                 ativarLink(document.getElementById('link-entr'), cfg.entregasUrl);
             }
+            if (cfg.firebase) {
+                if (cfg.firebase.apiKey) document.getElementById('fb-apiKey').value = cfg.firebase.apiKey;
+                if (cfg.firebase.authDomain) document.getElementById('fb-authDomain').value = cfg.firebase.authDomain;
+                if (cfg.firebase.databaseURL) document.getElementById('fb-databaseURL').value = cfg.firebase.databaseURL;
+                if (cfg.firebase.projectId) document.getElementById('fb-projectId').value = cfg.firebase.projectId;
+            }
         } catch { /* config ainda vazio */ }
     }
 
@@ -472,11 +518,50 @@
         if (ok) { ativarLink(document.getElementById('link-entr'), url); toast('Planilha de entregas OK!'); }
     });
 
+    /* ── Testar Firebase ── */
+    document.getElementById('btn-testar-fb').addEventListener('click', async () => {
+        const statusEl = document.getElementById('status-fb');
+        const dbUrl = document.getElementById('fb-databaseURL').value.trim();
+        const apiKey = document.getElementById('fb-apiKey').value.trim();
+
+        if (!dbUrl || !apiKey) {
+            statusEl.innerHTML = `<div class="status-strip status-warn">⚠️ Preencha pelo menos a API Key e a Database URL.</div>`;
+            return;
+        }
+
+        statusEl.innerHTML = `<div class="status-strip status-warn">⏳ Testando conexão…</div>`;
+
+        try {
+            const resp = await fetch(dbUrl + '/.json?shallow=true');
+            if (resp.ok) {
+                statusEl.innerHTML = `<div class="status-strip status-ok">✅ Conexão com o Realtime Database OK!</div>`;
+                toast('Firebase conectado!');
+            } else if (resp.status === 401) {
+                statusEl.innerHTML = `<div class="status-strip status-warn">⚠️ Database acessível, mas as regras de segurança bloquearam a leitura. Configure as regras para modo teste.</div>`;
+            } else {
+                statusEl.innerHTML = `<div class="status-strip status-err">❌ Erro ${resp.status}. Verifique a Database URL.</div>`;
+            }
+        } catch {
+            statusEl.innerHTML = `<div class="status-strip status-err">❌ Não foi possível conectar. Verifique se a URL está correta.</div>`;
+        }
+    });
+
     /* ── Baixar config.json ── */
     document.getElementById('btn-baixar-config').addEventListener('click', () => {
+        const fbApiKey = document.getElementById('fb-apiKey').value.trim();
+        const fbAuthDomain = document.getElementById('fb-authDomain').value.trim();
+        const fbDatabaseURL = document.getElementById('fb-databaseURL').value.trim();
+        const fbProjectId = document.getElementById('fb-projectId').value.trim();
+
         const config = {
             sheetsUrl:   document.getElementById('url-atividades').value.trim(),
             entregasUrl: document.getElementById('url-entregas').value.trim(),
+            firebase: {
+                apiKey: fbApiKey,
+                authDomain: fbAuthDomain,
+                databaseURL: fbDatabaseURL,
+                projectId: fbProjectId,
+            },
         };
         const blob = new Blob([JSON.stringify(config, null, 2)], { type: 'application/json' });
         const a = document.createElement('a');
