@@ -1,6 +1,6 @@
 {
-  "sheetsUrl": "",
-  "entregasUrl": "",
+   "sheetsUrl": "https://docs.google.com/spreadsheets/d/1nSBvbaqEHgtCOHE_F_fYSmKwPAcZm1Ai3Z7HNXat0lo/edit?usp=sharing",
+  "entregasUrl": "https://docs.google.com/spreadsheets/d/1MZQfloHWO9QyLp7HsmSDPtP9R5_O0b5_Knb3IyRSPbg/edit?usp=sharing"
   "firebase": {
     "apiKey": "",
     "authDomain": "",
