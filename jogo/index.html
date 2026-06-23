@@ -55,6 +55,27 @@
         .hist-texto p{margin:0 0 14px;}
         .hist-texto p:last-child{margin-bottom:0;}
         .hist-texto em{color:var(--blue);font-style:normal;font-weight:600;}
+        /* ── Transição de fase ── */
+        .fase-transicao{text-align:center;padding:30px 10px;width:100%;max-width:520px;animation:fadeIn .4s ease;}
+        @keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+        .ft-emoji{font-size:3.4rem;margin-bottom:8px;}
+        .ft-rotulo{font-size:.78rem;text-transform:uppercase;letter-spacing:.1em;color:var(--ink3);font-weight:600;}
+        .ft-titulo{font-family:'DM Serif Display',serif;font-size:2.2rem;margin:4px 0 14px;color:var(--ink);}
+        .ft-blurb{color:var(--ink2);font-size:1rem;line-height:1.6;margin:0 auto 28px;max-width:440px;}
+        .fase-banner{display:flex;gap:12px;align-items:center;background:linear-gradient(135deg,#E8EFFE,#f0f4ff);border:1.5px solid #c9d8fb;border-radius:12px;padding:14px 18px;margin-bottom:20px;width:100%;}
+        .fase-banner .fb-emoji{font-size:1.8rem;}
+        .fase-banner strong{color:var(--ink);font-size:1rem;}
+        .fase-banner .fb-blurb{font-size:.85rem;color:var(--ink2);margin-top:2px;line-height:1.4;}
+        /* ── Relatório de escolhas por equipe ── */
+        .rel-escolhas{background:var(--paper);border-radius:10px;padding:18px 22px;margin-bottom:18px;}
+        .rel-escolhas h3{font-family:'DM Serif Display',serif;font-size:1.3rem;margin:0 0 14px;}
+        .esc-item{padding:12px 0;border-bottom:1px solid var(--line);}
+        .esc-item:last-child{border-bottom:none;}
+        .esc-rodada{font-size:.9rem;color:var(--ink2);margin-bottom:5px;}
+        .esc-rodada .esc-num{font-weight:700;color:var(--ink);}
+        .esc-rodada .esc-conceito{font-size:.76rem;color:var(--blue);margin-left:6px;}
+        .esc-decisao{font-size:.92rem;color:var(--ink);margin-bottom:3px;}
+        .esc-feedback{font-size:.85rem;color:var(--ink3);font-style:italic;line-height:1.45;}
 
         /* ── LOBBY ── */
         .codigo-display{font-family:'DM Mono',monospace;font-size:3rem;text-align:center;letter-spacing:.3em;color:var(--blue);margin:16px 0 8px;font-weight:700;}
@@ -265,13 +286,8 @@
 <div id="tela-historia" class="tela tela-centro">
     <div class="card-ui card-historia">
         <div class="hist-emoji">🚀</div>
-        <h1>A Jornada Começa</h1>
-        <div class="hist-texto">
-            <p>Tudo começou com uma ideia e muita vontade de empreender. Vocês acabaram de <strong>fundar uma empresa do zero</strong> — com R$ 100 mil no caixa, uma equipe enxuta e os primeiros clientes acreditando no sonho.</p>
-            <p>Pela frente, <strong>25 decisões</strong> moldarão o destino do negócio, atravessando cinco fases: a <em>Fundação</em>, o <em>Lançamento</em>, o <em>Crescimento</em>, os <em>Desafios</em> e, se sobreviverem, a <em>Maturidade</em>.</p>
-            <p>O mercado é imprevisível — por isso o <strong>dado</strong> entra em cena a cada rodada, ditando se os ventos sopram a favor ou contra. Não existe resposta certa: existem <strong>trade-offs</strong>. Faturar a qualquer custo? Construir uma marca sólida? Cuidar do time? Conquistar mercado?</p>
-            <p>Ao final, só uma pergunta importa: <strong>quem construiu a empresa mais valiosa?</strong></p>
-        </div>
+        <h1 id="hist-titulo">A Jornada Começa</h1>
+        <div class="hist-texto" id="hist-texto"></div>
         <button class="btn btn-primary btn-big" id="btn-comecar-jornada">Começar a Jornada →</button>
     </div>
 </div>
@@ -366,15 +382,65 @@ function mostrarTela(id) {
 }
 
 // Mostra a abertura narrativa e executa o callback ao clicar em "Começar".
+const HISTORIA_BASE=`
+    <p>Tudo começou com uma ideia e muita vontade de empreender. Acabaram de <strong>fundar uma empresa do zero</strong> — com R$ 100 mil no caixa, uma equipe enxuta e os primeiros clientes acreditando no sonho.</p>
+    <p>Pela frente, <strong>25 decisões</strong> moldarão o destino do negócio, atravessando cinco fases: a <em>Fundação</em>, o <em>Lançamento</em>, o <em>Crescimento</em>, os <em>Desafios</em> e, se sobreviverem, a <em>Maturidade</em>.</p>
+    <p>O mercado é imprevisível — por isso o <strong>dado</strong> entra em cena a cada rodada, ditando se os ventos sopram a favor ou contra. Não existe resposta certa: existem <strong>trade-offs</strong>. Faturar a qualquer custo? Construir uma marca sólida? Cuidar do time? Conquistar mercado?</p>
+    <p>Ao final, só uma pergunta importa: <strong>quem construiu a empresa mais valiosa?</strong></p>`;
+
+function montarHistoria(){
+    let saud='';
+    if(modo==='team'&&meuTimeIdx>=0&&G.equipes[meuTimeIdx]){
+        const nome=esc(G.equipes[meuTimeIdx].nome);
+        document.getElementById('hist-titulo').textContent='A Jornada da '+G.equipes[meuTimeIdx].nome;
+        saud=`<p>Bem-vindos, equipe <strong style="color:var(--blue)">${nome}</strong>! A partir de agora, <strong>${nome}</strong> é a sua empresa — e a história dela começa com vocês.</p>`;
+    } else if(G.equipes.length){
+        document.getElementById('hist-titulo').textContent='A Jornada Começa';
+        const nomes=G.equipes.map(e=>esc(e.nome)).join(', ');
+        saud=`<p><strong>${G.equipes.length} empresas</strong> entram na disputa: <strong style="color:var(--blue)">${nomes}</strong>. Que vença a mais visionária!</p>`;
+    }
+    document.getElementById('hist-texto').innerHTML=saud+HISTORIA_BASE;
+}
+
 let _historiaCallback=null;
 function mostrarHistoria(callback){
     _historiaCallback=callback;
+    montarHistoria();
     mostrarTela('tela-historia');
 }
 document.getElementById('btn-comecar-jornada').addEventListener('click',()=>{
     const cb=_historiaCallback;_historiaCallback=null;
     if(cb)cb();
 });
+
+/* ── Fases: dados narrativos e transições ── */
+const FASE_INFO={
+    'Fundação':{emoji:'🌱',blurb:'Toda grande empresa começa aqui. É hora de estruturar a base do negócio e validar a ideia.'},
+    'Lançamento':{emoji:'🚀',blurb:'O produto vai ao mercado! As primeiras reações vão testar suas hipóteses.'},
+    'Crescimento':{emoji:'📈',blurb:'A empresa ganha tração. Crescer abre oportunidades — e traz novos riscos.'},
+    'Desafios':{emoji:'⚡',blurb:'Nem tudo são flores. Crises e dilemas vão provar a resiliência do negócio.'},
+    'Maturidade':{emoji:'🏛️',blurb:'A empresa amadurece. Decisões de longo prazo definem o legado que vão deixar.'}
+};
+function ehNovaFase(r){return r>0&&EVENTOS[r]&&EVENTOS[r-1]&&EVENTOS[r].fase!==EVENTOS[r-1].fase;}
+
+// Tela cheia de transição (modos local e host)
+function renderFaseTransicao(fase,onContinuar){
+    const f=FASE_INFO[fase]||{emoji:'🔹',blurb:''};
+    window._faseContinuar=onContinuar;
+    document.getElementById('centro').innerHTML=`${renderProgresso()}
+        <div class="fase-transicao">
+            <div class="ft-emoji">${f.emoji}</div>
+            <div class="ft-rotulo">Nova fase</div>
+            <h2 class="ft-titulo">${esc(fase)}</h2>
+            <p class="ft-blurb">${esc(f.blurb)}</p>
+            <button class="btn btn-primary btn-big" onclick="(window._faseContinuar||function(){})()">Continuar →</button>
+        </div>`;
+}
+// Banner compacto (modo equipe)
+function renderFaseBanner(fase){
+    const f=FASE_INFO[fase]||{emoji:'🔹',blurb:''};
+    return `<div class="fase-banner"><span class="fb-emoji">${f.emoji}</span><div><strong>Nova fase: ${esc(fase)}</strong><div class="fb-blurb">${esc(f.blurb)}</div></div></div>`;
+}
 
 function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 function clamp(v,mn,mx){return Math.max(mn,Math.min(mx,v));}
@@ -470,7 +536,9 @@ document.getElementById('btn-iniciar-local').addEventListener('click',()=>{
 function localIniciarRodada(){
     if(G.rodada>=EVENTOS.length){mostrarRelatorio();return;}
     G.fase='roll';G.escolhas=[];
-    atualizarHeader();renderSidebar();renderDado(true);
+    atualizarHeader();renderSidebar();
+    if(ehNovaFase(G.rodada))renderFaseTransicao(EVENTOS[G.rodada].fase,()=>renderDado(true));
+    else renderDado(true);
 }
 
 /* ═══════════════════════════════════════════
@@ -530,7 +598,9 @@ function onlineHostRodada(){
     }
     G.fase='roll';G.escolhas=[];
     roomRef.update({rodada:G.rodada,fase:'roll',dado:0});
-    atualizarHeader();renderSidebar();renderDado(true);
+    atualizarHeader();renderSidebar();
+    if(ehNovaFase(G.rodada))renderFaseTransicao(EVENTOS[G.rodada].fase,()=>renderDado(true));
+    else renderDado(true);
 
     // Escutar escolhas
     const choRef=roomRef.child('escolhas/'+G.rodada);
@@ -622,14 +692,15 @@ function onlineTeamEscutar(){
 
         atualizarHeader();renderSidebar();
 
-        if(room.status==='finished'){mostrarRelatorio();return;}
+        if(room.status==='finished'){reconstruirHistorico(room);mostrarRelatorio();return;}
 
         const ev=EVENTOS[G.rodada];
         if(!ev)return;
         const centro=document.getElementById('centro');
 
         if(G.fase==='roll'){
-            centro.innerHTML=`${renderProgresso()}<div class="aguardando"><div class="icone">🎲</div><h3>Aguardando o professor rolar o dado…</h3><p>Rodada ${G.rodada+1}: ${esc(ev.titulo)}</p></div>`;
+            const faseBanner=ehNovaFase(G.rodada)?renderFaseBanner(EVENTOS[G.rodada].fase):'';
+            centro.innerHTML=`${renderProgresso()}${faseBanner}<div class="aguardando"><div class="icone">🎲</div><h3>Aguardando o professor rolar o dado…</h3><p>Rodada ${G.rodada+1}: ${esc(ev.titulo)}</p></div>`;
         } else if(G.fase==='choosing'){
             const m=mercadoInfo(G.dado);
             // Checar se já escolhi
@@ -859,12 +930,57 @@ function avancarRodada(){
 /* ═══════════════════════════════════════════
    RELATÓRIO
    ═══════════════════════════════════════════ */
+// No modo equipe o histórico não é acumulado localmente — reconstrói a
+// partir das escolhas salvas no Firebase (room.escolhas) + dados dos eventos.
+function reconstruirHistorico(room){
+    G.historico=[];
+    for(let r=0;r<EVENTOS.length;r++){
+        const ch=room.escolhas?.[r];
+        if(!ch)continue;
+        const ev=EVENTOS[r];
+        const escolhas=G.equipes.map((eq,i)=>{
+            const idx=ch[i];
+            if(idx===undefined||idx===null)return null;
+            const opc=ev.opcoes[idx];
+            return{equipe:eq.nome,opcaoIdx:idx,opcaoTexto:opc.texto,feedback:opc.feedback,efeitos:opc.efeitos};
+        }).filter(Boolean);
+        if(escolhas.length)G.historico.push({rodada:r,titulo:ev.titulo,conceito:ev.conceito,escolhas});
+    }
+}
+
+// Relatório das escolhas de UMA equipe (base para a atividade).
+function relatorioEscolhasEquipe(nome,cor){
+    const linhas=G.historico.map(h=>{
+        const e=h.escolhas.find(c=>c.equipe===nome);
+        if(!e)return'';
+        return`<div class="esc-item">
+            <div class="esc-rodada"><span class="esc-num">Rodada ${h.rodada+1}</span> ${esc(h.titulo)} <span class="esc-conceito">📚 ${esc(h.conceito)}</span></div>
+            <div class="esc-decisao"><strong>Decisão:</strong> ${'ABC'[e.opcaoIdx]}) ${esc(e.opcaoTexto)}</div>
+            <div class="esc-feedback">${esc(e.feedback)}</div>
+        </div>`;
+    }).join('');
+    return`<div class="rel-escolhas" style="border-left:4px solid ${cor};"><h3 style="color:${cor}">${esc(nome)}</h3>${linhas}</div>`;
+}
+
 function mostrarRelatorio(){
     mostrarTela('tela-relatorio');
     limparListeners();
     const ranking=G.equipes.map((eq,i)=>{const v=valorEmpresa(eq);return{...eq,idx:i,valor:v.total,partes:v.partes};}).sort((a,b)=>b.valor-a.valor);
 
     const pilarInfo={caixa:{lbl:'Caixa',cor:'#2A5BDB'},clientes:{lbl:'Clientes',cor:'#0B6E4F'},reputacao:{lbl:'Reputação',cor:'#9A5000'},equipe:{lbl:'Equipe',cor:'#5B21A8'}};
+
+    // Seção de escolhas: no modo equipe, só as DA equipe; senão, todas (uma por bloco).
+    let secaoEscolhas;
+    if(modo==='team'&&meuTimeIdx>=0&&G.equipes[meuTimeIdx]){
+        const eq=G.equipes[meuTimeIdx];
+        secaoEscolhas=`<div class="rel-section"><h2>📝 Suas Escolhas — ${esc(eq.nome)}</h2>
+            <p style="color:var(--ink2);margin:-8px 0 16px;font-size:.92rem;">Registro completo das decisões da sua equipe ao longo do jogo. Use-o como base para a atividade.</p>
+            ${relatorioEscolhasEquipe(eq.nome,eq.cor)}</div>`;
+    } else {
+        secaoEscolhas=`<div class="rel-section"><h2>📝 Escolhas por Equipe</h2>
+            <p style="color:var(--ink2);margin:-8px 0 16px;font-size:.92rem;">Registro das decisões de cada equipe — imprima para usar na atividade.</p>
+            ${G.equipes.map(eq=>relatorioEscolhasEquipe(eq.nome,eq.cor)).join('')}</div>`;
+    }
 
     let html=`<h1>📊 Relatório Final</h1><p class="sub">Jogo da Vida Empresarial — ${new Date().toLocaleDateString('pt-BR')}</p>
     <div class="rel-section"><h2>🏆 Ranking Final — Valor da Empresa</h2>
@@ -887,6 +1003,7 @@ function mostrarRelatorio(){
     <p class="lp-titulo">Como o valor da empresa foi calculado</p>
     ${legendaPesos('completa')}
     </div>
+    ${secaoEscolhas}
     <div class="rel-section"><h2>📈 Análise Estratégica</h2>${ranking.map(eq=>analisarEquipe(eq)).join('')}</div>
     <div class="rel-section"><h2>📋 Linha do Tempo</h2><div class="timeline">
     ${G.historico.map((h,i)=>`<div class="tl-item"><div class="tl-titulo">Rodada ${i+1}: ${esc(h.titulo)} <small style="color:var(--ink3)">(${esc(h.conceito)})</small></div>${h.escolhas.map(c=>`<div class="tl-escolha"><strong>${esc(c.equipe)}:</strong> ${esc(c.opcaoTexto)}</div>`).join('')}</div>`).join('')}
