@@ -1,7 +1,7 @@
 {
-   "sheetsUrl": "https://docs.google.com/spreadsheets/d/1nSBvbaqEHgtCOHE_F_fYSmKwPAcZm1Ai3Z7HNXat0lo/edit?usp=sharing",
-  "entregasUrl": "https://docs.google.com/spreadsheets/d/1MZQfloHWO9QyLp7HsmSDPtP9R5_O0b5_Knb3IyRSPbg/edit?usp=sharing"
- "firebase": {
+  "sheetsUrl": "https://docs.google.com/spreadsheets/d/1nSBvbaqEHgtCOHE_F_fYSmKwPAcZm1Ai3Z7HNXat0lo/edit?usp=sharing",
+  "entregasUrl": "https://docs.google.com/spreadsheets/d/1MZQfloHWO9QyLp7HsmSDPtP9R5_O0b5_Knb3IyRSPbg/edit?usp=sharing",
+  "firebase": {
     "apiKey": "AIzaSyC_QxCGCT2fj4gfH9tS0uilXPMhF2Z3sBA",
     "authDomain": "jogo-d32f1.firebaseapp.com",
     "databaseURL": "https://jogo-d32f1-default-rtdb.firebaseio.com",
