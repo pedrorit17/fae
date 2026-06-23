@@ -550,8 +550,35 @@
             return;
         }
 
-        statusEl.innerHTML = `<div class="status-strip status-warn">⏳ Carregando SDK e testando…</div>`;
+        statusEl.innerHTML = `<div class="status-strip status-warn">⏳ Validando API Key…</div>`;
 
+        // 1) Valida a API Key de verdade. O Realtime Database NÃO usa a API Key
+        // (ele autoriza só pela databaseURL + regras), então a key precisa ser
+        // checada separadamente no endpoint de identidade do Google.
+        try {
+            const resp = await fetch(
+                `https://identitytoolkit.googleapis.com/v1/accounts:lookup?key=${encodeURIComponent(apiKey)}`,
+                {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ idToken: 'token-de-teste-invalido' }),
+                }
+            );
+            const data = await resp.json().catch(() => ({}));
+            const errMsg = data && data.error && data.error.message ? data.error.message : '';
+
+            if (errMsg === 'API_KEY_INVALID' || errMsg.includes('API key not valid')) {
+                statusEl.innerHTML = `<div class="status-strip status-err">❌ API Key inválida. Copie a key correta do Firebase Console → Configurações do projeto → Seus apps.</div>`;
+                return;
+            }
+            // Qualquer outra resposta (ex.: INVALID_ID_TOKEN) significa que a key é válida.
+        } catch {
+            // Sem internet ou bloqueio de rede — segue para o teste do banco mesmo assim.
+        }
+
+        statusEl.innerHTML = `<div class="status-strip status-warn">⏳ Testando o banco de dados…</div>`;
+
+        // 2) Testa a conexão e as regras do Realtime Database.
         try {
             await carregarFirebaseSDK();
 
@@ -568,16 +595,14 @@
             await testRef.set({ ts: Date.now() });
             await testRef.remove();
 
-            statusEl.innerHTML = `<div class="status-strip status-ok">✅ Firebase conectado! Leitura e escrita OK.</div>`;
+            statusEl.innerHTML = `<div class="status-strip status-ok">✅ Tudo certo! API Key válida e banco de dados com leitura/escrita OK.</div>`;
             toast('Firebase conectado!');
         } catch (err) {
             const msg = (err.message || '').toLowerCase();
             if (msg.includes('permission_denied') || msg.includes('permission denied')) {
-                statusEl.innerHTML = `<div class="status-strip status-warn">⚠️ Conectou ao Firebase, mas as regras de segurança bloquearam a escrita. Vá em Realtime Database → Regras e defina <code>".read": true, ".write": true</code> para modo teste.</div>`;
-            } else if (msg.includes('invalid') || msg.includes('api key')) {
-                statusEl.innerHTML = `<div class="status-strip status-err">❌ API Key inválida. Verifique no Firebase Console → Configurações do projeto.</div>`;
+                statusEl.innerHTML = `<div class="status-strip status-warn">⚠️ API Key válida, mas as regras de segurança bloquearam a escrita. Vá em Realtime Database → Regras e defina <code>".read": true, ".write": true</code> para modo teste.</div>`;
             } else {
-                statusEl.innerHTML = `<div class="status-strip status-err">❌ Erro: ${err.message || 'Não foi possível conectar.'}. Verifique os dados.</div>`;
+                statusEl.innerHTML = `<div class="status-strip status-err">❌ Erro no banco: ${err.message || 'Não foi possível conectar.'}. Verifique a Database URL.</div>`;
             }
         }
     });
