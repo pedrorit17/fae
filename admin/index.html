@@ -519,30 +519,66 @@
     });
 
     /* ── Testar Firebase ── */
+    let fbTestApp = null;
+
+    function carregarFirebaseSDK() {
+        return new Promise((resolve, reject) => {
+            if (window.firebase && window.firebase.app) { resolve(); return; }
+            const s1 = document.createElement('script');
+            s1.src = 'https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js';
+            s1.onload = () => {
+                const s2 = document.createElement('script');
+                s2.src = 'https://www.gstatic.com/firebasejs/10.14.1/firebase-database-compat.js';
+                s2.onload = resolve;
+                s2.onerror = () => reject(new Error('Falha ao carregar firebase-database'));
+                document.head.appendChild(s2);
+            };
+            s1.onerror = () => reject(new Error('Falha ao carregar firebase-app'));
+            document.head.appendChild(s1);
+        });
+    }
+
     document.getElementById('btn-testar-fb').addEventListener('click', async () => {
         const statusEl = document.getElementById('status-fb');
-        const dbUrl = document.getElementById('fb-databaseURL').value.trim();
         const apiKey = document.getElementById('fb-apiKey').value.trim();
+        const authDomain = document.getElementById('fb-authDomain').value.trim();
+        const dbUrl = document.getElementById('fb-databaseURL').value.trim().replace(/\/+$/, '');
+        const projectId = document.getElementById('fb-projectId').value.trim();
 
-        if (!dbUrl || !apiKey) {
+        if (!apiKey || !dbUrl) {
             statusEl.innerHTML = `<div class="status-strip status-warn">⚠️ Preencha pelo menos a API Key e a Database URL.</div>`;
             return;
         }
 
-        statusEl.innerHTML = `<div class="status-strip status-warn">⏳ Testando conexão…</div>`;
+        statusEl.innerHTML = `<div class="status-strip status-warn">⏳ Carregando SDK e testando…</div>`;
 
         try {
-            const resp = await fetch(dbUrl + '/.json?shallow=true');
-            if (resp.ok) {
-                statusEl.innerHTML = `<div class="status-strip status-ok">✅ Conexão com o Realtime Database OK!</div>`;
-                toast('Firebase conectado!');
-            } else if (resp.status === 401) {
-                statusEl.innerHTML = `<div class="status-strip status-warn">⚠️ Database acessível, mas as regras de segurança bloquearam a leitura. Configure as regras para modo teste.</div>`;
-            } else {
-                statusEl.innerHTML = `<div class="status-strip status-err">❌ Erro ${resp.status}. Verifique a Database URL.</div>`;
+            await carregarFirebaseSDK();
+
+            if (fbTestApp) {
+                try { await fbTestApp.delete(); } catch {}
             }
-        } catch {
-            statusEl.innerHTML = `<div class="status-strip status-err">❌ Não foi possível conectar. Verifique se a URL está correta.</div>`;
+
+            fbTestApp = firebase.initializeApp({
+                apiKey, authDomain, databaseURL: dbUrl, projectId
+            }, 'admin-test-' + Date.now());
+
+            const db = firebase.database(fbTestApp);
+            const testRef = db.ref('_admin_test');
+            await testRef.set({ ts: Date.now() });
+            await testRef.remove();
+
+            statusEl.innerHTML = `<div class="status-strip status-ok">✅ Firebase conectado! Leitura e escrita OK.</div>`;
+            toast('Firebase conectado!');
+        } catch (err) {
+            const msg = (err.message || '').toLowerCase();
+            if (msg.includes('permission_denied') || msg.includes('permission denied')) {
+                statusEl.innerHTML = `<div class="status-strip status-warn">⚠️ Conectou ao Firebase, mas as regras de segurança bloquearam a escrita. Vá em Realtime Database → Regras e defina <code>".read": true, ".write": true</code> para modo teste.</div>`;
+            } else if (msg.includes('invalid') || msg.includes('api key')) {
+                statusEl.innerHTML = `<div class="status-strip status-err">❌ API Key inválida. Verifique no Firebase Console → Configurações do projeto.</div>`;
+            } else {
+                statusEl.innerHTML = `<div class="status-strip status-err">❌ Erro: ${err.message || 'Não foi possível conectar.'}. Verifique os dados.</div>`;
+            }
         }
     });
 
