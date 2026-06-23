@@ -545,40 +545,72 @@
         const dbUrl = document.getElementById('fb-databaseURL').value.trim().replace(/\/+$/, '');
         const projectId = document.getElementById('fb-projectId').value.trim();
 
-        if (!apiKey || !dbUrl) {
-            statusEl.innerHTML = `<div class="status-strip status-warn">⚠️ Preencha pelo menos a API Key e a Database URL.</div>`;
+        const erros = [];
+        if (!apiKey) erros.push('API Key');
+        if (!authDomain) erros.push('Auth Domain');
+        if (!dbUrl) erros.push('Database URL');
+        if (!projectId) erros.push('Project ID');
+
+        if (erros.length > 0) {
+            statusEl.innerHTML = `<div class="status-strip status-warn">⚠️ Preencha todos os campos: ${erros.join(', ')}.</div>`;
+            return;
+        }
+
+        // ── Validação de formato ──
+        if (!/^AIza[A-Za-z0-9_-]{30,}$/.test(apiKey)) {
+            statusEl.innerHTML = `<div class="status-strip status-err">❌ API Key com formato inválido. Deve começar com <code>AIza</code> seguido de ~35 caracteres. Copie do Firebase Console → Configurações → Seus apps.</div>`;
+            return;
+        }
+
+        if (!authDomain.endsWith('.firebaseapp.com')) {
+            statusEl.innerHTML = `<div class="status-strip status-err">❌ Auth Domain deve terminar em <code>.firebaseapp.com</code> (ex: meu-projeto.firebaseapp.com).</div>`;
+            return;
+        }
+
+        if (!/^https:\/\/[a-z0-9-]+-default-rtdb\.firebaseio\.com$/.test(dbUrl) &&
+            !/^https:\/\/[a-z0-9-]+\.firebaseio\.com$/.test(dbUrl)) {
+            statusEl.innerHTML = `<div class="status-strip status-err">❌ Database URL inválida. Deve ser algo como <code>https://meu-projeto-default-rtdb.firebaseio.com</code>.</div>`;
+            return;
+        }
+
+        // ── Cross-check: authDomain deve conter o projectId ──
+        const authPrefix = authDomain.replace('.firebaseapp.com', '');
+        if (authPrefix !== projectId) {
+            statusEl.innerHTML = `<div class="status-strip status-warn">⚠️ O Auth Domain (<code>${authPrefix}</code>.firebaseapp.com) não bate com o Project ID (<code>${projectId}</code>). Normalmente eles são iguais. Verifique no Firebase Console.</div>`;
             return;
         }
 
         statusEl.innerHTML = `<div class="status-strip status-warn">⏳ Validando API Key…</div>`;
 
-        // 1) Valida a API Key de verdade. O Realtime Database NÃO usa a API Key
-        // (ele autoriza só pela databaseURL + regras), então a key precisa ser
-        // checada separadamente no endpoint de identidade do Google.
+        // ── Valida a API Key via Identity Toolkit ──
+        // O Realtime Database não usa a API Key (ele autoriza só pela databaseURL
+        // + regras), então a key precisa ser checada separadamente.
+        let apiKeyValida = false;
         try {
             const resp = await fetch(
                 `https://identitytoolkit.googleapis.com/v1/accounts:lookup?key=${encodeURIComponent(apiKey)}`,
                 {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ idToken: 'token-de-teste-invalido' }),
+                    body: JSON.stringify({ idToken: 'teste' }),
                 }
             );
             const data = await resp.json().catch(() => ({}));
-            const errMsg = data && data.error && data.error.message ? data.error.message : '';
+            const errMsg = (data && data.error && data.error.message) || '';
 
-            if (errMsg === 'API_KEY_INVALID' || errMsg.includes('API key not valid')) {
+            if (resp.status === 400 && (errMsg === 'API_KEY_INVALID' || errMsg.includes('API key not valid'))) {
                 statusEl.innerHTML = `<div class="status-strip status-err">❌ API Key inválida. Copie a key correta do Firebase Console → Configurações do projeto → Seus apps.</div>`;
                 return;
             }
-            // Qualquer outra resposta (ex.: INVALID_ID_TOKEN) significa que a key é válida.
+            apiKeyValida = true;
         } catch {
-            // Sem internet ou bloqueio de rede — segue para o teste do banco mesmo assim.
+            statusEl.innerHTML = `<div class="status-strip status-warn">⚠️ Não foi possível validar a API Key (falha de rede). Verifique sua conexão e tente novamente.</div>`;
+            return;
         }
 
-        statusEl.innerHTML = `<div class="status-strip status-warn">⏳ Testando o banco de dados…</div>`;
+        statusEl.innerHTML = `<div class="status-strip status-warn">⏳ Testando banco de dados…</div>`;
 
-        // 2) Testa a conexão e as regras do Realtime Database.
+        // ── Testa a conexão e regras do Realtime Database ──
         try {
             await carregarFirebaseSDK();
 
@@ -595,7 +627,7 @@
             await testRef.set({ ts: Date.now() });
             await testRef.remove();
 
-            statusEl.innerHTML = `<div class="status-strip status-ok">✅ Tudo certo! API Key válida e banco de dados com leitura/escrita OK.</div>`;
+            statusEl.innerHTML = `<div class="status-strip status-ok">✅ Tudo certo! API Key válida, campos consistentes e banco de dados com leitura/escrita OK.</div>`;
             toast('Firebase conectado!');
         } catch (err) {
             const msg = (err.message || '').toLowerCase();
