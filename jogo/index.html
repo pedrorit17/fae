@@ -39,6 +39,15 @@
         .divider::before,.divider::after{content:'';position:absolute;top:50%;width:38%;height:1px;background:var(--line);}
         .divider::before{left:0;}.divider::after{right:0;}
         .aviso{background:#FFF4DC;color:var(--ambar);padding:10px 14px;border-radius:8px;font-size:.82rem;text-align:center;margin-bottom:16px;}
+        /* ── Legenda de pesos ── */
+        .legenda-pesos{display:grid;gap:10px;text-align:left;background:var(--paper);border:1.5px solid var(--line);border-radius:10px;padding:14px 16px;margin:16px 0;}
+        .lp-item{display:flex;gap:10px;align-items:flex-start;}
+        .lp-ic{font-size:1.2rem;flex-shrink:0;line-height:1.2;}
+        .lp-top{font-size:.88rem;color:var(--ink);}
+        .lp-ex{font-size:.76rem;color:var(--ink3);}
+        .lp-titulo{font-size:.78rem;font-weight:700;color:var(--ink2);text-transform:uppercase;letter-spacing:.04em;margin:4px 0 0;text-align:left;}
+        .legenda-compacta{font-size:.72rem;color:var(--ink3);line-height:1.7;padding-top:14px;border-top:1px solid var(--line);margin-top:6px;}
+        .legenda-compacta .lp-c{display:block;}
 
         /* ── LOBBY ── */
         .codigo-display{font-family:'DM Mono',monospace;font-size:3rem;text-align:center;letter-spacing:.3em;color:var(--blue);margin:16px 0 8px;font-weight:700;}
@@ -147,7 +156,9 @@
 <div id="tela-menu" class="tela tela-centro ativa">
     <div class="card-ui">
         <h1>🎲 Vida Empresarial</h1>
-        <p class="sub">Simulador de desafios empresariais. Cada equipe joga no seu próprio dispositivo.<br><strong style="color:var(--ink);">Objetivo:</strong> construir a empresa mais valiosa ao longo de 25 rodadas — equilibrando caixa, clientes, reputação e equipe.</p>
+        <p class="sub">Simulador de desafios empresariais. Cada equipe joga no seu próprio dispositivo.<br><strong style="color:var(--ink);">Objetivo:</strong> construir a empresa mais valiosa ao longo de 25 rodadas.</p>
+        <p class="lp-titulo">Como o valor da empresa é calculado</p>
+        <div id="legenda-menu"></div>
         <div id="aviso-firebase" class="aviso" style="display:none;">Firebase não configurado. Acesse o <a href="../admin/" style="color:var(--ambar);font-weight:600;">Admin</a> para configurar. Apenas o modo local está disponível.</div>
         <div class="menu-opcoes">
             <button class="btn btn-primary btn-big" id="btn-criar-sala" disabled>🏫 Criar Sala (Professor)</button>
@@ -356,9 +367,27 @@ function valorEmpresa(eq){
 }
 function formatR$(v){return 'R$ '+Math.round(v).toLocaleString('pt-BR');}
 
+/* Legenda dos pesos — sempre derivada de VAL_PESOS para não desatualizar.
+   variante: 'completa' (com explicação) ou 'compacta' (uma linha). */
+function legendaPesos(variante){
+    const itens=[
+        {ic:'💰',lbl:'Caixa',v:'cada R$ 1 = R$ 1',ex:'recursos financeiros'},
+        {ic:'👥',lbl:'Clientes',v:'cada cliente = '+formatR$(VAL_PESOS.clientes),ex:'carteira de clientes (o que mais pesa!)'},
+        {ic:'⭐',lbl:'Reputação',v:'cada ponto = '+formatR$(VAL_PESOS.reputacao),ex:'valor de marca'},
+        {ic:'🤝',lbl:'Equipe',v:'cada ponto = '+formatR$(VAL_PESOS.equipe),ex:'capital humano'}
+    ];
+    if(variante==='compacta'){
+        return itens.map(i=>`<span class="lp-c">${i.ic} ${i.lbl}: <strong>${i.v}</strong></span>`).join('');
+    }
+    return `<div class="legenda-pesos">${itens.map(i=>`
+        <div class="lp-item"><div class="lp-ic">${i.ic}</div><div class="lp-txt"><div class="lp-top"><strong>${i.lbl}</strong> — ${i.v}</div><div class="lp-ex">${i.ex}</div></div></div>`).join('')}</div>`;
+}
+
 /* ═══════════════════════════════════════════
    INIT
    ═══════════════════════════════════════════ */
+document.getElementById('legenda-menu').innerHTML=legendaPesos('completa');
+
 (async function(){
     const ok = await initFirebase();
     if(ok){
@@ -655,7 +684,8 @@ function renderSidebar(deltas){
         return`<div class="team-card${dest}"><div class="nome"><div class="dot" style="background:${eq.cor}"></div>${esc(eq.nome)}</div>
             <div class="valor-empresa"><span class="ve-lbl">Valor da empresa</span><span class="ve-num">${formatR$(val)}</span>${lider}</div>
             <div class="recursos">${recursoHtml('R$',formatCaixa(eq.caixa),d?.caixa)}${recursoHtml('Rep',eq.reputacao,d?.reputacao)}${recursoHtml('Equipe',eq.equipe,d?.equipe)}${recursoHtml('Clientes',eq.clientes,d?.clientes)}</div></div>`;
-    }).join('');
+    }).join('')
+    +`<div class="legenda-compacta"><strong>Como pontua:</strong><br>${legendaPesos('compacta')}</div>`;
 }
 
 function recursoHtml(lbl,val,delta){
@@ -823,7 +853,10 @@ function mostrarRelatorio(){
             <div class="valor-legenda">${legenda}</div>
         </div>`;
     }).join('')}
-    </div></div>
+    </div>
+    <p class="lp-titulo">Como o valor da empresa foi calculado</p>
+    ${legendaPesos('completa')}
+    </div>
     <div class="rel-section"><h2>📈 Análise Estratégica</h2>${ranking.map(eq=>analisarEquipe(eq)).join('')}</div>
     <div class="rel-section"><h2>📋 Linha do Tempo</h2><div class="timeline">
     ${G.historico.map((h,i)=>`<div class="tl-item"><div class="tl-titulo">Rodada ${i+1}: ${esc(h.titulo)} <small style="color:var(--ink3)">(${esc(h.conceito)})</small></div>${h.escolhas.map(c=>`<div class="tl-escolha"><strong>${esc(c.equipe)}:</strong> ${esc(c.opcaoTexto)}</div>`).join('')}</div>`).join('')}
