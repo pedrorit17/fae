@@ -48,6 +48,13 @@
         .lp-titulo{font-size:.78rem;font-weight:700;color:var(--ink2);text-transform:uppercase;letter-spacing:.04em;margin:4px 0 0;text-align:left;}
         .legenda-compacta{font-size:.72rem;color:var(--ink3);line-height:1.7;padding-top:14px;border-top:1px solid var(--line);margin-top:6px;}
         .legenda-compacta .lp-c{display:block;}
+        /* ── História ── */
+        .card-historia{max-width:560px;}
+        .hist-emoji{font-size:3rem;text-align:center;margin-bottom:8px;}
+        .hist-texto{text-align:left;color:var(--ink2);font-size:.98rem;line-height:1.65;margin:20px 0 28px;}
+        .hist-texto p{margin:0 0 14px;}
+        .hist-texto p:last-child{margin-bottom:0;}
+        .hist-texto em{color:var(--blue);font-style:normal;font-weight:600;}
 
         /* ── LOBBY ── */
         .codigo-display{font-family:'DM Mono',monospace;font-size:3rem;text-align:center;letter-spacing:.3em;color:var(--blue);margin:16px 0 8px;font-weight:700;}
@@ -254,6 +261,21 @@
     </div>
 </div>
 
+<!-- ═══ HISTÓRIA (abertura) ═══ -->
+<div id="tela-historia" class="tela tela-centro">
+    <div class="card-ui card-historia">
+        <div class="hist-emoji">🚀</div>
+        <h1>A Jornada Começa</h1>
+        <div class="hist-texto">
+            <p>Tudo começou com uma ideia e muita vontade de empreender. Vocês acabaram de <strong>fundar uma empresa do zero</strong> — com R$ 100 mil no caixa, uma equipe enxuta e os primeiros clientes acreditando no sonho.</p>
+            <p>Pela frente, <strong>25 decisões</strong> moldarão o destino do negócio, atravessando cinco fases: a <em>Fundação</em>, o <em>Lançamento</em>, o <em>Crescimento</em>, os <em>Desafios</em> e, se sobreviverem, a <em>Maturidade</em>.</p>
+            <p>O mercado é imprevisível — por isso o <strong>dado</strong> entra em cena a cada rodada, ditando se os ventos sopram a favor ou contra. Não existe resposta certa: existem <strong>trade-offs</strong>. Faturar a qualquer custo? Construir uma marca sólida? Cuidar do time? Conquistar mercado?</p>
+            <p>Ao final, só uma pergunta importa: <strong>quem construiu a empresa mais valiosa?</strong></p>
+        </div>
+        <button class="btn btn-primary btn-big" id="btn-comecar-jornada">Começar a Jornada →</button>
+    </div>
+</div>
+
 <!-- ═══ JOGO ═══ -->
 <div id="tela-jogo" class="tela">
     <div class="jogo-header">
@@ -343,6 +365,17 @@ function mostrarTela(id) {
     document.getElementById(id).classList.add('ativa');
 }
 
+// Mostra a abertura narrativa e executa o callback ao clicar em "Começar".
+let _historiaCallback=null;
+function mostrarHistoria(callback){
+    _historiaCallback=callback;
+    mostrarTela('tela-historia');
+}
+document.getElementById('btn-comecar-jornada').addEventListener('click',()=>{
+    const cb=_historiaCallback;_historiaCallback=null;
+    if(cb)cb();
+});
+
 function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 function clamp(v,mn,mx){return Math.max(mn,Math.min(mx,v));}
 function formatCaixa(v){return Math.abs(v)>=1000?(v/1000).toFixed(0)+'k':String(v);}
@@ -431,8 +464,7 @@ document.getElementById('btn-iniciar-local').addEventListener('click',()=>{
         cor:CORES[i],caixa:100000,reputacao:50,equipe:50,clientes:10
     }));
     G.rodada=0;G.historico=[];
-    mostrarTela('tela-jogo');
-    localIniciarRodada();
+    mostrarHistoria(()=>{mostrarTela('tela-jogo');localIniciarRodada();});
 });
 
 function localIniciarRodada(){
@@ -482,8 +514,7 @@ document.getElementById('btn-iniciar-online').addEventListener('click',async()=>
     G.equipes=Array.from({length:numEq},(_,i)=>({...eqs[i]}));
     G.rodada=0;G.historico=[];
     await roomRef.update({status:'playing',rodada:0,fase:'roll',dado:0});
-    mostrarTela('tela-jogo');
-    onlineHostRodada();
+    mostrarHistoria(()=>{mostrarTela('tela-jogo');onlineHostRodada();});
 });
 
 document.getElementById('btn-cancelar-sala').addEventListener('click',async()=>{
@@ -570,8 +601,7 @@ document.getElementById('btn-entrar-codigo').addEventListener('click',async()=>{
                 const eqs=s.val();
                 G.equipes=Object.values(eqs);
                 G.rodada=0;G.historico=[];
-                mostrarTela('tela-jogo');
-                onlineTeamEscutar();
+                mostrarHistoria(()=>{mostrarTela('tela-jogo');onlineTeamEscutar();});
             });
         }
     });
